@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2009 by Henrik Just
+ *  Copyright: 2002-2010 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2009-04-30) 
+ *  Version 1.2 (2010-10-04) 
  *
  */
 
@@ -77,11 +77,14 @@ public class Context {
 	
     // within a caption
     private boolean bInCaption = false;
+    
+    // within a Zotero citation
+    private boolean bInZoteroText = false;
 	
     // within a floating figure (figure environment)
     private boolean bInFigureFloat = false;
 	
-    // within a floating table (table envrionment)
+    // within a floating table (table environment)
     private boolean bInTableFloat = false;
 	
     // within a minipage environment
@@ -190,6 +193,10 @@ public class Context {
     public void setInCaption(boolean bInCaption) { this.bInCaption = bInCaption; }
 	
     public boolean isInCaption() { return bInCaption; }
+    
+    public void setInZoteroText(boolean bInZoteroText) { this.bInZoteroText = bInZoteroText; }
+    
+    public boolean isInZoteroText() { return bInZoteroText; }
 
     public void setInFigureFloat(boolean bInFigureFloat) { this.bInFigureFloat = bInFigureFloat; }
 	

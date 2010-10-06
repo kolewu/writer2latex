@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-05-09)
+ *  Version 1.2 (2010-10-04)
  *
  */
 
@@ -315,6 +315,7 @@ public class XMLString {
     public static final String TEXT_TOC_MARK_END="text:toc-mark-end";
     public static final String TEXT_REFERENCE_MARK="text:reference-mark";
 	public static final String TEXT_REFERENCE_MARK_START="text:reference-mark-start";
+	public static final String TEXT_REFERENCE_MARK_END="text:reference-mark-end";
 	public static final String TEXT_REFERENCE_REF="text:reference-ref";
     public static final String TEXT_BOOKMARK="text:bookmark";
 	public static final String TEXT_BOOKMARK_START="text:bookmark-start";

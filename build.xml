@@ -2,7 +2,7 @@
   ############################################################################
   # This is the Ant build file for writer2latex
   # Original: Sep 2004 (mgn)
-  # version 1.2 (2010-06-19)
+  # version 1.2 (2010-10-01)
   ############################################################################
 -->
 <project name="w2l" default="help" basedir=".">
@@ -35,7 +35,7 @@
     <!-- configure the directories -->
     <property name="jarfile" value="writer2latex"/>
     <property name="basename" value="writer2latex11"/>
-    <property name="distrofile" value="${basename}4alpha.zip" />
+    <property name="distrofile" value="${basename}5alpha.zip" />
     <!--<property name="sourcedistrofile" value="${basename}source.zip" />-->
     <property name="src" location="source/java"/>
     <property name="source.distro" location="source/distro" />
@@ -93,7 +93,7 @@
 		    		<include name="**/*.xml"/>
                 	<include name="**/*.class"/>
                     <!-- do not include OOo components in standalone library -->
-                	<exclude name="org/**/*"/>
+                	<exclude name="org/openoffice/**/*"/>
                 </patternset>
             </fileset>
             <manifest>

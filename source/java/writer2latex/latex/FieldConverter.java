@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2008 by Henrik Just
+ *  Copyright: 2002-2010 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.0 (2008-11-23)
+ *  Version 1.2 (2010-10-06)
  *
  */
 
@@ -30,7 +30,11 @@ package writer2latex.latex;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
+import java.util.regex.Pattern;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -51,7 +55,10 @@ import writer2latex.util.SimpleInputBuffer;
 
  */
 public class FieldConverter extends ConverterHelper {
-
+	
+	// Identify Zotero items
+	private static final String ZOTERO_ITEM = "ZOTERO_ITEM";
+	
     // Links & references
     private ExportNameCollection targets = new ExportNameCollection(true);
     private ExportNameCollection refnames = new ExportNameCollection(true);
@@ -71,11 +78,14 @@ public class FieldConverter extends ConverterHelper {
     private boolean bUsesPageCount = false;
     private boolean bUsesTitleref = false;
     private boolean bUsesOooref = false;
+    private boolean bConvertZotero = false;
+    private boolean bNeedNatbib = false;
 	
     public FieldConverter(OfficeReader ofr, LaTeXConfig config, ConverterPalette palette) {
         super(ofr,config,palette);
         // hyperref.sty is not compatible with titleref.sty and oooref.sty:
         bUseHyperref = config.useHyperref() && !config.useTitleref() && !config.useOooref();
+        bConvertZotero = config.useBibtex() && config.zoteroBibtexFiles().length()>0;
     }
 	
     /** <p>Append declarations needed by the <code>FieldConverter</code> to
@@ -122,7 +132,12 @@ public class FieldConverter extends ConverterHelper {
                 }
             }
             pack.append("}").nl();
-        }		
+        }	
+        
+        // Use natbib
+        if (bNeedNatbib) {
+        	pack.append("\\usepackage{natbib}").nl();
+        }
 		
         // Export sequence declarations
         // The number format is fetched from the first occurence of the
@@ -422,10 +437,197 @@ public class FieldConverter extends ConverterHelper {
                 palette.getInlineCv().traversePCDATA(node,ldp,oc);
             }
         }
-    } 
+    }
+    
+    // Try to handle this reference name as a Zotero reference, return true on success
+    private boolean handleZoteroReferenceName(String sName, LaTeXDocumentPortion ldp, Context oc) {
+    	// First parse the reference name:
+    	// A Zotero reference name has the form ZOTERO_ITEM <json object> <identifier> with a single space separating the items
+    	// The identifier is a unique identifier for the reference and is not used here
+    	if (sName.startsWith(ZOTERO_ITEM)) {
+    		int nObjectStart = sName.indexOf('{');
+    		int nObjectEnd = sName.lastIndexOf('}');
+    		if (nObjectStart>-1 && nObjectEnd>-1 && nObjectStart<nObjectEnd) {
+    			String sJsonObject = sName.substring(nObjectStart, nObjectEnd+1);
+    			JSONObject jo = null;
+    			try {
+    				jo = new JSONObject(sJsonObject);
+    			} catch (JSONException e) {
+    				return false;
+    			}
+    			// Successfully parsed the reference, now generate the code
+    			// (we don't expect any errors and ignore them, if they happen anyway)
 
+    			// Sort key (purpose? currently ignored)
+    			boolean bSort = true;
+    			try {
+    				bSort = jo.getBoolean("sort");
+    			}
+    			catch (JSONException e) {
+    			}
 
-    /** <p>Process a reference mark (text:reference-mark tag)</p>
+    			JSONArray citationItemsArray = null;
+    			try { // The value is an array of objects, one for each source in this citation
+    				citationItemsArray = jo.getJSONArray("citationItems");
+    			}
+    			catch (JSONException e) {	
+    			}
+
+    			if (citationItemsArray!=null) {
+    				int nCitationCount = citationItemsArray.length();
+    				if (nCitationCount>1) {
+    					// For multiple citations, use \citetext, otherwise we cannot add individual prefixes and suffixes
+    					// TODO: If no prefixes or suffixes exist, it's safe to combine the citations
+    					ldp.append("\\citetext{");
+    				}
+    				
+    				for (int nIndex=0; nIndex<nCitationCount; nIndex++) {
+
+    					JSONObject citationItems = null;
+    					try { // Each citation is represented as an object
+    						citationItems = citationItemsArray.getJSONObject(nIndex);
+    					}
+    					catch (JSONException e) {
+    					}
+
+    					if (citationItems!=null) {
+    						if (nIndex>0) {
+    							ldp.append("; "); // Separate multiple citations in this reference
+    						}
+
+    						// Citation items
+    						String sURI = "";
+    						boolean bSuppressAuthor = false;
+    						String sPrefix = "";
+    						String sSuffix = "";
+    						String sLocator = "";
+    						String sLocatorType = "";
+
+    						try { // The URI seems to be an array with a single string value(?)
+    							sURI = citationItems.getJSONArray("uri").getString(0);
+    						}
+    						catch (JSONException e) {	
+    						}
+
+    						try { // SuppressAuthor is a boolean value
+    							bSuppressAuthor = citationItems.getBoolean("suppressAuthor");
+    						}
+    						catch (JSONException e) {	
+    						}
+
+    						try { // Prefix is a string value
+    							sPrefix = citationItems.getString("prefix");
+    						}
+    						catch (JSONException e) {	
+    						}
+
+    						try { // Suffix is a string value
+    							sSuffix = citationItems.getString("suffix");
+    						}
+    						catch (JSONException e) {	
+    						}
+
+    						try { // Locator is a string value, e.g. a page number
+    							sLocator = citationItems.getString("locator");
+    						}
+    						catch (JSONException e) {	
+    						}
+
+    						try {
+    							// LocatorType is a string value, e.g. book, verse, page (missing locatorType means page)
+    							sLocatorType = citationItems.getString("locatorType");
+    						}
+    						catch (JSONException e) {	
+    						}
+
+    						// Adjust locator type (empty locator type means "page")
+    						// TODO: Handle other locator types (localize and abbreviate): Currently the internal name (e.g. book) is used.
+    						if (sLocator.length()>0 && sLocatorType.length()==0) {
+    							// A locator of the form <number><other characters><number> is interpreted as several pages
+    							if (Pattern.compile("[0-9]+[^0-9]+[0-9]+").matcher(sLocator).find()) {
+    								sLocatorType = "pp.";
+    							}
+    							else {
+    								sLocatorType = "p.";
+    							}
+    						}
+
+    						// Insert command. TODO: Evaluate this
+    						if (nCitationCount>1) { // Use commands without parentheses
+    							if (bSuppressAuthor) { ldp.append("\\citeyear"); }
+    							else { ldp.append("\\citet"); }
+    						}
+    						else {
+    							if (bSuppressAuthor) { ldp.append("\\citeyearpar"); }
+    							else { ldp.append("\\citep"); }
+    						}
+
+    						if (sPrefix.length()>0) {
+    							ldp.append("[").append(palette.getI18n().convert(sPrefix,true,oc.getLang())).append("]");
+    						}
+
+    						if (sPrefix.length()>0 || sSuffix.length()>0 || sLocatorType.length()>0 || sLocator.length()>0) {
+    							// Note that we need to include an empty suffix if there's a prefix!
+    							ldp.append("[")
+    							.append(palette.getI18n().convert(sSuffix,true,oc.getLang()))
+    							.append(palette.getI18n().convert(sLocatorType,true,oc.getLang()));
+    							if (sLocatorType.length()>0 && sLocator.length()>0) {
+    								ldp.append("~");
+    							}
+    							ldp.append(palette.getI18n().convert(sLocator,true,oc.getLang()))
+    							.append("]");
+    						}
+
+    						ldp.append("{");
+    						int nSlash = sURI.lastIndexOf('/');
+    						if (nSlash>0) {
+    							ldp.append(sURI.substring(nSlash+1));
+    						}
+    						else {
+    							ldp.append(sURI);
+    						}
+    						ldp.append("}");
+    					}
+    				}
+    				
+    				if (nCitationCount>1) { // End the \citetext command
+    					ldp.append("}");
+    				}
+    				
+    				oc.setInZoteroText(true);
+    				
+    				bNeedNatbib = true;
+
+    				return true;
+    			}
+    		}
+    	}
+    	return false;
+    }
+    
+    private String shortenRefname(String s) {
+    	// For Zotero items, use the trailing unique identifier
+    	if (s.startsWith(ZOTERO_ITEM)) {
+    		int nLast = s.lastIndexOf(' ');
+    		if (nLast>0) {
+    			return s.substring(nLast+1);
+    		}
+    	}
+		return s;
+    }
+
+    /** <p>Process a reference mark end (text:reference-mark-end tag)</p>
+     * @param node The element containing the reference mark 
+     * @param ldp the <code>LaTeXDocumentPortion</code> to which
+     * LaTeX code should be added
+     * @param oc the current context
+     */
+    public void handleReferenceMarkEnd(Element node, LaTeXDocumentPortion ldp, Context oc) {
+    	// Nothing to do, except to mark that this ends any Zotero citation
+    	oc.setInZoteroText(false);
+    }
+
+    /** <p>Process a reference mark (text:reference-mark or text:reference-mark-start tag)</p>
      * @param node The element containing the reference mark 
      * @param ldp the <code>LaTeXDocumentPortion</code> to which
      * LaTeX code should be added
@@ -433,10 +635,12 @@ public class FieldConverter extends ConverterHelper {
      */
     public void handleReferenceMark(Element node, LaTeXDocumentPortion ldp, Context oc) {
         if (!oc.isInSection() && !oc.isInCaption() && !oc.isVerbatim()) {
-            // Note: Always include \label here, even when it's not used
             String sName = node.getAttribute(XMLString.TEXT_NAME);
-            if (sName!=null) {
-                ldp.append("\\label{ref:"+refnames.getExportName(sName)+"}");
+            // Zotero (mis)uses reference marks to store citations, so check this first
+            if (sName!=null && (!bConvertZotero || !handleZoteroReferenceName(sName, ldp, oc))) {
+            	// Plain reference mark
+            	// Note: Always include \label here, even when it's not used
+            	ldp.append("\\label{ref:"+refnames.getExportName(shortenRefname(sName))+"}");
             }
         }
         else {
@@ -455,11 +659,11 @@ public class FieldConverter extends ConverterHelper {
         String sFormat = node.getAttribute(XMLString.TEXT_REFERENCE_FORMAT);
         String sName = node.getAttribute(XMLString.TEXT_REF_NAME);
         if (("page".equals(sFormat) || "".equals(sFormat)) && sName!=null) {
-            ldp.append("\\pageref{ref:"+refnames.getExportName(sName)+"}");
+            ldp.append("\\pageref{ref:"+refnames.getExportName(shortenRefname(sName))+"}");
         }
         else if ("chapter".equals(sFormat) && ofr.referenceMarkInHeading(sName)) {
             // This is safe if the reference mark is contained in a heading
-            ldp.append("\\ref{ref:"+refnames.getExportName(sName)+"}");
+            ldp.append("\\ref{ref:"+refnames.getExportName(shortenRefname(sName))+"}");
         }
         else { // use current value
             palette.getInlineCv().traversePCDATA(node,ldp,oc);

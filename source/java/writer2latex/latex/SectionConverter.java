@@ -20,12 +20,15 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-03-28)
+ *  Version 1.2 (2010-10-06)
  *
  */
 
 package writer2latex.latex;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -55,6 +58,68 @@ public class SectionConverter extends ConverterHelper {
 	
     public void appendDeclarations(LaTeXDocumentPortion pack, LaTeXDocumentPortion decl) {
         if (bNeedMulticol) { pack.append("\\usepackage{multicol}").nl(); }
+    }
+    
+    // Handle a section as a Zotero bibliography
+    private boolean handleZoteroBibliography(Element node, LaTeXDocumentPortion ldp, Context oc) {
+    	String sName = node.getAttribute(XMLString.TEXT_NAME);
+    	if (config.useBibtex() && config.zoteroBibtexFiles().length()>0	&& sName.startsWith("ZOTERO_BIBL")) {
+    		// This section is a Zotero bibliography, and the user wishes to handle it as such
+        	// A Zotero bibliography name has the form ZOTERO_BIBL <json object> <identifier> with a single space separating the items
+        	// The identifier is a unique identifier for the bibliography and is not used here
+    		if (!config.noIndex()) {
+    			// Parse the name (errors are ignored) and add \nocite commands as appropriate
+        		int nObjectStart = sName.indexOf('{');
+        		int nObjectEnd = sName.lastIndexOf('}');
+        		if (nObjectStart>-1 && nObjectEnd>-1 && nObjectStart<nObjectEnd) {
+        			String sJsonObject = sName.substring(nObjectStart, nObjectEnd+1);
+        			JSONObject jo = null;
+        			try {
+        				jo = new JSONObject(sJsonObject);
+        			} catch (JSONException e) {
+        			}
+        			if (jo!=null) {
+        				JSONArray uncited = null;
+        				try {
+        					uncited = jo.getJSONArray("uncited");
+        				}
+        				catch (JSONException e) {
+        				}
+        				if (uncited!=null) {
+        					int nCount = uncited.length();
+        					if (nCount>0) {
+        						ldp.append("\\nocite{");
+        						for (int nIndex=0; nIndex<nCount; nIndex++) {
+        							if (nIndex>0) {
+        								ldp.append(",");
+        							}
+        							String sURI = null;
+        							try { // Each item is an array containing a single string
+        								sURI = uncited.getJSONArray(nIndex).getString(0);
+        							}
+        							catch (JSONException e) {
+        							}
+        							if (sURI!=null) {
+        								int nSlash = sURI.lastIndexOf('/');
+        								if (nSlash>0) { ldp.append(sURI.substring(nSlash+1)); }
+        								else { ldp.append(sURI); }
+        							}
+        						}
+        						ldp.append("}").nl();
+        					}
+        				}
+        			}
+        		}
+
+    			// Use the BibTeX style and files given in the configuration
+    			ldp.append("\\bibliographystyle{").append(config.bibtexStyle()).append("}").nl()
+    			.append("\\bibliography{").append(config.zoteroBibtexFiles()).append("}").nl();
+    		}
+    		return true;
+    	}
+    	else {
+    		return false;
+    	}
     }
 	
     /** <p> Process a section (text:section tag)</p>
@@ -102,7 +167,10 @@ public class SectionConverter extends ConverterHelper {
         if (sFileName!=null) {
             ldp.append("\\input{").append(sFileName).append("}").nl();
         }
-        palette.getBlockCv().traverseBlockText(node,sectionLdp,ic);
+        // Zotero might have generated this section as a bibliograhy:
+        if (!handleZoteroBibliography(node,sectionLdp,ic)) {
+        	palette.getBlockCv().traverseBlockText(node,sectionLdp,ic);
+        }
         if (sectionLdp!=ldp) { sectionLdp.append("\\endinput").nl(); }
         ldp.append(ba.getAfter());
     }

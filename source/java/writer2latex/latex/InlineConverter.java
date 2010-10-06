@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2008 by Henrik Just
+ *  Copyright: 2002-2010 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.0 (2008-11-22)
+ *  Version 1.2 (2010-10-04)
  *
  */
 
@@ -195,7 +195,13 @@ public class InlineConverter extends ConverterHelper {
                 case Node.TEXT_NODE:
                     String s = childNode.getNodeValue();
                     if (s.length() > 0) {
+                    	if (oc.isInZoteroText()) { // Comment out Zotero citations
+                    		ldp.append("%");
+                    	}
                         ldp.append(palette.getI18n().convert(s, false, oc.getLang()));
+                        if (oc.isInZoteroText()) { // End comment out
+                        	ldp.nl();
+                        }
                     }
                     break;
                         
@@ -318,6 +324,9 @@ public class InlineConverter extends ConverterHelper {
                             }
                             else if (sName.equals(XMLString.TEXT_REFERENCE_MARK_START)) {
                                 palette.getFieldCv().handleReferenceMark(child,ldp,oc);
+                            }
+                            else if (sName.equals(XMLString.TEXT_REFERENCE_MARK_END)) {
+                                palette.getFieldCv().handleReferenceMarkEnd(child,ldp,oc);
                             }
                             else if (sName.equals(XMLString.TEXT_REFERENCE_REF)) {
 	                            palette.getFieldCv().handleReferenceRef(child,ldp,oc);
