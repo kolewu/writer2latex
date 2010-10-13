@@ -50,7 +50,7 @@ public class RegistryHelper {
 	
     /** Get a registry view relative to the given path
      * 
-     * @param sPath the base path witin the registry
+     * @param sPath the base path within the registry
      * @param bUpdate true if we need update access
      * @return the registry view
      * @throws com.sun.star.uno.Exception

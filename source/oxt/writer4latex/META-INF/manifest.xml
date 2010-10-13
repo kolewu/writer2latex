@@ -10,7 +10,7 @@
      manifest:media-type="application/vnd.sun.star.configuration-data"/>
 
     <manifest:file-entry
-     manifest:full-path="OptionsDialog.xcu"
+     manifest:full-path="OptionPages.xcu"
      manifest:media-type="application/vnd.sun.star.configuration-data"/>
 
     <manifest:file-entry

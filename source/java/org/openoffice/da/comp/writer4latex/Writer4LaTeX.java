@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-03-12)
+ *  Version 1.2 (2010-10-13)
  *
  */ 
  
@@ -52,6 +52,8 @@ import org.openoffice.da.comp.w2lcommon.helper.MessageBox;
 import org.openoffice.da.comp.w2lcommon.helper.PropertyHelper;
 import org.openoffice.da.comp.w2lcommon.helper.RegistryHelper;
 import org.openoffice.da.comp.w2lcommon.helper.XPropertySetHelper;
+
+import writer2latex.util.CSVList;
        
 /** This class implements the ui (dispatch) commands provided by Writer4LaTeX.
  *  The actual processing is done by the three core classes <code>TeXify</code>,
@@ -198,6 +200,39 @@ public final class Writer4LaTeX extends WeakBase
         xStatus.start("Writer4LaTeX",10);
         xStatus.setValue(1); // At least we have started, that's 10% :-)
         
+        // First work a bit on the FilterData (get the backend and set bibliography options)
+        String sBackend = "generic";
+        PropertyHelper mediaHelper = new PropertyHelper(mediaProps);
+        Object filterData = mediaHelper.get("FilterData");
+        if (filterData instanceof PropertyValue[]) {
+        	PropertyHelper filterHelper = new PropertyHelper((PropertyValue[])filterData);
+            // Get the backend
+            Object backend = filterHelper.get("backend");
+            if (backend instanceof String) {
+                sBackend = (String) backend;
+            }
+            
+            // Set the bibliography options according to the settings
+        	RegistryHelper registry = new RegistryHelper(m_xContext);
+        	try {
+        		Object view = registry.getRegistryView(BibliographyDialog.REGISTRY_PATH, false);
+        		XPropertySet xProps = (XPropertySet) UnoRuntime.queryInterface(XPropertySet.class,view);
+        		if (XPropertySetHelper.getPropertyValueAsBoolean(xProps, "ConvertZoteroCitations")) {
+        			filterHelper.put("zotero_bibtex_files", getFileList(XPropertySetHelper.getPropertyValueAsString(xProps, "ZoteroBibTeXDir")));
+        			filterHelper.put("natbib_options", XPropertySetHelper.getPropertyValueAsString(xProps, "NatbibOptions"));
+        		}
+        		if (XPropertySetHelper.getPropertyValueAsBoolean(xProps, "UseExternalBibTeXFiles")) {
+        			filterHelper.put("external_bibtex_files", getFileList(XPropertySetHelper.getPropertyValueAsString(xProps, "ExternalBibTeXDir")));
+        		}
+                mediaHelper.put("FilterData",filterHelper.toArray());
+                mediaProps = mediaHelper.toArray();
+            	registry.disposeRegistryView(view);
+        	}
+        	catch (Exception e) {
+        		// Failed to get registry view
+        	}
+        }
+        
         try {
             // Convert to LaTeX
             String sTargetUrl = sBasePath+sBaseFileName+".tex";
@@ -213,16 +248,6 @@ public final class Writer4LaTeX extends WeakBase
 		
         xStatus.setValue(6); // Export is finished, that's more than half :-)
 
-        // Get the backend from the media properties
-        String sBackend = "generic";
-        Object filterData = (new PropertyHelper(mediaProps)).get("FilterData");
-        if (filterData instanceof PropertyValue[]) {
-            Object backend = (new PropertyHelper((PropertyValue[])filterData)).get("backend");
-            if (backend instanceof String) {
-                sBackend = (String) backend;
-            }
-        }
-		
         if (texify==null) { texify = new TeXify(m_xContext); }
         File file = new File(urlToFile(sBasePath),sBaseFileName);
         
@@ -257,7 +282,21 @@ public final class Writer4LaTeX extends WeakBase
         xStatus.end();
     }
 	
-    private void viewLog() {
+    private String getFileList(String sDirectory) {
+    	File dir = new File(sDirectory);
+    	CSVList filelist = new CSVList(",");
+    	if (dir.isDirectory()) {
+    		File[] files = dir.listFiles();
+    		for (File file : files) {
+    			if (file.isFile() && file.getName().endsWith(".bib")) {
+    				filelist.addValue(file.getAbsolutePath());
+    			}
+    		}
+    	}
+    	return filelist.toString();	
+	}
+
+	private void viewLog() {
         if (updateLocation()) {
             // Execute the log viewer dialog
             try {

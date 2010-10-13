@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2009 by Henrik Just
+ *  Copyright: 2002-2010 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2009-11-19)
+ *  Version 1.2 (2010-10-11)
  *
  */ 
  
@@ -32,12 +32,11 @@ import java.lang.Process;
 import java.lang.ProcessBuilder;
 import java.util.HashMap;
 import java.util.Vector;
+
+import org.openoffice.da.comp.w2lcommon.helper.RegistryHelper;
 //import java.util.Map;
 
-import com.sun.star.beans.PropertyValue;
 import com.sun.star.beans.XMultiHierarchicalPropertySet;
-import com.sun.star.lang.XComponent;
-import com.sun.star.lang.XMultiServiceFactory;
 import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
 import com.sun.star.util.XChangesBatch;
@@ -158,10 +157,12 @@ public class ExternalApps {
     /** Load the external applications from the registry
      */
     public void load() {
-        Object view;
-        try {
-            view = getRegistryView(false);
-        }
+    	RegistryHelper registry = new RegistryHelper(xContext);
+    	Object view;
+    	try {
+    		// Prepare registry view
+    		view = registry.getRegistryView("/org.openoffice.da.Writer4LaTeX.Options/Applications",false);
+    	}
         catch (com.sun.star.uno.Exception e) {
             // Give up...
             //setApplication(LATEX,"Error!",e.getMessage());
@@ -183,15 +184,16 @@ public class ExternalApps {
             }
         }
 		
-        disposeRegistryView(view);
+        registry.disposeRegistryView(view);
     }
 	
     /** Save the external applications to the registry
      */
     public void save() {
+    	RegistryHelper registry = new RegistryHelper(xContext);
         Object view;
         try {
-            view = getRegistryView(true);
+    		view = registry.getRegistryView("/org.openoffice.da.Writer4LaTeX.Options/Applications",true);
         }
         catch (com.sun.star.uno.Exception e) {
             // Give up...
@@ -223,34 +225,7 @@ public class ExternalApps {
             // ignore
         }
 
-        disposeRegistryView(view);
+        registry.disposeRegistryView(view);
     }
-	
-    // Get a view of the options root in the registry
-    private Object getRegistryView(boolean bUpdate) 
-        throws com.sun.star.uno.Exception {
-        //Object provider = xMSF.createInstance(
-        Object provider = xContext.getServiceManager().createInstanceWithContext(
-            "com.sun.star.configuration.ConfigurationProvider", xContext);
-        XMultiServiceFactory xProvider = (XMultiServiceFactory)
-            UnoRuntime.queryInterface(XMultiServiceFactory.class,provider);
-        PropertyValue[] args = new PropertyValue[1];
-        args[0] = new PropertyValue();
-        args[0].Name = "nodepath";
-        args[0].Value = "/org.openoffice.da.Writer4LaTeX.Options/Applications";
-        String sServiceName = bUpdate ?
-            "com.sun.star.configuration.ConfigurationUpdateAccess" :
-            "com.sun.star.configuration.ConfigurationAccess";
-        Object view = xProvider.createInstanceWithArguments(sServiceName,args);
-        return view;
-    }
-	
-    // Dispose a previously obtained registry view
-    private void disposeRegistryView(Object view) {
-        XComponent xComponent = (XComponent)
-            UnoRuntime.queryInterface(XComponent.class,view);
-        xComponent.dispose();
-    }
-	
 	
 }

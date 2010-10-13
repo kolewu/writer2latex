@@ -66,7 +66,7 @@ import org.openoffice.da.comp.w2lcommon.helper.StyleNameProvider;
 
 /** This class provides a uno component which implements the configuration
  *  of Writer2LaTeX. The same component is used for all pages - using the
- *  dialog title to distinguish between tha pages.
+ *  dialog title to distinguish between the pages.
  */
 public final class ConfigurationDialog extends WeakBase
     implements XServiceInfo, XContainerWindowEventHandler {

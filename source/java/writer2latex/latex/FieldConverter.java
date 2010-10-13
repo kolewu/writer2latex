@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-10-06)
+ *  Version 1.2 (2010-10-13)
  *
  */
 
@@ -136,7 +136,11 @@ public class FieldConverter extends ConverterHelper {
         
         // Use natbib
         if (bNeedNatbib) {
-        	pack.append("\\usepackage{natbib}").nl();
+        	pack.append("\\usepackage");
+        	if (config.getNatbibOptions().length()>0) {
+        		pack.append("[").append(config.getNatbibOptions()).append("]");
+        	}
+        	pack.append("{natbib}").nl();
         }
 		
         // Export sequence declarations
@@ -459,12 +463,12 @@ public class FieldConverter extends ConverterHelper {
     			// (we don't expect any errors and ignore them, if they happen anyway)
 
     			// Sort key (purpose? currently ignored)
-    			boolean bSort = true;
+    			/*boolean bSort = true;
     			try {
     				bSort = jo.getBoolean("sort");
     			}
     			catch (JSONException e) {
-    			}
+    			}*/
 
     			JSONArray citationItemsArray = null;
     			try { // The value is an array of objects, one for each source in this citation

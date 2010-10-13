@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-03-29)
+ *  Version 1.2 (2010-10-09)
  *
  */
  
@@ -340,7 +340,7 @@ public class DrawConverter extends ConverterHelper {
         boolean bCommentOut = true;
         String sHref = node.getAttribute(XMLString.XLINK_HREF);
 		
-        if (node.hasAttribute(XMLString.XLINK_HREF) && !ofr.isInPackage(sHref)) {
+        if (sHref.length()>0 && !ofr.isInPackage(sHref)) {
             // Linked image is not yet handled by ImageLoader. This is a temp.
             // solution (will go away when ImageLoader is finished)
             sFileName = ofr.fixRelativeLink(sHref);

@@ -107,7 +107,7 @@ public class TeXImportFilter extends WeakBase implements XInitialization, XNamed
 		return m_serviceNames;
 	}
 	
-	// The following methods may be called from multiple threads (eg. if someone wants to cancel the filtering),
+	// The following methods may be called from multiple threads (e.g. if someone wants to cancel the filtering),
 	// thus all access to class members must be synchronized
 	
 	// Implement XInitialization:
@@ -236,7 +236,7 @@ public class TeXImportFilter extends WeakBase implements XInitialization, XNamed
     // Private helper methods
     /** Import a TeX document with TeX4ht
      *  @param xText into this document
-     *  @param sURL from the TeX documetn given by this URL
+     *  @param sURL from the TeX document given by this URL
      */
     public boolean importTeX(XTextDocument xText, String sURL, XStatusIndicator xStatus) {
     	int nStep = 0;

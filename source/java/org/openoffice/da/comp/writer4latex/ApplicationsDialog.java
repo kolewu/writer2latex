@@ -1,6 +1,6 @@
 /************************************************************************
  *
- *  ConfigurationDialog.java
+ *  ApplicationsDialog.java
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-05-13)
+ *  Version 1.2 (2010-10-10)
  *
  */ 
  
@@ -52,9 +52,9 @@ import org.openoffice.da.comp.w2lcommon.helper.DialogAccess;
 import org.openoffice.da.comp.w2lcommon.helper.FilePicker;
 
 /** This class provides a uno component which implements the configuration
- *  of Writer4LaTeX
+ *  of applications in Writer4LaTeX.
  */
-public final class ConfigurationDialog
+public final class ApplicationsDialog
     extends WeakBase
     implements XServiceInfo, XContainerWindowEventHandler {
 
@@ -65,14 +65,14 @@ public final class ConfigurationDialog
     
     /** The component will be registered under this name.
      */
-    public static String __serviceName = "org.openoffice.da.writer4latex.ConfigurationDialog";
+    public static String __serviceName = "org.openoffice.da.writer4latex.ApplicationsDialog";
 
     /** The component should also have an implementation name.
      */
-    public static String __implementationName = "org.openoffice.da.comp.writer4latex.ConfigurationDialog";
+    public static String __implementationName = "org.openoffice.da.comp.writer4latex.ApplicationsDialog";
 
-    /** Create a new ConfigurationDialog */
-    public ConfigurationDialog(XComponentContext xContext) {
+    /** Create a new ApplicationsDialog */
+    public ApplicationsDialog(XComponentContext xContext) {
         this.xContext = xContext;
         externalApps = new ExternalApps(xContext);
         filePicker = new FilePicker(xContext);
@@ -183,8 +183,8 @@ public final class ConfigurationDialog
         return true;
     }
     
-    // Unix: Test to determine wether a certain application is available in the OS
-    // Requires "which", hence unix only
+    // Unix: Test to determine whether a certain application is available in the OS
+    // Requires "which", hence Unix only
     private boolean hasApp(String sAppName) {
         try {
 			Vector<String> command = new Vector<String>();
@@ -198,7 +198,7 @@ public final class ConfigurationDialog
             StreamGobbler errorGobbler = new 
                 StreamGobbler(proc.getErrorStream(), "ERROR");            
             
-            // Gooble the output stream of the application
+            // Gobble the output stream of the application
             StreamGobbler outputGobbler = new 
                 StreamGobbler(proc.getInputStream(), "OUTPUT");
                 
@@ -357,7 +357,7 @@ public final class ConfigurationDialog
     		externalApps.setApplication(ExternalApps.POSTSCRIPTVIEWER, sGsview, "-e \"%s\"");  
 
     	}
-    	else { // Assume a unix-like system supporting the "which" command
+    	else { // Assume a Unix-like system supporting the "which" command
     		configureApp(ExternalApps.LATEX, "latex", "--interaction=batchmode %s",info);
     		configureApp(ExternalApps.PDFLATEX, "pdflatex", "--interaction=batchmode %s",info);
     		configureApp(ExternalApps.XELATEX, "xelatex", "--interaction=batchmode %s",info);

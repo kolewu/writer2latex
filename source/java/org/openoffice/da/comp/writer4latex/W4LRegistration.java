@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2009 by Henrik Just
+ *  Copyright: 2002-2010 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2009-05-20) 
+ *  Version 1.2 (2010-10-10) 
  *
  */ 
  
@@ -78,9 +78,15 @@ public class W4LRegistration {
             multiFactory,						    
             regKey);
         }
-        else if (implName.equals(ConfigurationDialog.__implementationName) ) {
-            xSingleServiceFactory = FactoryHelper.getServiceFactory(ConfigurationDialog.class,
-            ConfigurationDialog.__serviceName,
+        else if (implName.equals(ApplicationsDialog.__implementationName) ) {
+            xSingleServiceFactory = FactoryHelper.getServiceFactory(ApplicationsDialog.class,
+            ApplicationsDialog.__serviceName,
+            multiFactory,						    
+            regKey);
+        }
+        else if (implName.equals(BibliographyDialog.__implementationName) ) {
+            xSingleServiceFactory = FactoryHelper.getServiceFactory(BibliographyDialog.class,
+            BibliographyDialog.__serviceName,
             multiFactory,						    
             regKey);
         }
@@ -110,8 +116,10 @@ public class W4LRegistration {
                         TeXImportFilter.__serviceName, regKey) &
             FactoryHelper.writeRegistryServiceInfo(TeXDetectService.__implementationName,
                         TeXDetectService.__serviceName, regKey) &
-            FactoryHelper.writeRegistryServiceInfo(ConfigurationDialog.__implementationName,
-                ConfigurationDialog.__serviceName, regKey) &
+            FactoryHelper.writeRegistryServiceInfo(ApplicationsDialog.__implementationName,
+            			ApplicationsDialog.__serviceName, regKey) &
+            FactoryHelper.writeRegistryServiceInfo(BibliographyDialog.__implementationName,
+                        BibliographyDialog.__serviceName, regKey) &
             FactoryHelper.writeRegistryServiceInfo(LogViewerDialog.__implementationName,
                 LogViewerDialog.__serviceName, regKey);
     }
