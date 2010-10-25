@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2009 by Henrik Just
+ *  Copyright: 2002-2010 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2009-06-18)
+ *  Version 1.2 (2010-10-25)
  *
  */
 
@@ -153,5 +153,15 @@ public class Token implements Cloneable {
 			return Character.toString(getChar());
 		}
 	}
-
+	
+	@Override public Object clone() {
+		Token newToken = new Token();
+		newToken.type = this.type;
+		newToken.nTokenLen = this.nTokenLen;
+		newToken.nCapacity = this.nCapacity;
+		newToken.tokenChars = new char[newToken.nCapacity];
+		System.arraycopy(this.tokenChars, 0, newToken.tokenChars, 0, newToken.nCapacity);
+		return newToken;
+	}
+	
 }

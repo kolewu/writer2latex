@@ -1,20 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <helpdocument version="1.0">
 	<meta>
-        <topic id="writer4latex-configuration" indexer="include">
-            <title xml-lang="en-US">Configuration</title>
-            <filename>org.openoffice.da.writer4latex.oxt/configuration.xhp</filename>
+        <topic id="writer4latex-applications" indexer="include">
+            <title xml-lang="en-US">Applications</title>
+            <filename>org.openoffice.da.writer4latex.oxt/applications.xhp</filename>
         </topic>
     </meta>
     <body>
 		<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer4latex.oxt:ConfigurationDialog" id="bm_configurationdialog"/>
-        <paragraph role="heading" level="1" xml-lang="en-US">Configuration</paragraph>
+        <paragraph role="heading" level="1" xml-lang="en-US">Configuration of applications</paragraph>
         <paragraph role="paragraph" xml-lang="en-US">Before you can use Writer4LaTeX you must configure it to use your LaTeX
         distribution as well as viewers for the different output formats.</paragraph>
         <section id="howtoget" xml-lang="en-US">
-        	Select <emph>Tools - Extension Manager - Writer4LaTeX</emph>
-        	and click <emph>Configure</emph><br/>
-        	Select <emph>Tools - Options - %PRODUCTNAME Writer - Writer4LaTeX</emph>
+        	Select <emph>Tools - Options - %PRODUCTNAME Writer - Writer4LaTeX - Applications</emph>
         </section>
 
 		<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer4latex.oxt:ConfigurationAutoButton" id="bm_configurationautobutton"/>

@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2009 by Henrik Just
+ *  Copyright: 2002-2010 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2009-06-18)
+ *  Version 1.2 (2010-10-25)
  *
  */
 
@@ -142,7 +142,7 @@ public class Mouth {
 					if (nIndex+3<nLen && isHex(c1)) {
 						char c2 = sLine.charAt(nIndex+3);
 						if (isHex(c2)) {
-							// Found ^^ and a lower case hexidecimal number
+							// Found ^^ and a lower case hexadecimal number
 							if (bMove) { nIndex+=4; }
 							char[] digits = {c1, c2};
 							return (char) Integer.parseInt(new String(digits), 16);
@@ -220,7 +220,7 @@ public class Mouth {
 	
 	/** Get the next token
 	 * 
-	 * @return the token (for convenince; the same object is returned by {@link Mouth#getTokenObject}).
+	 * @return the token (for convenience; the same object is returned by {@link Mouth#getTokenObject}).
 	 * @throws IOException if we fail to read the underlying stream
 	 */
 	public Token getToken() throws IOException {
@@ -231,7 +231,7 @@ public class Mouth {
 				case ESCAPE:
 					token.setType(TokenType.COMMAND_SEQUENCE);
 					token.clearChars();
-					// TODO: The description in the TeXBook is not completely clear, 
+					// TODO: The description in the TeXBook is not completely clear (to me anyway), 
 					// (as long as \r and no other character has catcode END_OF_LINE this should be correct)
 					if (catcodes.get(eyes.peekChar())==Catcode.LETTER) {
 						state = State.S;
@@ -253,15 +253,19 @@ public class Mouth {
 					}
 					return token;
 				case BEGIN_GROUP:
+					state = State.M;
 					token.set(c, TokenType.BEGIN_GROUP);
 					return token;
 				case END_GROUP:
+					state = State.M;
 					token.set(c, TokenType.END_GROUP);
 					return token;
 				case MATH_SHIFT:
+					state = State.M;
 					token.set(c, TokenType.MATH_SHIFT);
 					return token;
 				case ALIGNMENT_TAB:
+					state = State.M;
 					token.set(c, TokenType.ALIGNMENT_TAB);
 					return token;
 				case END_OF_LINE:
@@ -285,12 +289,15 @@ public class Mouth {
 					}
 					break;
 				case PARAMETER:
+					state = State.M;
 					token.set(c, TokenType.PARAMETER);
 					return token;
 				case SUPERSCRIPT:
+					state = State.M;
 					token.set(c, TokenType.SUPERSCRIPT);
 					return token;
 				case SUBSCRIPT:
+					state = State.M;
 					token.set(c, TokenType.SUBSCRIPT);
 					return token;
 				case IGNORED:
@@ -305,12 +312,15 @@ public class Mouth {
 					// In state N and S the space character is ignored
 					break;
 				case LETTER:
+					state = State.M;
 					token.set(c, TokenType.LETTER);
 					return token;
 				case OTHER:
+					state = State.M;
 					token.set(c, TokenType.OTHER);
 					return token;
 				case ACTIVE:
+					state = State.M;
 					token.set(c, TokenType.ACTIVE);
 					return token;
 				case COMMENT:

@@ -53,7 +53,7 @@
 
 		<paragraph role="heading" level="2" xml-lang="en-US">Before you start</paragraph>
         <paragraph role="paragraph" xml-lang="en-US">Before you can use Writer4LaTeX, you need to
-        <link href="org.openoffice.da.writer4latex.oxt/configuration.xhp" name="Configuration">configure</link> it.
+        <link href="org.openoffice.da.writer4latex.oxt/applications.xhp" name="Applications">configure</link> it.
         This requires that you have installed certain software on your system.</paragraph>
         <switch select="sys">
   			<case select="WIN">
