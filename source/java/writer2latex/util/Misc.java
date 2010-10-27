@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-05-17)
+ *  Version 1.2 (2010-10-27)
  *
  */
 
@@ -34,6 +34,7 @@ import java.io.UnsupportedEncodingException;
 import java.lang.Math;
 import java.net.URLEncoder;
 import java.net.URLDecoder;
+import java.util.Arrays;
 //import java.util.Hashtable;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -53,6 +54,7 @@ public class Misc{
     }
 	
     public static final String int2roman(int number) {
+    	assert number>0; // Only works for positive numbers!
         StringBuffer roman=new StringBuffer();
         while (number>=1000) { roman.append('m'); number-=1000; }
         if (number>=900) { roman.append("cm"); number-=900; }
@@ -79,8 +81,26 @@ public class Misc{
     }
 	
     public static final String int2alph(int number, boolean bLetterSync) {
-        // TODO: Handle overflow/lettersync
-        return new Character((char) (number+96)).toString();
+    	assert number>0; // Only works for positive numbers!
+    	if (bLetterSync) {
+    		char[] chars = new char[(number-1)/26+1]; // Repeat the character this number of times
+    		Arrays.fill(chars, (char) ((number-1) % 26+97)); // Use this character
+    		return String.valueOf(chars);
+    	}
+    	else {
+    		int n=number-1;
+    		// Least significant digit is special because a is treated as zero here!
+    		int m = n % 26;
+    		String sNumber = Character.toString((char) (m+97));
+    		n = (n-m)/26;
+    		// For the more significant digits, a is treated as one!
+    		while (n>0) {
+    			m = n % 26; // Calculate new least significant digit
+   				sNumber = ((char) (m+96))+sNumber;
+    			n = (n-m)/26;
+    		}
+            return sNumber;
+    	}
     }
 	
     public static final String int2Alph(int number, boolean bLetterSync) {

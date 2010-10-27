@@ -3,7 +3,7 @@
 <!-- Defines the menus and toolbars provided by Writer4LaTeX -->
 <node oor:name="AddonUI">
     <node oor:name="OfficeMenuBar">
-        <node oor:name="org.openoffice.da.writer4latex" oor:op="replace">
+        <node oor:name="org.openoffice.da.writer4latex" oor:op="fuse">
             <prop oor:name="Context" oor:type="xs:string">
                 <value>com.sun.star.text.TextDocument</value>
             </prop>
@@ -17,7 +17,7 @@
                 <value/>
             </prop>
             <node oor:name="Submenu">
-                <node oor:name="menu1" oor:op="replace">
+                <node oor:name="menu01" oor:op="replace">
                     <prop oor:name="Context" oor:type="xs:string">
                         <value>com.sun.star.text.TextDocument</value>
                     </prop>
@@ -35,7 +35,7 @@
                         <value/>
                     </prop>
                 </node>
-                <node oor:name="menu2" oor:op="replace">
+                <node oor:name="menu02" oor:op="replace">
                     <prop oor:name="Context" oor:type="xs:string">
                         <value>com.sun.star.text.TextDocument</value>
                     </prop>
@@ -53,7 +53,7 @@
                         <value/>
                     </prop>
                 </node>
-                <node oor:name="menu3" oor:op="replace">
+                <node oor:name="menu03" oor:op="replace">
                     <prop oor:name="Context" oor:type="xs:string">
                         <value>com.sun.star.text.TextDocument</value>
                     </prop>

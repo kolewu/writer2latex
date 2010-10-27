@@ -2,11 +2,19 @@ Changelog for Writer2LaTeX version 1.0 -> 1.2
 
 ---------- version 1.1.5 ----------
 
+[all] Added Norwegian Nynorsk translation from Kevin Brubeck Unhammer
+
+[w2x] Only create reference targets for reference marks, bookmarks and sequence numbers if reference exists
+
+[all] Bugfix: Fixed problem with empty exported names (e.g. bookmarks in xhtml export)
+
+[w2x] Fixed typo in Russian translation
+
 [w2l] Bugfix: Fixed problem with lost images in some documents
 
 [w2l] New option: natbib_options is used to set options for natbib.sty (used by Zotero export)
 
-[w2l] Added support for Zotero reference marks (with contributions from Kevin Brubeck Unhammer).
+[w2l] Added support for Zotero reference marks (with contributions from Kevin Brubeck Unhammer)
   A new option zotero_bibtex_files has been added to give the names of the BibTeX files from Zotero
 
 ---------- version 1.1.4 ----------

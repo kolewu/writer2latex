@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-05-09)
+ *  Version 1.2 (2010-10-27)
  *
  */
 
@@ -590,6 +590,14 @@ public class OfficeReader {
     }
 	
 	
+    /** <p>Is there a reference to this note id?
+     *  @param sId the id of the note
+     *  @return true if there is a reference
+     */
+    public boolean hasNoteRefTo(String sId) {
+        return footnoteRef.contains(sId) || endnoteRef.contains(sId);
+    }
+
     /** <p>Is there a reference to this footnote id?
      *  @param sId the id of the footnote
      *  @return true if there is a reference

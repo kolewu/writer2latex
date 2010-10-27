@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2009 by Henrik Just
+ *  Copyright: 2002-2010 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2009-06-05)
+ *  Version 1.2 (2010-10-27)
  *
  */
 
@@ -89,11 +89,25 @@ public class ExportNameCollection{
             }
         }
         String sExportName=outbuf.toString();
-        // the result may exist in the collecion; add a's at the end
-        while (exportNames.containsValue(sExportName)){
-            sExportName+="a";
+        if (sExportName.length()==0) {
+        	// Do not accept empty export names
+        	sExportName = "qwerty";
         }
-        exportNames.put(sName,sExportName);
+        if (!exportNames.containsValue(sExportName)) {
+        	// Everything's fine, we can use the stripped name directly
+        	exportNames.put(sName,sExportName);
+        }
+        else {
+        	// Otherwise add letters at the end until a unique export name is found
+        	int i=1;
+        	while (true) {
+        		String sSuffix = Misc.int2alph(i++, false);
+        		if (!exportNames.containsValue(sExportName+sSuffix)) {
+        			exportNames.put(sName,sExportName+sSuffix);
+        			break;
+        		}
+        	}
+        }
     }
     
     public String getExportName(String sName) {

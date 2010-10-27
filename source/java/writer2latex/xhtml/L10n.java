@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-06-03)
+ *  Version 1.2 (2010-10-27)
  *
  */
 
@@ -161,6 +161,20 @@ public class L10n {
                 case CONTENTS : return "Indhold";
                 case INDEX : return "Stikord";
                 case HOME : return "Hjem";
+                case DIRECTORY: return "Mappe";
+                case DOCUMENT: return "Dokument";
+            }
+        }
+        if (sLocale.startsWith("nn")) { // nynorsk
+            switch (nString) {
+                case UP: return "Opp";
+                case FIRST : return "F\u00f8rste";
+                case PREVIOUS : return "Forrige";
+                case NEXT : return "Neste";
+                case LAST : return "Siste";
+                case CONTENTS : return "Innhald";
+                case INDEX : return "Register";
+                case HOME : return "Heim";
                 case DIRECTORY: return "Mappe";
                 case DOCUMENT: return "Dokument";
             }

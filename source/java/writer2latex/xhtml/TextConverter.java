@@ -1717,7 +1717,7 @@ public class TextConverter extends ConverterHelper {
     private void handleSequence(Node onode, Node hnode) {
         // Use current value, but turn references into hyperlinks
         String sName = Misc.getAttribute(onode,XMLString.TEXT_REF_NAME);
-        if (sName!=null && !bInToc) {
+        if (sName!=null && !bInToc && ofr.hasSequenceRefTo(sName)) {
             Element anchor = converter.createTarget("seq"+sName);
             hnode.appendChild(anchor);
             traversePCDATA(onode,anchor);
@@ -1742,7 +1742,7 @@ public class TextConverter extends ConverterHelper {
     }
 		
     private void handleSequenceRef(Node onode, Node hnode) {
-        createReference(onode,hnode,"seq");
+   		createReference(onode,hnode,"seq");
     } 
 
     private void handleNoteRef(Node onode, Node hnode) {
@@ -1751,13 +1751,13 @@ public class TextConverter extends ConverterHelper {
         
     private void handleReferenceMark(Node onode, Node hnode) {
         String sName = Misc.getAttribute(onode,XMLString.TEXT_NAME);
-        if (sName!=null && !bInToc) {
+        if (sName!=null && !bInToc && ofr.hasReferenceRefTo(sName)) {
             hnode.appendChild(converter.createTarget("ref"+sName));
         }
     }
 	
     private void handleReferenceRef(Node onode, Node hnode) {
-        createReference(onode,hnode,"ref");
+   		createReference(onode,hnode,"ref");
     } 
 
     private void handleBookmark(Node onode, Node hnode) {
@@ -1765,7 +1765,9 @@ public class TextConverter extends ConverterHelper {
         String sName = Misc.getAttribute(onode,XMLString.TEXT_NAME);
         if (sName!=null && !bInToc) {
             hnode.appendChild(converter.createTarget(sName));
-            hnode.appendChild(converter.createTarget("bkm"+sName));
+            if (ofr.hasBookmarkRefTo(sName)) {
+            	hnode.appendChild(converter.createTarget("bkm"+sName));
+            }
         }
     }
 	
