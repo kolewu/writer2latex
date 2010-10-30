@@ -26,6 +26,8 @@
 
 package writer2latex.xhtml;
 
+import java.util.Locale;
+
 // This class handles localized strings (used for navigation)
 public class L10n {
     public final static int UP = 0;
@@ -39,21 +41,36 @@ public class L10n {
     public final static int DIRECTORY = 8;
     public final static int DOCUMENT = 9;
 
+    private Locale locale = null;
     private String sLocale="en-US";
-	
-    public void setLocale(String sLocale) {
-        if (sLocale!=null) { this.sLocale = sLocale;}
-    }
 	
     public void setLocale(String sLanguage, String sCountry) {
         if (sLanguage!=null) {
-            if (sCountry!=null) { sLocale = sLanguage + "-" + sCountry; }
-            else  { sLocale = sLanguage; }
+            if (sCountry!=null) {
+            	locale = new Locale(sLanguage,sCountry);
+            }
+            else  {
+            	locale = new Locale(sLanguage);
+            }
         }
+        else {
+        	locale = Locale.getDefault();
+        }
+
+        if (locale.getCountry().length()>0) {
+        	sLocale = locale.getLanguage()+"-"+locale.getCountry();
+        }
+        else {
+        	sLocale = locale.getLanguage();
+        }   
+    }
+    
+    public Locale getLocale() {
+    	return locale;
     }
 	
     public String get(int nString) {
-        if (sLocale.startsWith("de")) { // german
+        if (sLocale.startsWith("de")) { // German
             switch (nString) {
                 case UP: return "Nach oben";
                 case FIRST : return "Anfang";
@@ -67,7 +84,7 @@ public class L10n {
                 case DOCUMENT: return "Dokument";
             }
         }
-        if (sLocale.startsWith("fr")) { // french
+        if (sLocale.startsWith("fr")) { // French
             switch (nString) {
             	case UP: return "Haut";
             	case FIRST : return "D\u00e9but";
@@ -81,7 +98,7 @@ public class L10n {
             	case DOCUMENT: return "Document";
             }
         }
-        if (sLocale.startsWith("es")) { // spanish
+        if (sLocale.startsWith("es")) { // Spanish
             switch (nString) {
                 case UP: return "Arriba";
                 case FIRST : return "Primero";
@@ -95,7 +112,7 @@ public class L10n {
                 case DOCUMENT: return "Documento";
             }
         }
-        if (sLocale.startsWith("it")) { // italian
+        if (sLocale.startsWith("it")) { // Italian
             switch (nString) {
             	case UP: return "Su";
             	case FIRST : return "Inizio";
@@ -109,7 +126,7 @@ public class L10n {
             	case DOCUMENT: return "Documento";     
             }
         }
-        if (sLocale.startsWith("pt")) { // (brazilian) portuguese
+        if (sLocale.startsWith("pt")) { // (Brazilian) Portuguese
             switch (nString) {
             	case UP: return "Acima";
             	case FIRST : return "Primeiro";
@@ -123,7 +140,7 @@ public class L10n {
             	case DOCUMENT: return "Documento";     
             }
         }
-        if (sLocale.startsWith("cs")) { // czech
+        if (sLocale.startsWith("cs")) { // Czech
             switch (nString) {
             	case UP: return "Nahoru";
             	case FIRST : return "Prvn\u00ed";
@@ -137,7 +154,7 @@ public class L10n {
             	case DOCUMENT: return "Dokument";     
             }
         }
-        if (sLocale.startsWith("nl")) { // dutch
+        if (sLocale.startsWith("nl")) { // Dutch
             switch (nString) {
             case UP: return "Omhoog";
             case FIRST : return "Eerste";
@@ -151,7 +168,7 @@ public class L10n {
             case DOCUMENT: return "Document";  
             }
         }
-        if (sLocale.startsWith("da")) { // danish
+        if (sLocale.startsWith("da")) { // Danish
             switch (nString) {
                 case UP: return "Op";
                 case FIRST : return "F\u00F8rste";
@@ -165,7 +182,7 @@ public class L10n {
                 case DOCUMENT: return "Dokument";
             }
         }
-        if (sLocale.startsWith("nn")) { // nynorsk
+        if (sLocale.startsWith("nn")) { // Nynorsk
             switch (nString) {
                 case UP: return "Opp";
                 case FIRST : return "F\u00f8rste";
@@ -179,7 +196,7 @@ public class L10n {
                 case DOCUMENT: return "Dokument";
             }
         }
-        if (sLocale.startsWith("pl")) { // polish
+        if (sLocale.startsWith("pl")) { // Polish
         	switch (nString) {
         		case UP: return "W g\u00f3r\u0119";
         		case FIRST : return "Pierwsza";
@@ -193,7 +210,7 @@ public class L10n {
         		case DOCUMENT: return "Dokument";
         	}
         }
-        if (sLocale.startsWith("fi")) { // finnish
+        if (sLocale.startsWith("fi")) { // Finnish
         	switch (nString) {
         		case UP: return "Yl\u00f6s";
         		case FIRST : return "Ensimm\u00e4inen";
@@ -207,7 +224,7 @@ public class L10n {
         		case DOCUMENT: return "Dokumentti";
         	}
         }
-        if (sLocale.startsWith("ru")) { // russian
+        if (sLocale.startsWith("ru")) { // Russian
             switch (nString) {
             	case UP: return "\u0412\u0432\u0435\u0440\u0445";
             	case FIRST : return "\u041f\u0435\u0440\u0432\u0430\u044f";
@@ -221,7 +238,7 @@ public class L10n {
             	case DOCUMENT: return "\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442";
             }
         }
-        if (sLocale.startsWith("uk")) { // ukrainian
+        if (sLocale.startsWith("uk")) { // Ukrainian
             switch (nString) {
             	case UP: return "\u041d\u0430\u0433\u043e\u0440\u0443";
             	case FIRST : return "\u041f\u0435\u0440\u0448\u0430";
@@ -235,7 +252,7 @@ public class L10n {
             	case DOCUMENT: return "\u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442";
             }
         }
-        if (sLocale.startsWith("tr")) { // turkish
+        if (sLocale.startsWith("tr")) { // Turkish
             switch (nString) {
             	case UP: return "Yukar\u0131";
             	case FIRST : return "\u0130lk";
@@ -249,7 +266,7 @@ public class L10n {
             	case DOCUMENT: return "D\u00f6k\u00fcman";
             }        	
         }
-        if (sLocale.startsWith("hr")) { // croatian
+        if (sLocale.startsWith("hr")) { // Croatian
             switch (nString) {
                 case UP: return "Up";
                 case FIRST : return "Prvi";
@@ -262,7 +279,7 @@ public class L10n {
                 case DOCUMENT: return "Document";
             }
         }
-        // english - default
+        // English - default
         switch (nString) {
             case UP: return "Up";
             case FIRST : return "First";

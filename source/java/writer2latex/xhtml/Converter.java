@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-05-17)
+ *  Version 1.2 (2010-10-30)
  *
  */
 
@@ -201,12 +201,7 @@ public class Converter extends ConverterBase {
         // Set locale to document language
         StyleWithProperties style = ofr.isSpreadsheet() ? ofr.getDefaultCellStyle() : ofr.getDefaultParStyle();
         if (style!=null) {
-            String sLang = style.getProperty(XMLString.FO_LANGUAGE);
-            String sCountry = style.getProperty(XMLString.FO_COUNTRY);
-            if (sLang!=null) {
-                if (sCountry==null) { l10n.setLocale(sLang); }
-                else { l10n.setLocale(sLang+"-"+sCountry); }
-            }
+            l10n.setLocale(style.getProperty(XMLString.FO_LANGUAGE), style.getProperty(XMLString.FO_COUNTRY));
         }
 
         // Traverse the body
@@ -463,15 +458,31 @@ public class Converter extends ConverterBase {
 
     public void handleOfficeAnnotation(Node onode, Node hnode) {
         if (config.xhtmlNotes()) {
-            // Extract the text from the paragraphs, seperate paragraphs with newline
+            // Extract the text from the paragraphs, separate paragraphs with newline
         	StringBuffer buf = new StringBuffer();
+        	Element creator = null;
+        	Element date = null;
         	Node child = onode.getFirstChild();
         	while (child!=null) {
         		if (Misc.isElement(child, XMLString.TEXT_P)) {
         			if (buf.length()>0) { buf.append('\n'); }
         			buf.append(getPlainInlineText(child));
         		}
+        		else if (Misc.isElement(child, XMLString.DC_CREATOR)) {
+        			creator = (Element) child;
+        		}
+        		else if (Misc.isElement(child, XMLString.DC_DATE)) {
+        			date = (Element) child;
+        		}
         		child = child.getNextSibling();
+        	}
+        	if (creator!=null) {
+    			if (buf.length()>0) { buf.append('\n'); }
+    			buf.append(getPlainInlineText(creator));        		
+        	}
+        	if (date!=null) {
+    			if (buf.length()>0) { buf.append('\n'); }
+    			buf.append(Misc.formatDate(ofr.getTextContent(date), l10n.getLocale().getLanguage(), l10n.getLocale().getCountry()));
         	}
             Node commentNode = htmlDOM.createComment(buf.toString());
             hnode.appendChild(commentNode);

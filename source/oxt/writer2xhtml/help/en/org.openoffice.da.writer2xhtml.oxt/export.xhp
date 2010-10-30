@@ -143,9 +143,15 @@
         <paragraph role="heading" level="3" xml-lang="en-US">Split document at headings</paragraph>
    		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2latex.oxt:OptionsSplit" visibility="hidden">Check this to create a new document for each heading</ahelp></paragraph>
         <paragraph role="paragraph" xml-lang="en-US">To make a long Writer document easier to read in the browser, you can use
-        this option to split the document in several small files. Writer2xhtml will add a simple navigation panel that lets you
+        this option to split the document in several small files.</paragraph>
+        <paragraph role="paragraph" xml-lang="en-US">For the XHTML export, Writer2xhtml will add a simple navigation panel that lets you
         move between pages. The navigation links will be in the same language as the document (as defined
-        under <emph>Tools – Options – Language Settings – Languages</emph>). Note that this option has no effect for headings
+        under <emph>Tools – Options – Language Settings – Languages</emph>).</paragraph>
+        <paragraph role="paragraph" xml-lang="en-US">For the EPUB export it is highly recommended that you split at headings.
+        Some EPUB readers have a limitation on the size of the individual files in the document.
+        To avoid this, Writer2xhtml will always split your document to avoid very large files. This happens even if you have set the
+        heading level to 0 here.</paragraph>
+        <paragraph role="paragraph" xml-lang="en-US">Note that this option has no effect for headings
         inside tables.</paragraph>
 
     	<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:OptionsSplitLevel" id="bm_options_splitlevel"/>
@@ -161,6 +167,7 @@
         you can use this option to repeat the parent headings whenever the document is split. If you for example split at
         headings of level 3 and set this option to 2, the headings of level 1 and 2 will be repeated before the heading of level 3,
         providing precise information as to where in the document the section belongs.</paragraph>
+        <paragraph role="paragraph" xml-lang="en-US">For the EPUB export it is recommended to set this option to 0.</paragraph>
 
    		<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:OptionsSaveImagesInSubdir" id="bm_options_saveimagesinsubdir"/>
 		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2latex.oxt:OptionsSaveImagesInSubdir" visibility="hidden">Check this to save images in a subdirectory relative to the exported document</ahelp></paragraph>

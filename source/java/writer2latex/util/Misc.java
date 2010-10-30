@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-10-27)
+ *  Version 1.2 (2010-10-30)
  *
  */
 
@@ -34,7 +34,12 @@ import java.io.UnsupportedEncodingException;
 import java.lang.Math;
 import java.net.URLEncoder;
 import java.net.URLDecoder;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.Locale;
 //import java.util.Hashtable;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -51,6 +56,20 @@ public class Misc{
         int[] newArray = new int[2*n];
         for (int i=0; i<n; i++) { newArray[i] = array[i]; }
         return newArray;
+    }
+    
+    public static final String formatDate(String sDate, String sLanguage, String sCountry) {
+    	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+   		Date date = null;
+    	try {
+			date = sdf.parse(sDate);
+		} catch (ParseException e) {
+			// If the date cannot be parsed according to the given pattern, return the original string
+			return sDate;
+		}
+		// Return using a default format for the given locale
+		Locale locale = sCountry!=null ? new Locale(sLanguage,sCountry) : new Locale(sLanguage);
+		return DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT, locale).format(date);   		
     }
 	
     public static final String int2roman(int number) {

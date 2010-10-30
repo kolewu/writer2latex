@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-10-04)
+ *  Version 1.2 (2010-10-30)
  *
  */
 
@@ -583,6 +583,8 @@ public class InlineConverter extends ConverterHelper {
         case LaTeXConfig.IGNORE: return;
         case LaTeXConfig.COMMENT:
         	// Get the unformatted text of all paragraphs and insert each paragraph as a single comment
+        	Element creator = null;
+        	Element date = null;
 			ldp.append("%").nl();
         	Node child = node.getFirstChild();
         	while (child!=null) {
@@ -591,7 +593,23 @@ public class InlineConverter extends ConverterHelper {
         			traversePlainInlineText((Element)child, ldp, oc); 
         			ldp.nl();
         		}
+        		else if (Misc.isElement(child, XMLString.DC_CREATOR)) {
+        			creator = (Element) child;
+        		}
+        		else if (Misc.isElement(child, XMLString.DC_DATE)) {
+        			date = (Element) child;
+        		}
                 child = child.getNextSibling();        		
+        	}
+        	if (creator!=null) {
+        		ldp.append("%");
+        		traversePlainInlineText(creator, ldp, oc);
+        		ldp.nl();
+        	}
+        	if (date!=null) {
+        		ldp.append("%")
+        		   .append(Misc.formatDate(ofr.getTextContent(date), palette.getI18n().getDefaultLanguage(), null))
+        		   .nl();
         	}
         	return;
         case LaTeXConfig.PDFANNOTATION:
@@ -608,6 +626,8 @@ public class InlineConverter extends ConverterHelper {
     	
     	// Get the unformatted text of all paragraphs, separated by spaces
         ldp.append(sCommand).append("{");
+    	Element creator = null;
+    	Element date = null;
         boolean bFirst = true;
     	Node child = node.getFirstChild();
     	while (child!=null) {
@@ -616,9 +636,24 @@ public class InlineConverter extends ConverterHelper {
     			traversePlainInlineText((Element)child, ldp, oc);
     			bFirst = false;
     		}
-            child = child.getNextSibling();
-    		
+    		else if (Misc.isElement(child, XMLString.DC_CREATOR)) {
+    			creator = (Element) child;
+    		}
+    		else if (Misc.isElement(child, XMLString.DC_DATE)) {
+    			date = (Element) child;
+    		}
+            child = child.getNextSibling();    		
     	}
+    	if (creator!=null) {
+    		if (!bFirst) ldp.append(" - ");
+    		traversePlainInlineText(creator, ldp, oc);
+    	}
+    	if (date!=null) {
+    		if (creator!=null) ldp.append(", ");
+    		else if (!bFirst) ldp.append(" ");
+    		ldp.append(Misc.formatDate(ofr.getTextContent(date), palette.getI18n().getDefaultLanguage(), null));
+    	}
+
     	ldp.append("}");
     }
 

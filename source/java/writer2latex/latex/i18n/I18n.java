@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2009 by Henrik Just
+ *  Copyright: 2002-2010 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2009-03-26) 
+ *  Version 1.2 (2010-10-30) 
  * 
  */
 
@@ -44,11 +44,11 @@ public abstract class I18n {
     // Configuration items
     protected LaTeXConfig config;
     protected ReplacementTrie stringReplace;
-    protected boolean bGreekMath; // Use math mode for greek letters
+    protected boolean bGreekMath; // Use math mode for Greek letters
     protected boolean bAlwaysUseDefaultLang; // Ignore sLang parameter to convert()
 
     // Collected data
-    protected String sDefaultLanguage; // The default iso language to use
+    protected String sDefaultLanguage; // The default ISO language to use
     protected HashSet<String> languages = new HashSet<String>(); // All languages used
 
     // **** Constructors ****
@@ -92,7 +92,7 @@ public abstract class I18n {
     public abstract void appendDeclarations(LaTeXDocumentPortion pack, LaTeXDocumentPortion decl);
 	
     /** Apply a language language
-     *  @param style the OOo style to read attributesfrom
+     *  @param style the OOo style to read attributes from
      *  @param bDecl true if declaration form is required
      *  @param bInherit true if inherited properties should be used
      *  @param ba the <code>BeforeAfter</code> to add LaTeX code to.
@@ -111,8 +111,16 @@ public abstract class I18n {
     /** Convert a string of characters into LaTeX
      *  @param s the source string
      *  @param bMathMode true if the string should be rendered in math mode
-     *  @param sLang the iso language of the string
+     *  @param sLang the ISO language of the string
      *  @return the LaTeX string
      */
     public abstract String convert(String s, boolean bMathMode, String sLang);
+    
+    /** Get the default language (either the document language or the most used language)
+     * 
+     *  @param the default language
+     */
+    public String getDefaultLanguage() {
+    	return sDefaultLanguage;
+    }
 }

@@ -29,11 +29,22 @@
 
 		<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer4latex.oxt:BibliographyZoteroBibTeXDir" id="bm_zoterobibtexdir"/>
 		<paragraph role="heading" level="3" xml-lang="en-US">BibTeX folder</paragraph>
-		<paragraph role="paragraph" xml-lang="en-US">To use this feature you also have to export your Zotero bibliography databse to BibTeX.
-		(TODO).</paragraph>
-		<paragraph role="paragraph" xml-lang="en-US">Type the full path to the directory containing the exported database or click
-		<emph>Browse</emph> to find the directory in your file system.</paragraph>
-		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer4latex.oxt:BibliographyZoteroBibTeXDir" visibility="hidden">Enter the path to the directory containing the BibTeX file exported from Zotero</ahelp></paragraph>
+		<paragraph role="paragraph" xml-lang="en-US">To use this feature you also have to export your Zotero bibliography database
+		to BibTeX.</paragraph>
+		<paragraph role="paragraph" xml-lang="en-US">Type the full path to the folder containing the exported database or click
+		<emph>Browse</emph> to find the folder in your file system.</paragraph>
+		<paragraph role="heading" level="4" xml-lang="en-US">Exporting your Zotero database to BibTeX</paragraph>
+		<paragraph role="paragraph" xml-lang="en-US">To use this feature you must export your Zotero database to the specified
+		folder.</paragraph>
+		<paragraph role="paragraph" xml-lang="en-US">The Writer2LaTeX distribution contains a folder named <emph>Zotero</emph>,
+		which contains a file called <emph>BibTeX-Writer2LaTeX.js</emph>. This file must be added to Zotero to provide a suitable
+		BibTeX export: In Zotero, choose <emph>Preferences</emph> - <emph>Advanced</emph> and click <emph>Show Data Directory</emph>.
+		Open the subfolder <emph>Translators</emph>, and copy <emph>BibTeX-Writer2LaTeX.js</emph> to this location.
+		Finally restart Firefox.</paragraph>
+		<paragraph role="paragraph" xml-lang="en-US">You can now export your Zotero database: In Zotero, select
+		<emph>Export Library</emph>, and choose <emph>BibTeX (Writer2LaTeX)</emph> (not <emph>BibTeX</emph>).
+		Save the file in the folder, you have defined.</paragraph>		
+		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer4latex.oxt:BibliographyZoteroBibTeXDir" visibility="hidden">Enter the path to the folder containing the BibTeX file exported from Zotero</ahelp></paragraph>
 
 		<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer4latex.oxt:BibliographyNatbibOptions" id="bm_natbiboptions"/>
 		<paragraph role="heading" level="3" xml-lang="en-US">Natbib Options</paragraph>
@@ -54,9 +65,9 @@
 
 		<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer4latex.oxt:BibliographyExternalBibTeXDir" id="bm_externalbibtexdir"/>
 		<paragraph role="heading" level="3" xml-lang="en-US">BibTeX folder</paragraph>
-		<paragraph role="paragraph" xml-lang="en-US">Type the full path to the directory containing the BibTeX database(s) or click
-		<emph>Browse</emph> to find the directory in your file system.</paragraph>
-		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer4latex.oxt:Bibliography" visibility="hidden">Enter the path to the directory containing the BibTeX files</ahelp></paragraph>
+		<paragraph role="paragraph" xml-lang="en-US">Type the full path to the folder containing the BibTeX database(s) or click
+		<emph>Browse</emph> to find the folder in your file system.</paragraph>
+		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer4latex.oxt:Bibliography" visibility="hidden">Enter the path to the folder containing the BibTeX files</ahelp></paragraph>
 
 	</body>
 </helpdocument>

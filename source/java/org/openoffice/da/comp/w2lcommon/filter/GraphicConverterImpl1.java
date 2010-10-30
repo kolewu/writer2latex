@@ -16,14 +16,13 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2009 by Henrik Just
+ *  Copyright: 2002-2010 by Henrik Just
  *
  *  All Rights Reserved.
  *  
- *  Version 1.0 (2009-03-08)
+ *  Version 1.2 (2010-10-27)
  */
 
-// 
  
 package org.openoffice.da.comp.w2lcommon.filter;
 
@@ -78,7 +77,7 @@ public class GraphicConverterImpl1 implements GraphicConverter {
         if (bCrop || bResize) { return false; }
 
         // We can convert vector formats to eps:
-        if (MIMETypes.EPS.equals(sTargetMime) && (MIMETypes.WMF.equals(sSourceMime) && MIMETypes.SVM.equals(sSourceMime))) {
+        if (MIMETypes.EPS.equals(sTargetMime) && (MIMETypes.WMF.equals(sSourceMime) || MIMETypes.SVM.equals(sSourceMime))) {
             return true;
         }
 		

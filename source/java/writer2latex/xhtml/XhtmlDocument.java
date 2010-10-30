@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-06-19)
+ *  Version 1.2 (2010-10-27)
  *
  */
  
@@ -598,11 +598,16 @@ public class XhtmlDocument extends DOMDocument {
                 else if (node.hasChildNodes()) {
                     int nNextLevel = (nLevel<0 || blockThis((Element)node)) ? -1 : nLevel+1;
                     // Print start tag
-                    if (nLevel>=0) { writeSpaces(nLevel,osw); }
-                    osw.write("<"+node.getNodeName());
-                    writeAttributes(node,osw);
-                    osw.write(">");
-                    if (nNextLevel>=0) { osw.write("\n"); }
+                    boolean bRedundantElement = !node.hasAttributes() &&
+                    	(node.getNodeName().equals("a") || node.getNodeName().equals("span")); 
+                    if (!bRedundantElement) {
+                    	// Writer2xhtml may produce <a> and <span> without attributes, these are removed here
+                    	if (nLevel>=0) { writeSpaces(nLevel,osw); }
+                    	osw.write("<"+node.getNodeName());
+                    	writeAttributes(node,osw);
+                    	osw.write(">");
+                    	if (nNextLevel>=0) { osw.write("\n"); }
+                    }
                     // Print children
                     Node child = node.getFirstChild();
                     while (child!=null) {
@@ -610,9 +615,11 @@ public class XhtmlDocument extends DOMDocument {
                         child = child.getNextSibling();
                     }
                     // Print end tag
-                    if (nNextLevel>=0) { writeSpaces(nLevel,osw); }
-                    osw.write("</"+node.getNodeName()+">");
-                    if (nLevel>=0) { osw.write("\n"); }
+                    if (!bRedundantElement) {
+                    	if (nNextLevel>=0) { writeSpaces(nLevel,osw); }
+                    	osw.write("</"+node.getNodeName()+">");
+                    	if (nLevel>=0) { osw.write("\n"); }
+                    }
                 }
                 else { // empty element
                     if (nLevel>=0) { writeSpaces(nLevel,osw); }
