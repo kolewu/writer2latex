@@ -16,13 +16,15 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2008 by Henrik Just
+ *  Copyright: 2002-2010 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.0 (2008-11-23)
+ *  Version 1.2 (2010-11-21)
  *
  */
+
+// TODO: Get the styles for footnotes and endnotes and use Context.resetFormattingFromStyle...
 
 package writer2latex.latex;
 
@@ -276,6 +278,8 @@ public class NoteConverter extends ConverterHelper {
                     }
 
                     if (nodeName.equals(XMLString.TEXT_P)) {
+                    	StyleWithProperties style = ofr.getParStyle(node.getAttribute(XMLString.TEXT_STYLE_NAME));
+                    	oc.resetFormattingFromStyle(style);
                         palette.getInlineCv().traverseInlineText(child,ldp,oc);
                         if (i<len-1) {
                             if (nList.item(i+1).getNodeName().startsWith(XMLString.TEXT_)) {

@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2009 by Henrik Just
+ *  Copyright: 2002-2010 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2009-03-26) 
+ *  Version 1.2 (2010-11-21) 
  * 
  */
 
@@ -52,10 +52,11 @@ public class XeTeXI18n extends I18n {
      *  @param decl other declarations
      */
     public void appendDeclarations(LaTeXDocumentPortion pack, LaTeXDocumentPortion decl) {
-    	pack.append("\\usepackage{fontspec}").nl()
+    	pack.append("\\usepackage{amsmath,amssymb,amsfonts}").nl()
+    		.append("\\usepackage{fontspec}").nl()
     		.append("\\usepackage{xunicode}").nl()
-    		.append("\\usepackage{xltxtra}").nl()
-    		.append("\\usepackage{amsmath,amssymb,amsfonts}").nl();
+    		.append("\\usepackage{xltxtra}").nl();
+    		
     }
 	
     /** Apply a language language
@@ -94,22 +95,17 @@ public class XeTeXI18n extends I18n {
     	for (int i=0; i<nLen; i++) {
     		c = s.charAt(i);
     		switch (c) {
-    			case '"' : buf.append("\\textquotedbl{}"); break;
-    			case '#' : buf.append("\\#"); break;
-    			case '$' : buf.append("\\$"); break;
-    			case '%' : buf.append("\\%"); break;
-    			case '&' : buf.append("\\&"); break;
-    			case '\'' : buf.append("\\textbackslash{}"); break;
-    			case '<' : buf.append("\\textless{}"); break;
-    			case '>' : buf.append("\\textgreater{}"); break;
-    			case '\\' : buf.append("\\textbackslash{}"); break;
-    			case '\u005e' : buf.append("\\^{}"); break;
-    			case '_' : buf.append("\\_"); break;
-    			case '\u0060' : buf.append("\\textasciigrave{}"); break;
-    			case '{' : buf.append("\\{"); break;
-    			case '|' : buf.append("\\textbar{}"); break;
-    			case '}' : buf.append("\\}"); break;
-    			case '~' : buf.append("\\~{}"); break;
+    			case '#' : buf.append("\\#"); break; // Parameter
+    			case '$' : buf.append("\\$"); break; // Math shift
+    			case '%' : buf.append("\\%"); break; // Comment
+    			case '&' : buf.append("\\&"); break; // Alignment tab
+    			case '\\' : buf.append("\\textbackslash{}"); break; // Escape
+    			case '^' : buf.append("\\^{}"); break; // Superscript
+    			case '_' : buf.append("\\_"); break; // Subscript
+    			case '{' : buf.append("\\{"); break; // Begin group
+    			case '}' : buf.append("\\}"); break; // End group
+    			case '~' : buf.append("\\textasciitilde{}"); break; // Active (non-breaking space)
+    			case '\u00A0' : buf.append('~'); break; // Make non-breaking spaces visible
     			default: buf.append(c);
     		}
     	}

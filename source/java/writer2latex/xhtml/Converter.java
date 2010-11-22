@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-10-30)
+ *  Version 1.2 (2010-11-22)
  *
  */
 
@@ -182,7 +182,7 @@ public class Converter extends ConverterBase {
         outFiles = new Vector<XhtmlDocument>();
         nOutFileIndex = -1;
 
-        bNeedHeaderFooter = !bOPS && (ofr.isSpreadsheet() || ofr.isPresentation() || config.getXhtmlSplitLevel()>0 || config.getXhtmlUplink().length()>0);
+        bNeedHeaderFooter = !bOPS && (ofr.isSpreadsheet() || ofr.isPresentation() || config.getXhtmlSplitLevel()>0 || config.pageBreakSplit()>XhtmlConfig.NONE || config.getXhtmlUplink().length()>0);
 
         l10n = new L10n();
         
@@ -306,7 +306,7 @@ public class Converter extends ConverterBase {
                 if (footer!=null) { footer.appendChild(footerPar); }
             }
         }
-        else if (ofr.isPresentation() || config.getXhtmlSplitLevel()>0) {
+        else if (nOutFileIndex>0) {
             for (int i=0; i<=nOutFileIndex; i++) {
                 XhtmlDocument doc = outFiles.get(i);
                 Document dom = doc.getContentDOM();

@@ -1,4 +1,4 @@
-Writer2LaTeX source version 1.1.5
+Writer2LaTeX source version 1.1.9
 =================================
 
 Writer2LaTeX is (c) 2002-2010 by Henrik Just.
@@ -53,7 +53,7 @@ OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO 
 LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 
-Fromiharder.sourceforge.net:
+From iharder.sourceforge.net:
 
 The class writer2latex.util.Base64 is Robert Harders public domain Base64 class
 
@@ -95,7 +95,7 @@ In addition to oxt, the build file supports the following targets:
     clean
 
 
-Henrik Just, May 2010
+Henrik Just, November 2010
 
 
 Thanks to Michael Niedermair for writing the original ant build file

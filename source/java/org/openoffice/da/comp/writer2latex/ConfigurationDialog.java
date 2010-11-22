@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2009 by Henrik Just
+ *  Copyright: 2002-2010 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2009-11-19)
+ *  Version 1.2 (2010-11-21)
  *
  */ 
  
@@ -73,7 +73,7 @@ public final class ConfigurationDialog extends WeakBase
 	
 	private String[] sFamilyNames = { "text", "paragraph", "paragraph-block", "list", "listitem" };
 	private String[] sOOoFamilyNames = { "CharacterStyles", "ParagraphStyles", "ParagraphStyles", "NumberingStyles", "NumberingStyles" };
-	private String[] sAttributeNames = { "bold", "italics", "small-caps", "superscript", "subscipt" };
+	private String[] sAttributeNames = { "bold", "italic", "small-caps", "superscript", "subscipt" };
 
     private XComponentContext xContext;
     private XSimpleFileAccess2 sfa2;

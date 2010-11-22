@@ -50,6 +50,10 @@ public abstract class OfficeStyle {
     public String getDisplayName() { return sDisplayName; }
 
     public String getParentName() { return sParentName; }
+    
+    public OfficeStyle getParentStyle() {
+    	return family.getStyle(sParentName);
+    }
 	
     public String getListStyleName() { return sListStyleName; }
 

@@ -1,5 +1,23 @@
 Changelog for Writer2LaTeX version 1.0 -> 1.2
 
+---------- version 1.1.9 ----------
+
+[w2x] New option page_break_split with values none (default), styles (split on page breaks defined by a style),
+  explicit (split on all explicit page breaks, manual or defined by a style), all (split on all page breaks, including
+  soft page breaks (will not split until current paragraph, table or list is finished))
+
+[w2x] New option display_hidden_text (default false) to export sections, paragraphs and text marked as hidden
+
+[w2l] Bugfix: Export footnote configuration before other styles (otherwise some definitions may be lost)
+
+[w2l] XeTeX bugfix: AMS packages should be loaded before fontspec
+
+[w2l] XeTeX bugfix: Corrected translation of apostrophe (') and tilde (~) and removed unnecessary translations
+
+[w2l] Bugfix: Formatting attribute map for italic created with the configuration dialog did not work 
+
+[w2l] Bugfix: Character formatting in footnotes and endnotes was sometimes lost
+
 ---------- version 1.1.5 ----------
 
 [w2x] Automatic split of files in EPUB export after 150000 characters (to avoid problems with some EPUB readers

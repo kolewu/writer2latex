@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-06-20)
+ *  Version 1.2 (2010-11-22)
  *
  */
 
@@ -41,7 +41,7 @@ import writer2latex.util.Misc;
 
 public class XhtmlConfig extends writer2latex.base.ConfigBase {
     // Implement configuration methods
-    protected int getOptionCount() { return 44; }
+    protected int getOptionCount() { return 46; }
     protected String getDefaultConfigPath() { return "/writer2latex/xhtml/config/"; }
 	
     // Override setOption: To be backwards compatible, we must accept options
@@ -76,6 +76,12 @@ public class XhtmlConfig extends writer2latex.base.ConfigBase {
     public static final int IMAGE_STARMATH = 2;
     public static final int IMAGE_LATEX = 3;
     
+    // Page breaks
+    public static final int NONE = 0;
+    public static final int STYLES = 1;
+    public static final int EXPLICIT = 2;
+    public static final int ALL = 3;
+    
     // Options
     private static final int IGNORE_HARD_LINE_BREAKS = 0;
     private static final int IGNORE_EMPTY_PARAGRAPHS = 1;
@@ -99,28 +105,30 @@ public class XhtmlConfig extends writer2latex.base.ConfigBase {
     private static final int LIST_FORMATTING = 19;
     private static final int USE_DUBLIN_CORE = 20;
     private static final int NOTES = 21;
-    private static final int CONVERT_TO_PX = 22;
-    private static final int SCALING = 23;
-    private static final int COLUMN_SCALING = 24;
-    private static final int FLOAT_OBJECTS = 25;
-    private static final int TABSTOP_STYLE = 26;
-    private static final int FORMULAS = 27;
-    private static final int ENDNOTES_HEADING = 28;
-    private static final int SPLIT_LEVEL = 29;
-    private static final int REPEAT_LEVELS = 30;
-    private static final int CALC_SPLIT = 31;
-    private static final int DISPLAY_HIDDEN_SHEETS = 32;
-    private static final int DISPLAY_HIDDEN_ROWS_COLS = 33;
-    private static final int DISPLAY_FILTERED_ROWS_COLS = 34;
-    private static final int APPLY_PRINT_RANGES = 35;
-    private static final int USE_TITLE_AS_HEADING = 36;
-    private static final int USE_SHEET_NAMES_AS_HEADINGS = 37;
-    private static final int XSLT_PATH = 38;
-    private static final int SAVE_IMAGES_IN_SUBDIR = 39;
-    private static final int UPLINK = 40;
-    private static final int DIRECTORY_ICON = 41;
-    private static final int DOCUMENT_ICON = 42;
-    private static final int ZEN_HACK = 43; // temporary hack for ePub Zen Garden styles
+    private static final int DISPLAY_HIDDEN_TEXT = 22;
+    private static final int CONVERT_TO_PX = 23;
+    private static final int SCALING = 24;
+    private static final int COLUMN_SCALING = 25;
+    private static final int FLOAT_OBJECTS = 26;
+    private static final int TABSTOP_STYLE = 27;
+    private static final int FORMULAS = 28;
+    private static final int ENDNOTES_HEADING = 29;
+    private static final int SPLIT_LEVEL = 30;
+    private static final int REPEAT_LEVELS = 31;
+    private static final int PAGE_BREAK_SPLIT = 32;
+    private static final int CALC_SPLIT = 33;
+    private static final int DISPLAY_HIDDEN_SHEETS = 34;
+    private static final int DISPLAY_HIDDEN_ROWS_COLS = 35;
+    private static final int DISPLAY_FILTERED_ROWS_COLS = 36;
+    private static final int APPLY_PRINT_RANGES = 37;
+    private static final int USE_TITLE_AS_HEADING = 38;
+    private static final int USE_SHEET_NAMES_AS_HEADINGS = 39;
+    private static final int XSLT_PATH = 40;
+    private static final int SAVE_IMAGES_IN_SUBDIR = 41;
+    private static final int UPLINK = 42;
+    private static final int DIRECTORY_ICON = 43;
+    private static final int DOCUMENT_ICON = 44;
+    private static final int ZEN_HACK = 45; // temporary hack for ePub Zen Garden styles
 
     protected ComplexOption xheading = addComplexOption("heading-map");
     protected ComplexOption xpar = addComplexOption("paragraph-map");
@@ -161,6 +169,7 @@ public class XhtmlConfig extends writer2latex.base.ConfigBase {
         };
         options[USE_DUBLIN_CORE] = new BooleanOption("use_dublin_core","true");
         options[NOTES] = new BooleanOption("notes","true");
+        options[DISPLAY_HIDDEN_TEXT] = new BooleanOption("display_hidden_text", "false");
         options[CONVERT_TO_PX] = new BooleanOption("convert_to_px","true");
         options[SCALING] = new Option("scaling","100%");
         options[COLUMN_SCALING] = new Option("column_scaling","100%");
@@ -188,8 +197,17 @@ public class XhtmlConfig extends writer2latex.base.ConfigBase {
                 nValue = Misc.getPosInteger(sValue,0);
             }
         };
+        options[PAGE_BREAK_SPLIT] = new IntegerOption("page_break_split", "none") {
+        	@Override public void setString(String sValue) {
+        		super.setString(sValue);
+        		if ("styles".equals(sValue)) { nValue = STYLES; }
+        		else if ("explicit".equals(sValue)) { nValue = EXPLICIT; }
+        		else if ("all".equals(sValue)) { nValue = ALL; }
+        		else { nValue = NONE; }
+        	}
+        };
         options[CALC_SPLIT] = new BooleanOption("calc_split","false");
-        options[DISPLAY_HIDDEN_SHEETS] = new BooleanOption("display_hidden_sheets","false");
+        options[DISPLAY_HIDDEN_SHEETS] = new BooleanOption("display_hidden_sheets", "false");
         options[DISPLAY_HIDDEN_ROWS_COLS] = new BooleanOption("display_hidden_rows_cols","false");
         options[DISPLAY_FILTERED_ROWS_COLS] = new BooleanOption("display_filtered_rows_cols","false");
         options[APPLY_PRINT_RANGES] = new BooleanOption("apply_print_ranges","false");
@@ -293,6 +311,7 @@ public class XhtmlConfig extends writer2latex.base.ConfigBase {
     public int listFormatting() { return ((IntegerOption) options[LIST_FORMATTING]).getValue(); }
     public boolean xhtmlUseDublinCore() { return ((BooleanOption) options[USE_DUBLIN_CORE]).getValue(); }
     public boolean xhtmlNotes() { return ((BooleanOption) options[NOTES]).getValue(); }
+    public boolean displayHiddenText() { return ((BooleanOption) options[DISPLAY_HIDDEN_TEXT]).getValue(); }
     public boolean xhtmlConvertToPx() { return ((BooleanOption) options[CONVERT_TO_PX]).getValue(); }
     public String getXhtmlScaling() { return options[SCALING].getString(); }
     public String getXhtmlColumnScaling() { return options[COLUMN_SCALING].getString(); }
@@ -302,6 +321,7 @@ public class XhtmlConfig extends writer2latex.base.ConfigBase {
     public int formulas() { return ((IntegerOption) options[FORMULAS]).getValue(); }
     public int getXhtmlSplitLevel() { return ((IntegerOption) options[SPLIT_LEVEL]).getValue(); }
     public int getXhtmlRepeatLevels() { return ((IntegerOption) options[REPEAT_LEVELS]).getValue(); }
+    public int pageBreakSplit() { return ((IntegerOption) options[PAGE_BREAK_SPLIT]).getValue(); }
     public boolean xhtmlCalcSplit() { return ((BooleanOption) options[CALC_SPLIT]).getValue(); }
     public boolean xhtmlDisplayHiddenSheets() { return ((BooleanOption) options[DISPLAY_HIDDEN_SHEETS]).getValue(); }
     public boolean displayHiddenRowsCols() { return ((BooleanOption) options[DISPLAY_HIDDEN_ROWS_COLS]).getValue(); }

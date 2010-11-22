@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-03-28) 
+ *  Version 1.2 (2010-11-21) 
  *
  */
 
@@ -206,6 +206,7 @@ public final class ConverterPalette extends ConverterBase {
         // Add declarations from our helpers
         i18n.appendDeclarations(packages,declarations);
         colorCv.appendDeclarations(packages,declarations);
+        noteCv.appendDeclarations(packages,declarations);
         charSc.appendDeclarations(packages,declarations);
         headingCv.appendDeclarations(packages,declarations);
         parCv.appendDeclarations(packages,declarations);
@@ -216,7 +217,6 @@ public final class ConverterPalette extends ConverterBase {
         bibCv.appendDeclarations(packages,declarations);
         sectionCv.appendDeclarations(packages,declarations);
         tableCv.appendDeclarations(packages,declarations);
-        noteCv.appendDeclarations(packages,declarations);
         captionCv.appendDeclarations(packages,declarations);
         inlineCv.appendDeclarations(packages,declarations);
         fieldCv.appendDeclarations(packages,declarations);
