@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-03-12)
+ *  Version 1.2 (2010-12-08)
  *
  */
 
@@ -63,6 +63,10 @@ public class TextStyleConverter extends StyleWithPropertiesConverterHelper {
     private Hashtable<String, String> anchorCombinedStyleNames = new Hashtable<String, String>();
     private Hashtable<String, String> orgAnchorStyleNames = new Hashtable<String, String>();
     private Hashtable<String, String> orgAnchorVisitedStyleNames = new Hashtable<String, String>();
+    
+    // Export font sizes as percentages?
+    private boolean bRelativeFontSize = false;
+    private String sBaseFontSize = "12pt";
 
     /** Create a new <code>TextStyleConverter</code>
      *  @param ofr an <code>OfficeReader</code> to read style information from
@@ -75,6 +79,14 @@ public class TextStyleConverter extends StyleWithPropertiesConverterHelper {
         this.styleMap = config.getXTextStyleMap();
         this.bConvertStyles = config.xhtmlFormatting()==XhtmlConfig.CONVERT_ALL || config.xhtmlFormatting()==XhtmlConfig.IGNORE_HARD;
         this.bConvertHard = config.xhtmlFormatting()==XhtmlConfig.CONVERT_ALL || config.xhtmlFormatting()==XhtmlConfig.IGNORE_STYLES;
+        this.bRelativeFontSize = converter.isOPS() && config.xhtmlConvertToPx();
+        StyleWithProperties defaultStyle = ofr.getDefaultParStyle();
+        if (defaultStyle!=null) {
+        	String sFontSize = defaultStyle.getProperty(XMLString.FO_FONT_SIZE,false);
+        	if (sFontSize!=null) {
+        		sBaseFontSize = sFontSize;
+        	}
+        }
     }
 
     /** Apply a link style, using a combination of two text styles
@@ -298,14 +310,30 @@ public class TextStyleConverter extends StyleWithPropertiesConverterHelper {
                 else { // one value
                     s3 = s2; s4="100%";
                 }
-                if (s!=null) { props.addValue("font-size",Misc.multiply(s4,scale(s))); }
-                else { props.addValue("font-size",s4); }
+                if (s!=null) {
+                	if (bRelativeFontSize) {
+                		String sFontSize = Misc.divide(Misc.multiply(s4,s), sBaseFontSize);
+                		if (!"100%".equals(sFontSize)) props.addValue("font-size", sFontSize);
+                	}
+                	else {
+                		props.addValue("font-size",Misc.multiply(s4,scale(s)));
+                	}
+                }
+                else {
+                	props.addValue("font-size",s4);
+                }
                 if (!"0%".equals(s3)) {
                 	props.addValue("vertical-align",s3);
                 }
             }
             else if (s!=null) {
-                props.addValue("font-size",scale(s));
+            	if (bRelativeFontSize) {
+            		String sFontSize = Misc.divide(s,sBaseFontSize);
+            		if (!"100%".equals(sFontSize)) props.addValue("font-size", sFontSize);
+            	}
+            	else {
+            		props.addValue("font-size",scale(s));
+            	}
             }
         }
 

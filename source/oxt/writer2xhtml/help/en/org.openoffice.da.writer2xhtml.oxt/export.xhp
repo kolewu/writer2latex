@@ -79,7 +79,9 @@
     	    <paragraph role="heading" level="3" xml-lang="en-US">Convert units to px (pixels)</paragraph>
 	        <paragraph role="paragraph" xml-lang="en-US">In %PRODUCTNAME, font sizes are usually given in points and other dimensions
     	    in e.g. cm or inches. For XHTML it is recommended to use the unit px instead, and using this option you can require that
-        	all dimensions are converted to px. If you choose not to check this option,the original units will always be used.</paragraph>
+        	all dimensions are converted to px. For EPUB it is recommended to use relative font sizes, and using this option will
+        	export all font sizes as percentages (and use px for all other dimensions).</paragraph>
+        	<paragraph role="paragraph" xml-lang="en-US">If you choose not to check this option,the original units will always be used.</paragraph>
         </section>
 
     	<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:OptionsOriginalImageSize" id="bm_options_originalimagesize"/>

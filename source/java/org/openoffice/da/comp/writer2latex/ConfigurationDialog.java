@@ -20,83 +20,30 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-11-21)
+ *  Version 1.2 (2010-12-08)
  *
  */ 
  
 package org.openoffice.da.comp.writer2latex;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.text.Collator;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
-
-import com.sun.star.awt.XContainerWindowEventHandler;
-import com.sun.star.awt.XDialog;
-import com.sun.star.awt.XDialogProvider2;
-import com.sun.star.awt.XWindow;
-import com.sun.star.io.NotConnectedException;
-import com.sun.star.io.XInputStream;
-import com.sun.star.io.XOutputStream;
-import com.sun.star.lang.XMultiComponentFactory;
-import com.sun.star.lang.XServiceInfo;
-import com.sun.star.ucb.CommandAbortedException;
-import com.sun.star.ucb.XSimpleFileAccess2;
-import com.sun.star.ui.dialogs.ExecutableDialogResults;
-import com.sun.star.uno.AnyConverter;
-import com.sun.star.uno.UnoRuntime;
-import com.sun.star.uno.XComponentContext;
-import com.sun.star.util.XStringSubstitution;
-
-import com.sun.star.lib.uno.helper.WeakBase;
-import com.sun.star.lib.uno.adapter.XInputStreamToInputStreamAdapter;
-import com.sun.star.lib.uno.adapter.XOutputStreamToOutputStreamAdapter;
 
 import writer2latex.api.ComplexOption;
-import writer2latex.api.Config;
-import writer2latex.api.ConverterFactory;
 
+import org.openoffice.da.comp.w2lcommon.filter.ConfigurationDialogBase;
 import org.openoffice.da.comp.w2lcommon.helper.DialogAccess;
-import org.openoffice.da.comp.w2lcommon.helper.StyleNameProvider;
 
-/** This class provides a uno component which implements the configuration
+import com.sun.star.lang.XServiceInfo;
+import com.sun.star.uno.XComponentContext;
+
+/** This class provides a UNO component which implements the configuration
  *  of Writer2LaTeX. The same component is used for all pages - using the
  *  dialog title to distinguish between the pages.
  */
-public final class ConfigurationDialog extends WeakBase
-    implements XServiceInfo, XContainerWindowEventHandler {
-	
-	private String[] sFamilyNames = { "text", "paragraph", "paragraph-block", "list", "listitem" };
-	private String[] sOOoFamilyNames = { "CharacterStyles", "ParagraphStyles", "ParagraphStyles", "NumberingStyles", "NumberingStyles" };
-	private String[] sAttributeNames = { "bold", "italic", "small-caps", "superscript", "subscipt" };
+public final class ConfigurationDialog extends ConfigurationDialogBase implements XServiceInfo {
 
-    private XComponentContext xContext;
-    private XSimpleFileAccess2 sfa2;
-    private String sConfigFileName = null;
-    Config config;
-    // Local cache of complex options
-    ComplexOption[] styleMap;
-    ComplexOption attributeMap;
-    ComplexOption headingMap;
-    ComplexOption mathSymbols;
-    ComplexOption stringReplace;
-    short nCurrentFamily = -1;
-    String sCurrentStyleName = null;
-    short nCurrentAttribute = -1;
-    short nCurrentWriterLevel = 0;
-    String sCurrentMathSymbol = null;
-    String sCurrentText = null;
-    private String sTitle = null;
-    private DialogAccess dlg = null;
-    private StyleNameProvider styleNameProvider = null;
-    private CustomSymbolNameProvider customSymbolNameProvider = null;
-    
-    /** The component will be registered under this name.
+	/** The component will be registered under this name.
      */
     public static String __serviceName = "org.openoffice.da.writer2latex.ConfigurationDialog";
 
@@ -104,8 +51,676 @@ public final class ConfigurationDialog extends WeakBase
      */
     public static String __implementationName = "org.openoffice.da.comp.writer2latex.ConfigurationDialog";
 
-    /** Create a new ConfigurationDialog */
+    // Implement the interface XServiceInfo
+    public boolean supportsService(String sServiceName) {
+        return sServiceName.equals(__serviceName);
+    }
+
+    public String getImplementationName() {
+        return __implementationName;
+    }
+    
+    public String[] getSupportedServiceNames() {
+        String[] sSupportedServiceNames = { __serviceName };
+        return sSupportedServiceNames;
+    }
+	
+    // Configure the base class
+    @Override protected String getMIMEType() { return "application/x-latex"; }
+    
+    @Override protected String getDialogLibraryName() { return "W2LDialogs2"; }
+    
+    @Override protected String getConfigFileName() { return "writer2latex.xml"; }
+    
+    /** Construct a new <code>ConfigurationDialog</code> */
     public ConfigurationDialog(XComponentContext xContext) {
+    	super(xContext);
+    	
+    	pageHandlers.put("Documentclass", new DocumentclassHandler());
+    	pageHandlers.put("Headings", new HeadingsHandler());
+    	pageHandlers.put("Styles", new StylesHandler());
+    	pageHandlers.put("Characters", new CharactersHandler());
+    	pageHandlers.put("Fonts", new FontsHandler());
+    	pageHandlers.put("Pages", new PagesHandler());
+    	//pageHandlers.put("Tables", new Handler());
+    	//pageHandlers.put("Figures", new Handler());
+    	//pageHandlers.put("TextAndMath", new Handler());
+    }
+    
+    // Implement remaining method from XContainerWindowEventHandler
+    public String[] getSupportedMethodNames() {
+        String[] sNames = {
+        		"NoPreambleChange", // Documentclass
+        		"MaxLevelChange", "WriterLevelChange", "NoIndexChange", // Headings
+        		"StyleFamilyChange", "StyleNameChange", "NewStyleClick", "DeleteStyleClick", "AddNextClick",
+        			"RemoveNextClick", "LoadDefaultsClick", // Styles
+        		"UseSoulChange", "FormattingAttributeChange", "CustomAttributeChange", // Characters
+        		"ExportGeometryChange", "ExportHeaderAndFooterChange", // Pages
+        		"NoTablesChange", "UseSupertabularChange", "UseLongtableChange", // Tables
+        		"NoImagesChange", // Images
+        		"MathSymbolNameChange", "NewSymbolClick", "DeleteSymbolClick",
+        		"TextInputChange", "NewTextClick", "DeleteTextClick" // Text and Math
+        };
+        return sNames;
+    }
+
+    // The page "Documentclass"
+    // This page handles the options no_preamble, documentclass, global_options and the custom-preamble
+    private class DocumentclassHandler extends PageHandler {
+    	@Override protected void setControls(DialogAccess dlg) {
+        	checkBoxFromConfig(dlg,"NoPreamble","no_preamble");
+        	textFieldFromConfig(dlg,"Documentclass","documentclass");
+        	textFieldFromConfig(dlg,"GlobalOptions","global_options");
+        	textFieldFromConfig(dlg,"CustomPreamble","custom-preamble");
+    		noPreambleChange(dlg);
+    	}
+    	
+    	@Override protected void getControls(DialogAccess dlg) {
+    		checkBoxToConfig(dlg,"NoPreamble", "no_preamble");
+    		textFieldToConfig(dlg,"Documentclass","documentclass");
+    		textFieldToConfig(dlg,"GlobalOptions","global_options");
+    		textFieldToConfig(dlg,"CustomPreamble","custom-preamble");
+    	}
+    	
+    	@Override protected boolean handleEvent(DialogAccess dlg, String sMethod) {
+    		if (sMethod.equals("NoPreambleChange")) {
+    			noPreambleChange(dlg);
+    			return true;
+    		}
+    		return false;
+    	}
+
+    	private void noPreambleChange(DialogAccess dlg) {
+        	boolean bPreamble = !dlg.getCheckBoxStateAsBoolean("NoPreamble");
+        	dlg.setControlEnabled("DocumentclassLabel",bPreamble);
+        	dlg.setControlEnabled("Documentclass",bPreamble);
+        	dlg.setControlEnabled("GlobalOptionsLabel",bPreamble);
+        	dlg.setControlEnabled("GlobalOptions",bPreamble);
+        	dlg.setControlEnabled("CustomPreambleLabel",bPreamble);
+        	dlg.setControlEnabled("CustomPreamble",bPreamble);
+    	}    	
+    }
+    
+    // The page "Headings"
+    // This page handles the heading map as well as the options no_index, use_titlesec and use_titletoc
+    private class HeadingsHandler extends PageHandler {
+        ComplexOption headingMap = new ComplexOption(); // Cached heading map
+        short nCurrentWriterLevel = -1; // Currently displayed level
+        
+    	@Override protected void setControls(DialogAccess dlg) {
+        	// Load heading map from config
+    		headingMap.clear();
+    		headingMap.copyAll(config.getComplexOption("heading-map"));
+    		nCurrentWriterLevel = -1;
+    		
+        	// Determine and set the max level (from 0 to 10)
+        	short nMaxLevel = 0;
+        	while(nMaxLevel<10 && headingMap.containsKey(Integer.toString(nMaxLevel+1))) {
+        		nMaxLevel++;
+        	}
+        	dlg.setListBoxSelectedItem("MaxLevel", nMaxLevel);
+        	
+        	// Get other controls from config
+        	checkBoxFromConfig(dlg,"UseTitlesec","use_titlesec");
+
+        	checkBoxFromConfig(dlg,"NoIndex","no_index");
+        	checkBoxFromConfig(dlg,"UseTitletoc","use_titletoc");
+
+    		noIndexChange(dlg);
+    	}
+    	
+    	@Override protected void getControls(DialogAccess dlg) {
+        	updateHeadingMap(dlg);
+        	
+        	// Save heading map to config
+        	config.getComplexOption("heading-map").clear();
+        	int nMaxLevel = dlg.getListBoxSelectedItem("MaxLevel");
+        	System.out.println("Using current max level of "+nMaxLevel);
+    		for (int i=1; i<=nMaxLevel; i++) {
+    			String sLevel = Integer.toString(i);
+    			config.getComplexOption("heading-map").copy(sLevel,headingMap.get(sLevel));
+    		}
+
+        	// Save other controls to config
+    		checkBoxToConfig(dlg,"UseTitlesec","use_titlesec");    	
+    		checkBoxToConfig(dlg,"NoIndex","no_index");    	
+    		checkBoxToConfig(dlg,"UseTitletoc","use_titletoc");    	
+    	}
+    	
+    	@Override protected boolean handleEvent(DialogAccess dlg, String sMethod) { 
+    		if (sMethod.equals("MaxLevelChange")) {
+    			maxLevelChange(dlg);
+    			return true;
+    		}
+    		else if (sMethod.equals("WriterLevelChange")) {
+    			writerLevelChange(dlg);
+    			return true;
+    		}
+    		else if (sMethod.equals("NoIndexChange")) {
+    			noIndexChange(dlg);
+    			return true;
+    		}
+    		return false;
+    	}
+
+    	private void maxLevelChange(DialogAccess dlg) {
+    		// Remember current writer level and clear it
+    		short nPreviousWriterLevel = nCurrentWriterLevel;
+    		dlg.setListBoxSelectedItem("WriterLevel", (short) -1);
+    		
+        	// Adjust the presented writer levels to the max level
+        	short nMaxLevel = dlg.getListBoxSelectedItem("MaxLevel");
+        	String[] sWriterLevels = new String[nMaxLevel];
+        	for (int i=0; i<nMaxLevel; i++) {
+        		sWriterLevels[i]=Integer.toString(i+1);
+        	}
+        	dlg.setListBoxStringItemList("WriterLevel", sWriterLevels);
+        	
+        	if (nMaxLevel>0) {
+        		short nNewWriterLevel;
+        		if (nPreviousWriterLevel+1>nMaxLevel) {
+                	// If we lower the max level, we may have to change the displayed Writer level
+        			nNewWriterLevel = (short)(nMaxLevel-1);
+        		}
+        		else if (nPreviousWriterLevel>-1){
+        			// Otherwise reselect the current level, if any
+        			nNewWriterLevel = nPreviousWriterLevel;
+        		}
+        		else {
+        			// Or select the top level
+        			nNewWriterLevel = (short) 0;
+        		}
+        		dlg.setListBoxSelectedItem("WriterLevel", nNewWriterLevel);
+        	}
+
+        	// All controls should be disabled if the maximum level is zero
+        	boolean bUpdate = dlg.getListBoxSelectedItem("MaxLevel")>0;
+        	dlg.setControlEnabled("WriterLevelLabel", bUpdate);
+        	dlg.setControlEnabled("WriterLevel", bUpdate);
+        	dlg.setControlEnabled("LaTeXLevelLabel", bUpdate);
+        	dlg.setControlEnabled("LaTeXLevel", bUpdate);
+        	dlg.setControlEnabled("LaTeXNameLabel", bUpdate);
+        	dlg.setControlEnabled("LaTeXName", bUpdate);
+        	// Until implemented:
+        	dlg.setControlEnabled("UseTitlesec", false);
+        	//dlg.setControlEnabled("UseTitlesec", bUpdate);
+    	}
+    	
+    	private void writerLevelChange(DialogAccess dlg) {
+    		updateHeadingMap(dlg);
+    		
+        	// Load the values for the new level
+    		nCurrentWriterLevel = dlg.getListBoxSelectedItem("WriterLevel");    		
+        	if (nCurrentWriterLevel>-1) {
+        		String sLevel = Integer.toString(nCurrentWriterLevel+1);
+        		if (headingMap.containsKey(sLevel)) {
+        			Map<String,String> attr = headingMap.get(sLevel);
+        			dlg.setComboBoxText("LaTeXLevel", attr.containsKey("level") ? attr.get("level") : "");
+        			dlg.setComboBoxText("LaTeXName", attr.containsKey("name") ? attr.get("name") : "");
+        		}
+        		else {
+        			dlg.setListBoxSelectedItem("LaTeXLevel", (short)2);
+        			dlg.setComboBoxText("LaTeXName", "");
+        		}
+        	}
+        	else {
+    			dlg.setComboBoxText("LaTeXLevel", "");
+    			dlg.setComboBoxText("LaTeXName", "");
+        	}
+    	}
+
+       	private void noIndexChange(DialogAccess dlg) {
+        	// Until implemented:
+        	dlg.setControlEnabled("UseTitletoc", false);
+        	//boolean bNoIndex = dlg.getCheckBoxStateAsBoolean("NoIndex");
+        	//dlg.setControlEnabled("UseTitletoc", !bNoIndex);    		
+    	} 
+    	
+        private void updateHeadingMap(DialogAccess dlg) {
+        	// Save the current writer level in our cache
+        	if (nCurrentWriterLevel>-1) {
+        		System.out.println("Updating current definition for writer level "+nCurrentWriterLevel+ " from ui");
+        		Map<String,String> attr = new HashMap<String,String>();
+        		attr.put("name", dlg.getComboBoxText("LaTeXName"));
+        		attr.put("level", dlg.getComboBoxText("LaTeXLevel"));
+        		headingMap.put(Integer.toString(nCurrentWriterLevel+1), attr);
+        	}
+        }
+
+    }
+    
+    // The page "Styles"
+    // This page handles the various style maps as well as the options other_styles and formatting
+	// Limitation: Cannot handle the values "error" and "warning" for other_styles
+    private class StylesHandler extends StylesPageHandler {
+    	private final String[] sLaTeXFamilyNames = { "text", "paragraph", "paragraph-block", "list", "listitem" };
+    	private final String[] sLaTeXOOoFamilyNames = { "CharacterStyles", "ParagraphStyles", "ParagraphStyles", "NumberingStyles", "NumberingStyles" };
+    	    	
+    	protected StylesHandler() {
+    		super(5);
+    		sFamilyNames =sLaTeXFamilyNames;
+    		sOOoFamilyNames = sLaTeXOOoFamilyNames;
+     	}
+    	
+    	// Override standard PageHandler methods
+    	@Override public void setControls(DialogAccess dlg) {
+    		super.setControls(dlg);
+    		
+    		String sOtherStyles = config.getOption("other_styles");
+    		if ("accept".equals(sOtherStyles)) {
+    			dlg.setListBoxSelectedItem("OtherStyles", (short)1);
+    		}
+    		else {
+    			dlg.setListBoxSelectedItem("OtherStyles", (short)0);
+    		}
+
+    		String sFormatting = config.getOption("formatting");
+        	if ("ignore_all".equals(sFormatting)) {
+        		dlg.setListBoxSelectedItem("Formatting", (short)0);
+        	}
+        	else if ("ignore_most".equals(sFormatting)) {
+        		dlg.setListBoxSelectedItem("Formatting", (short)1);
+        	}
+        	else if ("convert_most".equals(sFormatting)) {
+        		dlg.setListBoxSelectedItem("Formatting", (short)3);
+        	}
+        	else if ("convert_all".equals(sFormatting)) {
+        		dlg.setListBoxSelectedItem("Formatting", (short)4);
+        	}
+        	else {
+        		dlg.setListBoxSelectedItem("Formatting", (short)2);
+        	}
+    	}
+    	
+    	@Override public void getControls(DialogAccess dlg) {
+    		super.getControls(dlg);
+    		
+    		switch (dlg.getListBoxSelectedItem("OtherStyles")) {
+    		case 0: config.setOption("other_styles", "ignore"); break;
+    		case 1: config.setOption("other_styles", "accept");
+    		}
+        	
+        	switch (dlg.getListBoxSelectedItem("Formatting")) {
+        	case 0: config.setOption("formatting", "ignore_all"); break;
+        	case 1: config.setOption("formatting", "ignore_most"); break;
+        	case 2: config.setOption("formatting", "convert_basic"); break;
+        	case 3: config.setOption("formatting", "convert_most"); break;
+        	case 4: config.setOption("formatting", "convert_all");
+        	}
+    	}
+    	
+    	@Override protected boolean handleEvent(DialogAccess dlg, String sMethod) {
+    		if (sMethod.equals("AddNextClick")) {
+    			addNextClick(dlg);
+    			return true;
+    		}
+    		else if (sMethod.equals("RemoveNextClick")) {
+    			removeNextClick(dlg);
+    			return true;
+    		}
+    		return super.handleEvent(dlg, sMethod);
+    	}
+    	
+    	// Define methods required by super
+    	protected String getDefaultConfigName() {
+    		return "clean.xml";
+    	}
+		
+		protected void setControls(DialogAccess dlg, Map<String,String> attr) {
+			// Always set before and after, and ensure they are defined
+			if (!attr.containsKey("before")) { attr.put("before", ""); }
+			if (!attr.containsKey("after")) { attr.put("after", ""); }
+			dlg.setTextFieldText("Before", attr.get("before"));
+	    	dlg.setTextFieldText("After", attr.get("after"));
+	    	
+	    	// Set next for paragraph block only
+    		String[] sNextItems;
+    		if (nCurrentFamily==2 && attr.containsKey("next") && attr.get("next").length()>0) {
+    			sNextItems = attr.get("next").split(";");
+    			// Localize known styles
+				Map<String,String> displayNames = styleNameProvider.getDisplayNames(sOOoFamilyNames[nCurrentFamily]);
+    			int nLen = sNextItems.length;
+				for (int i=0; i<nLen; i++) {
+					if (displayNames.containsKey(sNextItems[i])) {
+						sNextItems[i]=displayNames.get(sNextItems[i]);
+					}
+				}
+    		}
+    		else {
+    			sNextItems = new String[0];
+    		}
+    		dlg.setListBoxStringItemList("Next", sNextItems);
+    		dlg.setListBoxSelectedItem("Next", (short)Math.min(sNextItems.length-1, 0));
+	    	updateRemoveNextButton(dlg);
+	    	
+	        // Set verbatim for paragraph and character styles only
+	    	if (nCurrentFamily<2) {
+	    		dlg.setCheckBoxStateAsBoolean("Verbatim", 
+	    				attr.containsKey("verbatim") ? "true".equals(attr.get("verbatim")) : false);
+	    	}
+	    	else {
+	    		dlg.setCheckBoxStateAsBoolean("Verbatim", false);
+	    	}
+	    	
+	    	// Set line break for paragraph style only
+	    	if (nCurrentFamily==1) {
+	    		dlg.setCheckBoxStateAsBoolean("LineBreak",
+	    				attr.containsKey("line-break") ? "true".equals(attr.get("line-break")) : false);
+	    	}
+	    	else {
+	    		dlg.setCheckBoxStateAsBoolean("LineBreak", false);
+	    	}
+		}
+		
+		protected void getControls(DialogAccess dlg, Map<String,String> attr) {
+			// Always get before and after
+    		attr.put("before", dlg.getTextFieldText("Before"));
+    		attr.put("after", dlg.getTextFieldText("After"));
+	    	
+	    	// Get next for paragraph block only
+    		if (nCurrentFamily==2) {
+    			String[] sNextItems = dlg.getListBoxStringItemList("Next");
+    			// Internalize known styles
+				Map<String,String> internalNames = styleNameProvider.getInternalNames(sOOoFamilyNames[nCurrentFamily]);
+    			int nLen = sNextItems.length;
+				for (int i=0; i<nLen; i++) {
+					if (internalNames.containsKey(sNextItems[i])) {
+						sNextItems[i]=internalNames.get(sNextItems[i]);
+					}
+				}
+    			StringBuffer list = new StringBuffer();
+    			for (int i=0; i<nLen; i++) {
+    				if (i>0) list.append(';');
+    				list.append(sNextItems[i]);
+    			}
+    			attr.put("next", list.toString());
+    		}
+	    	
+	        // Get verbatim for paragraph and character styles only
+    		if (nCurrentFamily<2) {
+    			attr.put("verbatim", Boolean.toString(dlg.getCheckBoxStateAsBoolean("Verbatim")));
+    		}
+	    	
+	    	// Get line break for paragraph style only
+			if (nCurrentFamily==1) {
+				attr.put("line-break", Boolean.toString(dlg.getCheckBoxStateAsBoolean("LineBreak")));
+	    	}
+		}
+		
+		protected void clearControls(DialogAccess dlg) {
+			dlg.setTextFieldText("Before", "");
+			dlg.setTextFieldText("After", "");
+			dlg.setListBoxStringItemList("Next", new String[0]);
+			dlg.setCheckBoxStateAsBoolean("Verbatim", false);
+			dlg.setCheckBoxStateAsBoolean("LineBreak", false);
+		}
+		
+		protected void prepareControls(DialogAccess dlg) {
+        	dlg.setControlEnabled("NextLabel", nCurrentFamily==2);
+        	dlg.setControlEnabled("Next", nCurrentFamily==2);
+        	dlg.setControlEnabled("AddNextButton", nCurrentFamily==2);
+        	dlg.setControlEnabled("RemoveNextButton", nCurrentFamily==2);
+        	dlg.setControlEnabled("Verbatim", nCurrentFamily<2);
+        	dlg.setControlEnabled("LineBreak", nCurrentFamily==1);
+		}
+		
+		// Define own event handlers
+		private void addNextClick(DialogAccess dlg) {
+			appendItem(dlg, "Next",styleNameProvider.getInternalNames(sOOoFamilyNames[nCurrentFamily]).keySet());
+			updateRemoveNextButton(dlg);
+		}
+
+		private void removeNextClick(DialogAccess dlg) {
+			deleteCurrentItem(dlg, "Next");
+			updateRemoveNextButton(dlg);
+		}
+		
+		private void updateRemoveNextButton(DialogAccess dlg) {
+			dlg.setControlEnabled("RemoveNextButton", dlg.getListBoxStringItemList("Next").length>0);
+		}
+
+    }
+    
+    // The page "Characters"
+    // This page handles the options use_color, use_soul, use_ulem and use_hyperref
+    // In addition it handles style maps for formatting attributes
+    // TODO: Should extend AttributePageHandler
+    private class CharactersHandler extends PageHandler {
+    	private final String[] sAttributeNames = { "bold", "italic", "small-caps", "superscript", "subscipt" };
+        private ComplexOption attributeMap = new ComplexOption(); // Cache of attribute maps
+        short nCurrentAttribute = -1; // Currently displayed map
+
+    	@Override protected void setControls(DialogAccess dlg) {
+        	// Load attribute style map from config and select the first map
+    		attributeMap.clear();
+    		attributeMap.copyAll(config.getComplexOption("text-attribute-map"));
+    		nCurrentAttribute = -1;
+    		dlg.setListBoxSelectedItem("FormattingAttribute", (short)0);
+
+        	// Load other controls from config
+    		checkBoxFromConfig(dlg,"UseHyperref","use_hyperref");
+    		checkBoxFromConfig(dlg,"UseColor","use_color");
+    		checkBoxFromConfig(dlg,"UseSoul","use_soul");
+    		checkBoxFromConfig(dlg,"UseUlem","use_ulem");
+    	}
+    	
+    	@Override protected void getControls(DialogAccess dlg) {
+        	updateAttributeMap(dlg);
+        	
+        	// Save the attribute style map to config
+        	config.getComplexOption("text-attribute-map").clear();
+        	for (String s : attributeMap.keySet()) {
+        		if (!attributeMap.get(s).containsKey("deleted")) {
+        			config.getComplexOption("text-attribute-map").copy(s, attributeMap.get(s));
+        		}
+        	}
+
+    		// Save other controls to config
+    		checkBoxToConfig(dlg,"UseHyperref","use_hyperref");
+    		checkBoxToConfig(dlg,"UseColor","use_color");
+    		checkBoxToConfig(dlg,"UseSoul","use_soul");
+    		checkBoxToConfig(dlg,"UseUlem","use_ulem");
+    	}
+    	
+    	@Override protected boolean handleEvent(DialogAccess dlg, String sMethod) {
+    		if (sMethod.equals("UseSoulChange")) {
+    			useSoulChange(dlg);
+    			return true;
+    		}
+    		else if (sMethod.equals("FormattingAttributeChange")) {
+    			formattingAttributeChange(dlg);
+    			return true;
+    		}
+    		else if (sMethod.equals("CustomAttributeChange")) {
+    			customAttributeChange(dlg);
+    			return true;
+    		}
+    		return false;
+    	}
+    	
+    	private void useSoulChange(DialogAccess dlg) {
+        	// Until implemented...
+        	dlg.setControlEnabled("UseSoul", false);
+        	// After which it should be...
+        	//boolean bUseSoul = dlg.getCheckBoxStateAsBoolean("UseSoul");   	    	
+        	//dlg.setControlEnabled("UseUlem", !bUseSoul);
+    	}
+    	
+    	private void formattingAttributeChange(DialogAccess dlg) {
+        	updateAttributeMap(dlg);
+        	
+        	short nNewAttribute = dlg.getListBoxSelectedItem("FormattingAttribute");
+        	if (nNewAttribute>-1) {
+        		String sName = sAttributeNames[nNewAttribute];
+        		if (attributeMap.containsKey(sName)) {
+        			Map<String,String> attr = attributeMap.get(sName);
+        			dlg.setCheckBoxStateAsBoolean("CustomAttribute", !attr.containsKey("deleted"));
+        			dlg.setTextFieldText("Before", attr.containsKey("before") ? attr.get("before") : "");
+        			dlg.setTextFieldText("After", attr.containsKey("after") ? attr.get("after") : "");
+        		}
+        		else {
+        			dlg.setCheckBoxStateAsBoolean("CustomAttribute", false);
+        			dlg.setTextFieldText("Before", "");
+        			dlg.setTextFieldText("After", "");
+        		}
+        		customAttributeChange(dlg); // setCheckBoxStateAsBoolean does not trigger this
+        		nCurrentAttribute = nNewAttribute;
+        	}
+    	}
+
+    	private void customAttributeChange(DialogAccess dlg) {
+        	boolean bCustom = dlg.getCheckBoxStateAsBoolean("CustomAttribute");
+        	dlg.setControlEnabled("Before", bCustom);
+        	dlg.setControlEnabled("After", bCustom);    		
+    	}
+
+        private void updateAttributeMap(DialogAccess dlg) {
+        	// Save the current attribute map, if any
+        	if (nCurrentAttribute>-1) {
+        		Map<String,String> attr = new HashMap<String,String>();
+        		if (!dlg.getCheckBoxStateAsBoolean("CustomAttribute")) {
+        			// don't delete the map now, but defer this to the dialog is closed
+        			attr.put("deleted", "true");
+        		}
+        		attr.put("before", dlg.getTextFieldText("Before"));
+        		attr.put("after", dlg.getTextFieldText("After"));
+        		attributeMap.put(sAttributeNames[nCurrentAttribute], attr);
+        	}    	
+        }
+        
+    }
+
+    // The page "Fonts"
+    // This page handles the options use_fontspec, use_pifont, use_tipa, use_eurosym, use_wasysym,
+    // use_ifsym, use_bbding
+    private class FontsHandler extends PageHandler {
+    	@Override protected void setControls(DialogAccess dlg) {
+        	checkBoxFromConfig(dlg,"UsePifont","use_pifont");
+        	checkBoxFromConfig(dlg,"UseTipa","use_tipa");
+        	checkBoxFromConfig(dlg,"UseEurosym","use_eurosym");
+        	checkBoxFromConfig(dlg,"UseWasysym","use_wasysym");
+        	checkBoxFromConfig(dlg,"UseIfsym","use_ifsym");
+        	checkBoxFromConfig(dlg,"UseBbding","use_bbding");
+        	checkBoxFromConfig(dlg,"UseFontspec","use_fontspec");
+        	// Until implemented:
+        	dlg.setControlEnabled("UseFontspec", false);
+    	}
+    	
+    	@Override protected void getControls(DialogAccess dlg) {
+        	checkBoxToConfig(dlg,"UsePifont","use_pifont");
+        	checkBoxToConfig(dlg,"UseTipa","use_tipa");
+        	checkBoxToConfig(dlg,"UseEurosym","use_eurosym");
+        	checkBoxToConfig(dlg,"UseWasysym","use_wasysym");
+        	checkBoxToConfig(dlg,"UseIfsym","use_ifsym");
+        	checkBoxToConfig(dlg,"UseBbding","use_bbding");
+        	checkBoxToConfig(dlg,"UseFontspec","use_fontspec");
+    	}
+    	
+    	@Override protected boolean handleEvent(DialogAccess dlg, String sMethod) {
+    		// Currently no events
+    		return false;
+    	}
+    }
+    
+    // The page "Pages"
+    // This page handles the options page_formatting, use_geometry, use_fancyhdr, use_lastpage and use_endnotes
+    private class PagesHandler extends PageHandler {
+    	@Override protected void setControls(DialogAccess dlg) {
+    		// The option page_formatting is presented as two options in the user interface
+        	String sPageFormatting = config.getOption("page_formatting");
+        	if ("ignore_all".equals(sPageFormatting)) {
+        		dlg.setCheckBoxStateAsBoolean("ExportGeometry", false);
+        		dlg.setCheckBoxStateAsBoolean("ExportHeaderFooter", false);
+        	}
+        	else if ("convert_geometry".equals(sPageFormatting)) {
+        		dlg.setCheckBoxStateAsBoolean("ExportGeometry", true);
+        		dlg.setCheckBoxStateAsBoolean("ExportHeaderFooter", false);
+        	}
+        	else if ("convert_header_footer".equals(sPageFormatting)) {
+        		dlg.setCheckBoxStateAsBoolean("ExportGeometry", false);
+        		dlg.setCheckBoxStateAsBoolean("ExportHeaderFooter", true);
+        	}
+        	else if ("convert_all".equals(sPageFormatting)) {
+        		dlg.setCheckBoxStateAsBoolean("ExportGeometry", true);
+        		dlg.setCheckBoxStateAsBoolean("ExportHeaderFooter", true);
+        	}
+        	
+        	checkBoxFromConfig(dlg,"UseGeometry", "use_geometry");
+        	checkBoxFromConfig(dlg,"UseFancyhdr", "use_fancyhdr");
+        	checkBoxFromConfig(dlg,"UseLastpage", "use_lastpage");
+        	checkBoxFromConfig(dlg,"UseEndnotes", "use_endnotes");
+
+        	// Trigger change events (this is not done by the setters above)
+			exportGeometryChange(dlg);
+			exportHeaderAndFooterChange(dlg);
+    	}
+    	
+    	@Override protected void getControls(DialogAccess dlg) {
+        	boolean bGeometry = dlg.getCheckBoxStateAsBoolean("ExportGeometry");
+        	boolean bHeaderFooter = dlg.getCheckBoxStateAsBoolean("ExportHeaderFooter");
+        	if (bGeometry && bHeaderFooter) {
+        		config.setOption("page_formatting", "convert_all");
+        	}
+        	else if (bGeometry && !bHeaderFooter) {
+        		config.setOption("page_formatting", "convert_geometry");
+        	}
+        	else if (!bGeometry && bHeaderFooter) {
+        		config.setOption("page_formatting", "convert_header_footer");
+        	}
+        	else {
+        		config.setOption("page_formatting", "ignore_all");
+        	}
+        	
+        	checkBoxToConfig(dlg,"UseGeometry", "use_geometry");
+        	checkBoxToConfig(dlg,"UseFancyhdr", "use_fancyhdr");
+        	checkBoxToConfig(dlg,"UseLastpage", "use_lastpage");
+        	checkBoxToConfig(dlg,"UseEndnotes", "use_endnotes");
+    	}
+    	
+    	@Override protected boolean handleEvent(DialogAccess dlg, String sMethod) {
+    		if (sMethod.equals("ExportGeometryChange")) {
+    			exportGeometryChange(dlg);
+    			return true;
+    		}
+    		else if (sMethod.equals("ExportHeaderAndFooterChange")) {
+    			exportHeaderAndFooterChange(dlg);
+    			return true;
+    		}
+    		return false;
+    	}
+    	
+    	private void exportGeometryChange(DialogAccess dlg) {
+        	dlg.setControlEnabled("UseGeometry", dlg.getCheckBoxStateAsBoolean("ExportGeometry"));    		
+    	}
+    	
+    	private void exportHeaderAndFooterChange(DialogAccess dlg) {
+        	dlg.setControlEnabled("UseFancyhdr", dlg.getCheckBoxStateAsBoolean("ExportHeaderFooter"));
+    	}
+    }
+    	
+    
+	/*
+	
+
+    private XComponentContext xContext;
+    private XSimpleFileAccess2 sfa2;
+    private String sConfigFileName = null;
+    Config config;
+    // Local cache of complex options
+    ComplexOption[] styleMap;
+    ComplexOption mathSymbols;
+    ComplexOption stringReplace;
+    short nCurrentFamily = -1;
+    String sCurrentStyleName = null;
+    String sCurrentMathSymbol = null;
+    String sCurrentText = null;
+    private String sTitle = null;
+    private DialogAccess dlg = null;
+    private StyleNameProvider styleNameProvider = null;
+    private CustomSymbolNameProvider customSymbolNameProvider = null;
+    
+    /** Create a new ConfigurationDialog */
+    /*public ConfigurationDialog(XComponentContext xContext) {
         this.xContext = xContext;
 
         // Get the SimpleFileAccess service
@@ -137,203 +752,16 @@ public final class ConfigurationDialog extends WeakBase
         // Initialize the local cache of complex options
         styleMap = new ComplexOption[5];
         for (int i=0; i<5; i++) { styleMap[i]=new ComplexOption(); }
-        attributeMap = new ComplexOption();
-        headingMap = new ComplexOption();
         mathSymbols = new ComplexOption();
         stringReplace = new ComplexOption();
         
         styleNameProvider = new StyleNameProvider(xContext);
         customSymbolNameProvider = new CustomSymbolNameProvider(xContext);
-    }
+    }*/
         	
-    // Implement XContainerWindowEventHandler
-    public boolean callHandlerMethod(XWindow xWindow, Object event, String sMethod)
-        throws com.sun.star.lang.WrappedTargetException {
-    	XDialog xDialog = (XDialog)UnoRuntime.queryInterface(XDialog.class, xWindow);
-    	sTitle = xDialog.getTitle();
-   		dlg = new DialogAccess(xDialog);
-
-   		try {
-            if (sMethod.equals("external_event") ){
-                return handleExternalEvent(event);
-            }
-            // Documentclass page
-            else if (sMethod.equals("NoPreambleChange")) {
-                updateDocumentclassControls();
-                return true;
-            }
-            // Headings page
-            else if (sMethod.equals("MaxLevelChange")) {
-                updateHeadingsControls();
-                return true;
-            }
-            else if (sMethod.equals("WriterLevelChange")) {
-                updateHeadingsControls();
-                return true;
-            }
-            else if (sMethod.equals("NoIndexChange")) {
-                updateHeadingsControls();
-                return true;
-            }
-            // Styles page
-            else if (sMethod.equals("StyleFamilyChange")) {
-            	updateStylesControls();
-            	return true;
-            }
-            else if (sMethod.equals("StyleNameChange")) {
-            	updateStylesControls();
-            	return true;
-            }
-            else if (sMethod.equals("NewStyleClick")) {
-            	newStyleClick();
-            	return true;
-            }
-            else if (sMethod.equals("DeleteStyleClick")) {
-            	deleteStyleClick();
-            	return true;
-            }
-            else if (sMethod.equals("AddNextClick")) {
-            	addNextClick();
-            	return true;
-            }
-            else if (sMethod.equals("RemoveNextClick")) {
-            	removeNextClick();
-            	return true;
-            }
-            else if (sMethod.equals("LoadDefaultsClick")) {
-            	loadDefaultsClick();
-            	return true;
-            }
-            // Characters page
-            else if (sMethod.equals("UseSoulChange")) {
-            	updateCharactersControls();
-                return true;
-            }
-            else if (sMethod.equals("FormattingAttributeChange")) {
-            	updateCharactersControls();
-                return true;
-            }
-            else if (sMethod.equals("CustomAttributeChange")) {
-            	updateCharactersControls();
-                return true;
-            }
-            // Fonts page
-            // Pages page
-            else if (sMethod.equals("ExportGeometryChange")) {
-            	updatePagesControls();
-                return true;
-            }
-            else if (sMethod.equals("ExportHeaderAndFooterChange")) {
-            	updatePagesControls();
-                return true;
-            }
-            // Tables page
-            else if (sMethod.equals("NoTablesChange")) {
-            	updateTablesControls();
-            	return true;
-            }
-            else if (sMethod.equals("UseSupertabularChange")) {
-            	updateTablesControls();
-            	return true;
-            }
-            else if (sMethod.equals("UseLongtableChange")) {
-            	updateTablesControls();
-            	return true;
-            }
-            // Figures page
-            else if (sMethod.equals("NoImagesChange")) {
-            	updateFiguresControls();
-            	return true;
-            }
-            // Text and math page
-            else if (sMethod.equals("MathSymbolNameChange")) {
-            	updateTextAndMathControls();
-            	return true;
-            }
-            else if (sMethod.equals("NewSymbolClick")) {
-            	newSymbolClick();
-            	return true;
-            }
-            else if (sMethod.equals("DeleteSymbolClick")) {
-            	deleteSymbolClick();
-            	return true;
-            }
-            else if (sMethod.equals("TextInputChange")) {
-            	updateTextAndMathControls();
-            	return true;
-            }
-            else if (sMethod.equals("NewTextClick")) {
-            	newTextClick();
-            	return true;
-            }
-            else if (sMethod.equals("DeleteTextClick")) {
-            	deleteTextClick();
-            	return true;
-            }            
-        }
-        catch (com.sun.star.uno.RuntimeException e) {
-            throw e;
-        }
-        catch (com.sun.star.uno.Exception e) {
-            throw new com.sun.star.lang.WrappedTargetException(sMethod, this, e);
-        }
-        return false;
-    }
 	
-    public String[] getSupportedMethodNames() {
-        String[] sNames = { "external_event", 
-        		"NoPreambleChange", // Documentclass
-        		"MaxLevelChange", "WriterLevelChange", "NoIndexChange", // Headings
-        		"StyleFamilyChange", "StyleNameChange", "NewStyleClick", "DeleteStyleClick", "AddNextClick", "RemoveNextClick", "LoadDefaultsClick", // Styles
-        		"UseSoulChange", "FormattingAttributeChange", "CustomAttributeChange", // Characters
-        		"ExportGeometryChange", "ExportHeaderAndFooterChange", // Pages
-        		"NoTablesChange", "UseSupertabularChange", "UseLongtableChange", // Tables
-        		"NoImagesChange", // Images
-        		"MathSymbolNameChange", "NewSymbolClick", "DeleteSymbolClick",
-        		"TextInputChange", "NewTextClick", "DeleteTextClick" // Text and Math
-        };
-        return sNames;
-    }
     
-    // Implement the interface XServiceInfo
-    public boolean supportsService(String sServiceName) {
-        return sServiceName.equals(__serviceName);
-    }
-
-    public String getImplementationName() {
-        return __implementationName;
-    }
-    
-    public String[] getSupportedServiceNames() {
-        String[] sSupportedServiceNames = { __serviceName };
-        return sSupportedServiceNames;
-    }
-	
-    // Private stuff
-    private boolean handleExternalEvent(Object aEventObject)
-    throws com.sun.star.uno.Exception {
-    	try {
-    		String sMethod = AnyConverter.toString(aEventObject);
-    		if (sMethod.equals("ok")) {
-    			loadConfig();
-    			getControls();
-    			saveConfig();
-    			return true;
-    		}
-    		else if (sMethod.equals("back") || sMethod.equals("initialize")) {
-    			loadConfig();
-    			setControls();
-    			return true;
-    		}
-    	}
-    	catch (com.sun.star.lang.IllegalArgumentException e) {
-    		throw new com.sun.star.lang.IllegalArgumentException(
-    				"Method external_event requires a string in the event object argument.", this,(short) -1);
-    	}
-    	return false;
-    }
-    
-    // Display a dialog
+    /*// Display a dialog
     private XDialog getDialog(String sDialogName) {
     	XMultiComponentFactory xMCF = xContext.getServiceManager();
     	try {
@@ -488,23 +916,8 @@ public final class ConfigurationDialog extends WeakBase
     
 	// Set controls based on the config
     private void setControls() {
-    	if ("Documentclass".equals(sTitle)) {
-    		loadDocumentclass();
-    	}
-    	else if ("Headings".equals(sTitle)) {
-    		loadHeadings();
-    	}
     	else if ("Styles".equals(sTitle)) {
     		loadStyles();
-    	}
-    	else if ("Characters".equals(sTitle)) {
-    		loadCharacters();
-    	}
-    	else if ("Fonts".equals(sTitle)) {
-    		loadFonts();
-    	}
-    	else if ("Pages".equals(sTitle)) {
-    		loadPages();
     	}
     	else if ("Tables".equals(sTitle)) {
     		loadTables();
@@ -519,23 +932,8 @@ public final class ConfigurationDialog extends WeakBase
     
 	// Change the config based on the controls
     private void getControls() {
-    	if ("Documentclass".equals(sTitle)) {
-    		saveDocumentclass();
-    	}
-    	else if ("Headings".equals(sTitle)) {
-    		saveHeadings();
-    	}
     	else if ("Styles".equals(sTitle)) {
     		saveStyles();
-    	}
-    	else if ("Characters".equals(sTitle)) {
-    		saveCharacters();
-    	}
-    	else if ("Fonts".equals(sTitle)) {
-    		saveFonts();
-    	}
-    	else if ("Pages".equals(sTitle)) {
-    		savePages();
     	}
     	else if ("Tables".equals(sTitle)) {
     		saveTables();
@@ -548,582 +946,8 @@ public final class ConfigurationDialog extends WeakBase
     	}    	
     }
     
-    // The page "Documentclass"
-    // This page handles the options no_preamble, documentclass, global_options and the custom-preamble
     
-    private void loadDocumentclass() {
-    	dlg.setCheckBoxStateAsBoolean("NoPreamble","true".equals(config.getOption("no_preamble")));
-    	dlg.setTextFieldText("Documentclass",config.getOption("documentclass"));
-    	dlg.setTextFieldText("GlobalOptions",config.getOption("global_options"));
-    	dlg.setTextFieldText("CustomPreamble",config.getOption("custom-preamble"));
-    	updateDocumentclassControls();
-    }
     
-    private void saveDocumentclass() {
-    	config.setOption("no_preamble", Boolean.toString(dlg.getCheckBoxStateAsBoolean("NoPreamble")));
-    	config.setOption("documentclass", dlg.getTextFieldText("Documentclass"));
-    	config.setOption("global_options", dlg.getTextFieldText("GlobalOptions"));
-    	config.setOption("custom-preamble", dlg.getTextFieldText("CustomPreamble"));
-    }
-
-    private void updateDocumentclassControls() {
-    	boolean bPreamble = !dlg.getCheckBoxStateAsBoolean("NoPreamble");
-    	dlg.setControlEnabled("DocumentclassLabel",bPreamble);
-    	dlg.setControlEnabled("Documentclass",bPreamble);
-    	dlg.setControlEnabled("GlobalOptionsLabel",bPreamble);
-    	dlg.setControlEnabled("GlobalOptions",bPreamble);
-    	dlg.setControlEnabled("CustomPreambleLabel",bPreamble);
-    	dlg.setControlEnabled("CustomPreamble",bPreamble);
-    }
-    
-    // The page "Headings"
-    // This page handles the heading map as well as the options no_index, use_titlesec and use_titletoc
-    
-    private void loadHeadings() {
-    	// Load heading map from config
-		headingMap.clear();
-		headingMap.copyAll(config.getComplexOption("heading-map"));
-		nCurrentWriterLevel = -1;
-    	
-    	// Determine the max level (from 0 to 10)
-    	short nMaxLevel = 0;
-    	while(nMaxLevel<10 && headingMap.containsKey(Integer.toString(nMaxLevel+1))) {
-    		nMaxLevel++;
-    	}
-    	dlg.setListBoxSelectedItem("MaxLevel", nMaxLevel);
-    	
-    	dlg.setCheckBoxStateAsBoolean("UseTitlesec","true".equals(config.getOption("use_titlesec")));
-    	dlg.setCheckBoxStateAsBoolean("NoIndex","true".equals(config.getOption("no_index")));
-    	dlg.setCheckBoxStateAsBoolean("UseTitletoc","true".equals(config.getOption("use_titletoc")));
-
-    	updateHeadingsControls();
-    }
-    
-    private void saveHeadings() {
-    	updateHeadingMap();
-    	
-    	// Save heading map to config
-    	config.getComplexOption("heading-map").clear();
-    	int nMaxLevel = dlg.getListBoxSelectedItem("MaxLevel");
-		for (int i=1; i<=nMaxLevel; i++) {
-			String sLevel = Integer.toString(i);
-			config.getComplexOption("heading-map").copy(sLevel,headingMap.get(sLevel));
-		}
-
-    	// Save other controls to config
-		config.setOption("use_titlesec", Boolean.toString(dlg.getCheckBoxStateAsBoolean("UseTitlesec")));    	
-    	config.setOption("no_index", Boolean.toString(dlg.getCheckBoxStateAsBoolean("NoIndex")));
-    	config.setOption("use_titletoc", Boolean.toString(dlg.getCheckBoxStateAsBoolean("UseTitletoc")));    		
-    }
-    
-    private void updateHeadingMap() {
-    	// Save the current writer level in our cache
-    	if (nCurrentWriterLevel>-1) {
-    		Map<String,String> attr = new HashMap<String,String>();
-    		attr.put("name", dlg.getComboBoxText("LaTeXName"));
-    		attr.put("level", dlg.getComboBoxText("LaTeXLevel"));
-    		headingMap.put(Integer.toString(nCurrentWriterLevel+1), attr);
-    	}
-    }
-    
-    private void updateHeadingsControls() {
-    	updateHeadingMap();
-    	
-    	// Adjust the presented writer levels to the max level
-    	int nMaxLevel = dlg.getListBoxSelectedItem("MaxLevel");
-    	nCurrentWriterLevel = dlg.getListBoxSelectedItem("WriterLevel");
-    	String[] sWriterLevels = new String[nMaxLevel];
-    	for (int i=0; i<nMaxLevel; i++) {
-    		sWriterLevels[i]=Integer.toString(i+1);
-    	}
-    	dlg.setListBoxStringItemList("WriterLevel", sWriterLevels);
-    	if (nCurrentWriterLevel+1>nMaxLevel) { nCurrentWriterLevel = (short)(nMaxLevel-1); }
-    	else if (nCurrentWriterLevel<0 && nMaxLevel>0) { nCurrentWriterLevel=0; }
-    	dlg.setListBoxSelectedItem("WriterLevel", nCurrentWriterLevel);
-    	
-    	// Load the values for the current level
-    	if (nCurrentWriterLevel>-1) {
-    		String sLevel = Integer.toString(nCurrentWriterLevel+1);
-    		if (headingMap.containsKey(sLevel)) {
-    			Map<String,String> attr = headingMap.get(sLevel);
-    			dlg.setComboBoxText("LaTeXLevel", attr.containsKey("level") ? attr.get("level") : "");
-    			dlg.setComboBoxText("LaTeXName", attr.containsKey("name") ? attr.get("name") : "");
-    		}
-    		else {
-    			dlg.setListBoxSelectedItem("LaTeXLevel", (short)2);
-    			dlg.setComboBoxText("LaTeXName", "");
-    		}
-    	}
-
-    	boolean bupdate = dlg.getListBoxSelectedItem("MaxLevel")>0;
-    	dlg.setControlEnabled("WriterLevelLabel", bupdate);
-    	dlg.setControlEnabled("WriterLevel", bupdate);
-    	dlg.setControlEnabled("LaTeXLevelLabel", bupdate);
-    	dlg.setControlEnabled("LaTeXLevel", bupdate);
-    	dlg.setControlEnabled("LaTeXNameLabel", bupdate);
-    	dlg.setControlEnabled("LaTeXName", bupdate);
-    	// Until implemented:
-    	dlg.setControlEnabled("UseTitlesec", false);
-    	//dlg.setControlEnabled("UseTitlesec", bupdate);
-
-    	// Until implemented:
-    	dlg.setControlEnabled("UseTitletoc", false);
-    	//boolean bNoIndex = dlg.getCheckBoxStateAsBoolean("NoIndex");
-    	//dlg.setControlEnabled("UseTitletoc", !bNoIndex);
-    }
-    
-    // The page "Styles"
-    // This page handles the various style maps as well as the options other_styles and formatting
-	// Limitation: Cannot handle the values "error" and "warning" for other_styles
-    
-    private void loadStyles() {
-    	// Display paragraph maps first
-    	dlg.setListBoxSelectedItem("StyleFamily", (short)1);
-    	nCurrentFamily = -1;
-    	sCurrentStyleName = null;
-    	
-    	// Load style maps from config (translating keys to display names)
-		for (int i=0; i<5; i++) {
-			ComplexOption configMap = config.getComplexOption(sFamilyNames[i]+"-map"); 
-			styleMap[i].clear();
-	    	Map<String,String> displayNames = styleNameProvider.getDisplayNames(sOOoFamilyNames[i]);
-			copyStyles(configMap, styleMap[i], displayNames);
-			for (String sName : styleMap[i].keySet()) {
-				Map<String,String> attr = styleMap[i].get(sName);
-				if (attr.containsKey("next")) {
-					String[] sNext = attr.get("next").split(";");
-					String sNewNext = "";
-					for (String sNextName : sNext) {
-						if (sNewNext.length()>0) { sNewNext+=";"; }
-						sNewNext+=displayNames.get(sNextName);
-					}
-					attr.put("next", sNewNext);
-				}
-			}
-		}
-    	
-		// Load other controls from config
-		String sOtherStyles = config.getOption("other_styles");
-		if ("accept".equals(sOtherStyles)) {
-			dlg.setListBoxSelectedItem("OtherStyles", (short)1);
-		}
-		else {
-			dlg.setListBoxSelectedItem("OtherStyles", (short)0);
-		}
-
-		String sFormatting = config.getOption("formatting");
-    	if ("ignore_all".equals(sFormatting)) {
-    		dlg.setListBoxSelectedItem("Formatting", (short)0);
-    	}
-    	else if ("ignore_most".equals(sFormatting)) {
-    		dlg.setListBoxSelectedItem("Formatting", (short)1);
-    	}
-    	else if ("convert_most".equals(sFormatting)) {
-    		dlg.setListBoxSelectedItem("Formatting", (short)3);
-    	}
-    	else if ("convert_all".equals(sFormatting)) {
-    		dlg.setListBoxSelectedItem("Formatting", (short)4);
-    	}
-    	else {
-    		dlg.setListBoxSelectedItem("Formatting", (short)2);
-    	}
-
-    	updateStylesControls();
-    }
-    
-    private void saveStyles() {
-    	updateStyleMaps();
-    	
-    	// Save style maps to config (translating keys back to internal names)
-		for (int i=0; i<5; i++) {
-			ComplexOption configMap = config.getComplexOption(sFamilyNames[i]+"-map"); 
-			configMap.clear();
-			Map<String,String> internalNames = styleNameProvider.getInternalNames(sOOoFamilyNames[i]);
-			copyStyles(styleMap[i], configMap, internalNames);
-			for (String sName : configMap.keySet()) {
-				Map<String,String> attr = configMap.get(sName);
-				if (attr.containsKey("next")) {
-					String[] sNext = attr.get("next").split(";");
-					String sNewNext = "";
-					for (String sNextName : sNext) {
-						if (sNewNext.length()>0) { sNewNext+=";"; }
-						sNewNext+=internalNames.get(sNextName);
-					}
-					attr.put("next", sNewNext);
-				}
-			}
-		}
-
-		// Save other controls to config
-		switch (dlg.getListBoxSelectedItem("OtherStyles")) {
-		case 0: config.setOption("other_styles", "ignore"); break;
-		case 1: config.setOption("other_styles", "accept");
-		}
-    	
-    	switch (dlg.getListBoxSelectedItem("Formatting")) {
-    	case 0: config.setOption("formatting", "ignore_all"); break;
-    	case 1: config.setOption("formatting", "ignore_most"); break;
-    	case 2: config.setOption("formatting", "convert_basic"); break;
-    	case 3: config.setOption("formatting", "convert_most"); break;
-    	case 4: config.setOption("formatting", "convert_all");
-    	}
-    }
-    
-    private void updateStyleMaps() {
-    	// Save the current style map, if any
-    	if (nCurrentFamily>-1 && sCurrentStyleName!=null) {
-    		Map<String,String> attr=new HashMap<String,String>();
-    		attr.put("before", dlg.getTextFieldText("Before"));
-    		attr.put("after", dlg.getTextFieldText("After"));
-    		if (dlg.getControlEnabled("Next")) {
-    			String[] sNextItems = dlg.getListBoxStringItemList("Next");
-    			int nCount = sNextItems.length;
-    			String sList = "";
-    			for (int i=0; i<nCount; i++) {
-    				if (i>0) sList+=";";
-    				sList+=sNextItems[i];
-    			}
-    			attr.put("next", sList);
-    		}
-    		if (dlg.getControlEnabled("LineBreak")) {
-    			attr.put("line-break", Boolean.toString(dlg.getCheckBoxStateAsBoolean("LineBreak")));
-    		}
-    		if (dlg.getControlEnabled("Verbatim")) {
-    			attr.put("verbatim", Boolean.toString(dlg.getCheckBoxStateAsBoolean("Verbatim")));
-    		}
-    		styleMap[nCurrentFamily].put(sCurrentStyleName, attr);
-    	}
-    }
-    
-    private void updateStylesControls() {
-    	updateStyleMaps();
-    	
-    	short nNewFamily = dlg.getListBoxSelectedItem("StyleFamily");
-    	if (nNewFamily>-1 && nNewFamily!=nCurrentFamily) {
-    		// The user has changed the family; load and display the corresponding style names
-    		Set<String> items = styleMap[nNewFamily].keySet();
-        	String[] sStyleNames = new String[items.size()];
-        	int i=0;
-        	for (String s : items) {
-        		sStyleNames[i++] = s;
-        	}
-        	sortStringArray(sStyleNames);
-        	dlg.setListBoxStringItemList("StyleName", sStyleNames);
-        	dlg.setListBoxSelectedItem("StyleName", (short)Math.min(sStyleNames.length-1, 0));
-        	dlg.setControlEnabled("NextLabel", nNewFamily==2);
-        	dlg.setControlEnabled("Next", nNewFamily==2);
-        	dlg.setControlEnabled("AddNextButton", nNewFamily==2);
-        	dlg.setControlEnabled("RemoveNextButton", nNewFamily==2);
-        	dlg.setControlEnabled("Verbatim", nNewFamily<2);
-        	dlg.setControlEnabled("LineBreak", nNewFamily==1);
-        	nCurrentFamily = nNewFamily;
-    	}
-    	
-    	if (nCurrentFamily>-1) {
-    		short nStyleNameItem = dlg.getListBoxSelectedItem("StyleName");
-    		if (nStyleNameItem>=0) {
-    			sCurrentStyleName = dlg.getListBoxStringItemList("StyleName")[nStyleNameItem];
-    			
-    			Map<String,String> attr = styleMap[nCurrentFamily].get(sCurrentStyleName);
-    			dlg.setTextFieldText("Before", attr.containsKey("before") ? attr.get("before") : "");
-    			dlg.setTextFieldText("After", attr.containsKey("after") ? attr.get("after") : "");
-    			String[] sNextItems;
-    			if (attr.containsKey("next")) {
-    				sNextItems = attr.get("next").split(";");
-    			}
-    			else {
-    				sNextItems = new String[0];
-    			}
-    			dlg.setListBoxStringItemList("Next", sNextItems);
-            	dlg.setListBoxSelectedItem("Next", (short)Math.min(sNextItems.length-1, 0));
-    			dlg.setCheckBoxStateAsBoolean("Verbatim", 
-    					attr.containsKey("verbatim") ? "true".equals(attr.get("verbatim")) : false);
-    			dlg.setCheckBoxStateAsBoolean("LineBreak",
-    					attr.containsKey("line-break") ? "true".equals(attr.get("line-break")) : false);
-    			dlg.setControlEnabled("DeleteStyleButton", true);
-    		}
-    		else {
-    			sCurrentStyleName = null;
-    			dlg.setTextFieldText("Before", "");
-    			dlg.setTextFieldText("After", "");
-    			dlg.setListBoxStringItemList("Next", new String[0]);
-    			dlg.setCheckBoxStateAsBoolean("Verbatim", false);
-    			dlg.setCheckBoxStateAsBoolean("LineBreak", false);
-    			dlg.setControlEnabled("DeleteStyleButton", false);
-    		}
-    	}
-    }
-    
-    private void newStyleClick() {
-    	if (nCurrentFamily>-1) {
-    		String sNewName = appendItem("StyleName",styleNameProvider.getInternalNames(sOOoFamilyNames[nCurrentFamily]).keySet());
-    		if (sNewName!=null) {
-    			Map<String,String> attr = new HashMap<String,String>();
-    			attr.put("before", "");
-    			attr.put("after", "");
-    			attr.put("after", "");
-    			attr.put("verbatim", "");
-    			attr.put("line-break","");
-    			styleMap[nCurrentFamily].put(sNewName, attr);
-    		}
-    		saveStyles();
-    		updateStylesControls();
-    	}
-    }
-    
-    private void deleteStyleClick() {
-    	if (nCurrentFamily>-1 && sCurrentStyleName!=null) {
-    		if (deleteCurrentItem("StyleName")) {
-    			styleMap[nCurrentFamily].remove(sCurrentStyleName);
-    			sCurrentStyleName = null;
-        		updateStylesControls();
-    		}
-    	}
-    }
-    
-    private void addNextClick() {
-		appendItem("Next",styleNameProvider.getInternalNames(sOOoFamilyNames[nCurrentFamily]).keySet());
-		saveStyles();
-		updateStylesControls();
-    }
-    
-    private void removeNextClick() {
-		deleteCurrentItem("Next");
-		updateStylesControls();
-    }
-    
-    private void loadDefaultsClick() {
-		saveStyles();
-		// Force update of the ui
-		nCurrentFamily = -1;
-		sCurrentStyleName = null;
-		
-		// Count styles that we will overwrite
-    	Config clean = ConverterFactory.createConverter("application/x-latex").getConfig();
-    	clean.readDefaultConfig("clean.xml");
-
-    	int nCount = 0;
-		for (int i=0; i<5; i++) {
-			ComplexOption cleanMap = clean.getComplexOption(sFamilyNames[i]+"-map"); 
-	    	Map<String,String> displayNames = styleNameProvider.getDisplayNames(sOOoFamilyNames[i]);
-	    	for (String sName : cleanMap.keySet()) {
-	    		String sDisplayName = (displayNames!=null && displayNames.containsKey(sName)) ? displayNames.get(sName) : ""; 
-	    		if (styleMap[i].containsKey(sDisplayName)) { nCount++; }
-	    	}
-		}
-		
-		// Display confirmation dialog
-		boolean bConfirm = false;
-		XDialog xDialog=getDialog("W2LDialogs2.LoadDefaults");
-    	if (xDialog!=null) {
-    		DialogAccess ldlg = new DialogAccess(xDialog);
-    		if (nCount>0) {
-    			String sLabel = ldlg.getLabelText("OverwriteLabel");
-    			sLabel = sLabel.replaceAll("%s", Integer.toString(nCount));
-    			ldlg.setLabelText("OverwriteLabel", sLabel);
-    		}
-    		else {
-    			ldlg.setLabelText("OverwriteLabel", "");
-    		}
-    		bConfirm = xDialog.execute()==ExecutableDialogResults.OK;
-    		xDialog.endExecute();
-    	}
-
-		// Do the replacement
-    	if (bConfirm) { 
-    		for (int i=0; i<5; i++) {
-    			ComplexOption cleanMap = clean.getComplexOption(sFamilyNames[i]+"-map"); 
-    			Map<String,String> displayNames = styleNameProvider.getDisplayNames(sOOoFamilyNames[i]);
-    			copyStyles(cleanMap, styleMap[i], displayNames);
-    		}
-    	}
-		updateStylesControls();
-    }
-    
-    private void copyStyles(ComplexOption source, ComplexOption target, Map<String,String> nameTranslation) {
-    	for (String sName : source.keySet()) {
-    		String sNewName = sName;
-    		if (nameTranslation!=null && nameTranslation.containsKey(sName)) {
-    			sNewName = nameTranslation.get(sName);
-    		}
-    		target.copy(sNewName, source.get(sName));
-    	}
-    }
-    
-    // The page "Characters"
-    // This page handles the options use_color, use_soul, use_ulem and use_hyperref
-    // In addition it handles style maps for formatting attributes
-    
-    private void loadCharacters() {
-    	// Load attribute style map from config
-		attributeMap.clear();
-		attributeMap.copyAll(config.getComplexOption("text-attribute-map"));
-		nCurrentAttribute = -1;
-		dlg.setListBoxSelectedItem("FormattingAttribute", (short)0);
-
-    	// Load other controls from config
-    	dlg.setCheckBoxStateAsBoolean("UseHyperref","true".equals(config.getOption("use_hyperref")));
-    	dlg.setCheckBoxStateAsBoolean("UseColor","true".equals(config.getOption("use_color")));
-    	dlg.setCheckBoxStateAsBoolean("UseSoul","true".equals(config.getOption("use_soul")));
-    	dlg.setCheckBoxStateAsBoolean("UseUlem","true".equals(config.getOption("use_ulem")));
-    	
-    	updateCharactersControls();
-    }
-    
-    private void saveCharacters() {
-    	updateCharactersMap();
-    	
-    	// Save the attribute style map to config
-    	config.getComplexOption("text-attribute-map").clear();
-    	for (String s : attributeMap.keySet()) {
-    		if (!attributeMap.get(s).containsKey("deleted")) {
-    			config.getComplexOption("text-attribute-map").copy(s, attributeMap.get(s));
-    		}
-    	}
-
-		// Save other controls to config
-    	config.setOption("use_hyperref", Boolean.toString(dlg.getCheckBoxStateAsBoolean("UseHyperref")));    	
-    	config.setOption("use_color", Boolean.toString(dlg.getCheckBoxStateAsBoolean("UseColor")));    	
-    	config.setOption("use_soul", Boolean.toString(dlg.getCheckBoxStateAsBoolean("UseSoul")));    	
-    	config.setOption("use_ulem", Boolean.toString(dlg.getCheckBoxStateAsBoolean("UseUlem")));    
-    }
-    
-    private void updateCharactersMap() {
-    	// Save the current attribute map, if any
-    	if (nCurrentAttribute>-1) {
-    		HashMap<String,String> attr = new HashMap<String,String>();
-    		if (!dlg.getCheckBoxStateAsBoolean("CustomAttribute")) {
-    			// don't delete the map now, but defer this to the dialog is closed
-    			attr.put("deleted", "true");
-    		}
-    		attr.put("before", dlg.getTextFieldText("Before"));
-    		attr.put("after", dlg.getTextFieldText("After"));
-    		attributeMap.put(sAttributeNames[nCurrentAttribute], attr);
-    	}    	
-    }
-    
-    private void updateCharactersControls() {
-    	updateCharactersMap();
-    	
-    	short nNewAttribute = dlg.getListBoxSelectedItem("FormattingAttribute");
-    	if (nNewAttribute>-1 && nCurrentAttribute!=nNewAttribute) {
-    		String sName = sAttributeNames[nNewAttribute];
-    		if (attributeMap.containsKey(sName)) {
-    			Map<String,String> attr = attributeMap.get(sName);
-    			dlg.setCheckBoxStateAsBoolean("CustomAttribute", !attr.containsKey("deleted"));
-    			dlg.setTextFieldText("Before", attr.containsKey("before") ? attr.get("before") : "");
-    			dlg.setTextFieldText("After", attr.containsKey("after") ? attr.get("after") : "");
-    		}
-    		else {
-    			dlg.setCheckBoxStateAsBoolean("CustomAttribute", false);
-    			dlg.setTextFieldText("Before", "");
-    			dlg.setTextFieldText("After", "");
-    		}
-    		nCurrentAttribute = nNewAttribute;
-    	}
-    	
-    	boolean bCustom = dlg.getCheckBoxStateAsBoolean("CustomAttribute");
-    	dlg.setControlEnabled("Before", bCustom);
-    	dlg.setControlEnabled("After", bCustom);
-    	
-    	// Until implemented...
-    	dlg.setControlEnabled("UseSoul", false);
-    	// After which it should be...
-    	//boolean bUseSoul = dlg.getCheckBoxStateAsBoolean("UseSoul");   	    	
-    	//dlg.setControlEnabled("UseUlem", !bUseSoul);
-    }
-    
-    // The page "Fonts"
-    // This page handles the options use_fontspec, use_pifont, use_tipa, use_eurosym, use_wasysym,
-    // use_ifsym, use_bbding
-    
-    private void loadFonts() {
-    	dlg.setCheckBoxStateAsBoolean("UseFontspec","true".equals(config.getOption("use_fontspec")));
-    	dlg.setCheckBoxStateAsBoolean("UsePifont","true".equals(config.getOption("use_pifont")));
-    	dlg.setCheckBoxStateAsBoolean("UseTipa","true".equals(config.getOption("use_tipa")));
-    	dlg.setCheckBoxStateAsBoolean("UseEurosym","true".equals(config.getOption("use_eurosym")));
-    	dlg.setCheckBoxStateAsBoolean("UseWasysym","true".equals(config.getOption("use_wasysym")));
-    	dlg.setCheckBoxStateAsBoolean("UseIfsym","true".equals(config.getOption("use_ifsym")));
-    	dlg.setCheckBoxStateAsBoolean("UseBbding","true".equals(config.getOption("use_bbding")));
-    	
-    	updateFontsControls();
-    }
-    
-    private void saveFonts() {    	
-    	config.setOption("use_fontspec", Boolean.toString(dlg.getCheckBoxStateAsBoolean("UseFontspec")));    	
-    	config.setOption("use_pifont", Boolean.toString(dlg.getCheckBoxStateAsBoolean("UsePifont")));    	
-    	config.setOption("use_tipa", Boolean.toString(dlg.getCheckBoxStateAsBoolean("UseTipa")));    	
-    	config.setOption("use_eurosym", Boolean.toString(dlg.getCheckBoxStateAsBoolean("UseEurosym")));    	
-    	config.setOption("use_wasysym", Boolean.toString(dlg.getCheckBoxStateAsBoolean("UseWasysym")));    	
-    	config.setOption("use_ifsym", Boolean.toString(dlg.getCheckBoxStateAsBoolean("UseIfsym")));    	
-    	config.setOption("use_bbding", Boolean.toString(dlg.getCheckBoxStateAsBoolean("UseBbding")));    	    	
-    }
-    
-    private void updateFontsControls() {
-    	// Until implemented...
-    	dlg.setControlEnabled("UseFontspec", false);
-    	// Nothing to do
-    }
-    
-    // The page "Pages"
-    // This page handles the options page_formatting, use_geometry, use_fancyhdr, use_lastpage and use_endnotes
-    
-    private void loadPages() {
-    	String sPageFormatting = config.getOption("page_formatting");
-    	if ("ignore_all".equals(sPageFormatting)) {
-    		dlg.setCheckBoxStateAsBoolean("ExportGeometry", false);
-    		dlg.setCheckBoxStateAsBoolean("ExportHeaderFooter", false);
-    	}
-    	else if ("convert_geometry".equals(sPageFormatting)) {
-    		dlg.setCheckBoxStateAsBoolean("ExportGeometry", true);
-    		dlg.setCheckBoxStateAsBoolean("ExportHeaderFooter", false);
-    	}
-    	else if ("convert_header_footer".equals(sPageFormatting)) {
-    		dlg.setCheckBoxStateAsBoolean("ExportGeometry", false);
-    		dlg.setCheckBoxStateAsBoolean("ExportHeaderFooter", true);
-    	}
-    	else if ("convert_all".equals(sPageFormatting)) {
-    		dlg.setCheckBoxStateAsBoolean("ExportGeometry", true);
-    		dlg.setCheckBoxStateAsBoolean("ExportHeaderFooter", true);
-    	}
-    	
-    	dlg.setCheckBoxStateAsBoolean("UseGeometry", "true".equals(config.getOption("use_geometry")));
-    	dlg.setCheckBoxStateAsBoolean("UseFancyhdr", "true".equals(config.getOption("use_fancyhdr")));
-    	dlg.setCheckBoxStateAsBoolean("UseLastpage", "true".equals(config.getOption("use_lastpage")));
-    	dlg.setCheckBoxStateAsBoolean("UseEndnotes", "true".equals(config.getOption("use_endnotes")));
-    	
-    	updatePagesControls();
-    }
-    
-    private void savePages() {
-    	boolean bGeometry = dlg.getCheckBoxStateAsBoolean("ExportGeometry");
-    	boolean bHeaderFooter = dlg.getCheckBoxStateAsBoolean("ExportHeaderFooter");
-    	if (bGeometry && bHeaderFooter) {
-    		config.setOption("page_formatting", "convert_all");
-    	}
-    	else if (bGeometry && !bHeaderFooter) {
-    		config.setOption("page_formatting", "convert_geometry");
-    	}
-    	else if (!bGeometry && bHeaderFooter) {
-    		config.setOption("page_formatting", "convert_header_footer");
-    	}
-    	else {
-    		config.setOption("page_formatting", "ignore_all");
-    	}
-    	
-    	config.setOption("use_geometry", Boolean.toString(dlg.getCheckBoxStateAsBoolean("UseGeometry")));
-    	config.setOption("use_fancyhdr", Boolean.toString(dlg.getCheckBoxStateAsBoolean("UseFancyhdr")));
-    	config.setOption("use_lastpage", Boolean.toString(dlg.getCheckBoxStateAsBoolean("UseLastpage")));
-    	config.setOption("use_endnotes", Boolean.toString(dlg.getCheckBoxStateAsBoolean("UseEndnotes")));
-    }
-    
-    private void updatePagesControls() {
-    	boolean bExportGeometry = dlg.getCheckBoxStateAsBoolean("ExportGeometry");
-    	dlg.setControlEnabled("UseGeometry",bExportGeometry);
-
-    	boolean bExport = dlg.getCheckBoxStateAsBoolean("ExportHeaderFooter");
-    	dlg.setControlEnabled("UseFancyhdr",bExport);
-    }
     
     // The page "Tables"
     // This page handles the options table_content, use_tabulary, use_colortbl, use_multirow, use_supertabular, use_longtable,
@@ -1318,9 +1142,10 @@ public final class ConfigurationDialog extends WeakBase
     		Map<String,String> attr = new HashMap<String,String>();
     		attr.put("latex", "");
     		mathSymbols.put(sNewName, attr);
+        	saveTextAndMath();
+        	dlg.setTextFieldText("MathLaTeX", "");
+        	updateTextAndMathControls();
     	}
-    	saveTextAndMath();
-    	updateTextAndMathControls();
     }
     
     private void deleteSymbolClick() {
@@ -1338,9 +1163,10 @@ public final class ConfigurationDialog extends WeakBase
     		attr.put("latex-code", "");
     		attr.put("fontenc", "any");
     		stringReplace.put(sNewName, attr);
+    		dlg.setTextFieldText("LaTeX", "");
+        	saveTextAndMath();
+        	updateTextAndMathControls();	
     	}
-    	saveTextAndMath();
-    	updateTextAndMathControls();	
     }
     
     private void deleteTextClick() {
@@ -1367,5 +1193,5 @@ public final class ConfigurationDialog extends WeakBase
         Collator collator = Collator.getInstance();
     	Arrays.sort(theArray, collator);
     }
-	
+	*/
 }

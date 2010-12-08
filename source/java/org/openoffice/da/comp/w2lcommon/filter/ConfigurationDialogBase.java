@@ -577,7 +577,7 @@ public abstract class ConfigurationDialogBase extends WeakBase implements XConta
 		private String sCurrentStyleName = null;
 		
 		// Access to display names of the styles in the current document
-		private StyleNameProvider styleNameProvider = null;
+		protected StyleNameProvider styleNameProvider = null;
 		
 		// Some methods to be implemented by the subclass
 		protected abstract String getDefaultConfigName();

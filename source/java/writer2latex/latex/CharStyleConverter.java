@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2008 by Henrik Just
+ *  Copyright: 2002-2010 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.0 (2008-12-03)
+ *  Version 1.2 (2010-11-28)
  *
  */
 
@@ -97,6 +97,8 @@ public class CharStyleConverter extends StyleConverter {
             StyleMap sm = config.getTextStyleMap();
             if (sm.contains(sDisplayName)) {
                 ba.add(sm.getBefore(sDisplayName),sm.getAfter(sDisplayName));
+                context.setVerbatim(sm.getVerbatim(sDisplayName));
+                context.setNoLineBreaks(sm.getVerbatim(sDisplayName));
             }
             return;
         }

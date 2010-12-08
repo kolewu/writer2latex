@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-10-30)
+ *  Version 1.2 (2010-12-08)
  *
  */
 
@@ -159,7 +159,7 @@ public class Misc{
         return n;
     }
 	
-    public static int min(int n, int m) { return n<m ? n : m; }
+    //public static int min(int n, int m) { return n<m ? n : m; }
 	
     public static String truncateLength(String sValue) {
         if (sValue.endsWith("inch")) {
@@ -198,6 +198,25 @@ public class Misc{
         else {
             // Or above -1px
             return Float.toString(fPixels>-1 ? -1 : fPixels)+"px";
+        }
+    }
+    
+    // Divide dividend by divisor and return the quotient as an integer percentage
+    // (never below 1% except if the dividend is zero)
+    public static final String divide(String sDividend, String sDivisor) {
+        if (sDividend.equals("0")) { return "0%"; }
+        if (sDivisor.equals("0")) { return "100%"; }
+
+        float fDividend=getFloat(sDividend.substring(0,sDividend.length()-2),1);
+        String sDividendUnit=sDividend.substring(sDividend.length()-2);
+        float fDivisor=getFloat(sDivisor.substring(0,sDivisor.length()-2),1);
+        String sDivisorUnit=sDivisor.substring(sDivisor.length()-2);
+        int nPercent = Math.round(100*fDividend*getUpi(sDivisorUnit)/fDivisor/getUpi(sDividendUnit));
+        if (nPercent>0) {
+        	return Integer.toString(nPercent)+"%";
+        }
+        else {
+        	return "1%";
         }
     }
     

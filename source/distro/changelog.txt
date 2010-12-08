@@ -2,6 +2,17 @@ Changelog for Writer2LaTeX version 1.0 -> 1.2
 
 ---------- version 1.1.9 ----------
 
+[w2x] In EPUB export, convert_to_px=true now (despite the name) exports relative font sizes
+
+[w2l] Custom config ui is now refactored to use ConfigurationDialogBase, fixing some minor bugs
+
+[w2l] String replace now also works with XeTeX as backend
+
+[w2l] Bugfix: The verbatim attribute for character style maps now also works if formatting=ignore_all
+
+[w2x] New option external_toc_depth to set the number of levels to include in the external table of contents
+  in EPUB export (default value is "auto", which determines the depth from the split level)
+
 [w2x] New option page_break_split with values none (default), styles (split on page breaks defined by a style),
   explicit (split on all explicit page breaks, manual or defined by a style), all (split on all page breaks, including
   soft page breaks (will not split until current paragraph, table or list is finished))

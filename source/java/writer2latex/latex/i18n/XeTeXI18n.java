@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-11-21) 
+ *  Version 1.2 (2010-11-30) 
  * 
  */
 
@@ -85,32 +85,43 @@ public class XeTeXI18n extends I18n {
     /** Convert a string of characters into LaTeX
      *  @param s the source string
      *  @param bMathMode true if the string should be rendered in math mode
-     *  @param sLang the iso language of the string
+     *  @param sLang the ISO language of the string
      *  @return the LaTeX string
      */
     public String convert(String s, boolean bMathMode, String sLang){
+    	// TODO: Do we need anything special for math mode?
     	StringBuffer buf = new StringBuffer();
-    	int nLen = s.length();
-    	char c;
-    	for (int i=0; i<nLen; i++) {
-    		c = s.charAt(i);
-    		switch (c) {
-    			case '#' : buf.append("\\#"); break; // Parameter
-    			case '$' : buf.append("\\$"); break; // Math shift
-    			case '%' : buf.append("\\%"); break; // Comment
-    			case '&' : buf.append("\\&"); break; // Alignment tab
-    			case '\\' : buf.append("\\textbackslash{}"); break; // Escape
-    			case '^' : buf.append("\\^{}"); break; // Superscript
-    			case '_' : buf.append("\\_"); break; // Subscript
-    			case '{' : buf.append("\\{"); break; // Begin group
-    			case '}' : buf.append("\\}"); break; // End group
-    			case '~' : buf.append("\\textasciitilde{}"); break; // Active (non-breaking space)
-    			case '\u00A0' : buf.append('~'); break; // Make non-breaking spaces visible
-    			default: buf.append(c);
-    		}
-    	}
+        char c;
+        int nLen = s.length();
+        int i = 0;
+        while (i<nLen) {
+            ReplacementTrieNode node = stringReplace.get(s,i,nLen);
+            if (node!=null) {
+                buf.append(node.getLaTeXCode());
+                i += node.getInputLength();
+            }
+            else {
+        		c = s.charAt(i++);
+        		switch (c) {
+        			case '#' : buf.append("\\#"); break; // Parameter
+        			case '$' : buf.append("\\$"); break; // Math shift
+        			case '%' : buf.append("\\%"); break; // Comment
+        			case '&' : buf.append("\\&"); break; // Alignment tab
+        			case '\\' : buf.append("\\textbackslash{}"); break; // Escape
+        			case '^' : buf.append("\\^{}"); break; // Superscript
+        			case '_' : buf.append("\\_"); break; // Subscript
+        			case '{' : buf.append("\\{"); break; // Begin group
+        			case '}' : buf.append("\\}"); break; // End group
+        			case '~' : buf.append("\\textasciitilde{}"); break; // Active (non-breaking space)
+        			case '\u00A0' : buf.append('~'); break; // Make non-breaking spaces visible
+        			default: buf.append(c);
+        		}
+            }
+        }
     	return buf.toString();
     }
+    
+
 	
 
 }

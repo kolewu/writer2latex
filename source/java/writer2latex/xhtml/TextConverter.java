@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-11-22)
+ *  Version 1.2 (2010-11-28)
  *
  */
 
@@ -86,7 +86,8 @@ public class TextConverter extends ConverterHelper {
 	private static final int EPUB_CHARACTER_COUNT_TRESHOLD = 150000;
 	private int nPageBreakSplit = XhtmlConfig.NONE; // Should we split at page breaks?
 	// TODO: Collect soft page breaks between table rows
-	private boolean bPendingPageBreak = false; // We have encountered a page break which should be inserted asap 
+	private boolean bPendingPageBreak = false; // We have encountered a page break which should be inserted asap
+	private int nExternalTocDepth = 1; // The number of levels to include in the "external" table of contents
     private int nSplit = 0;  // The outline level at which to split files (0=no split)
     private int nRepeatLevels = 5; // The number of levels to repeat when splitting (0=no repeat)
     private int nLastSplitLevel = 1; // The outline level at which the last split occurred
@@ -147,6 +148,10 @@ public class TextConverter extends ConverterHelper {
         nPageBreakSplit = config.pageBreakSplit();
         nSplit = config.getXhtmlSplitLevel();
         nRepeatLevels = config.getXhtmlRepeatLevels();
+        nExternalTocDepth = config.externalTocDepth();
+        if (nExternalTocDepth==0) { // A value of zero means auto (i.e. determine from split level)
+        	nExternalTocDepth = Math.max(nSplit,1);
+        }
         nFloatMode = ofr.isText() && config.xhtmlFloatObjects() ? 
             DrawConverter.FLOATING : DrawConverter.ABSOLUTE;
         outlineNumbering = new ListCounter(ofr.getOutlineStyle());
@@ -674,10 +679,10 @@ public class TextConverter extends ConverterHelper {
                 converter.addTarget(heading,sTarget);
                 
                 // Add in external content. For single file output we include all level 1 headings + their target
-                // For multi-file output, the included heading levels depends on the split leve, and we don't include targets 
-                if (nLevel<=Math.max(nSplit,1)) {
+                // Targets are added only when the toc level is deeper than the split level 
+                if (nLevel<=nExternalTocDepth) {
                 	converter.addContentEntry(sLabel+(sLabel.length()>0 ? " " : "")+converter.getPlainInlineText(onode), nLevel,
-                			nSplit==0 ? sTarget : null);
+                			nLevel>nSplit ? sTarget : null);
                 }
 
                 // Add to real toc

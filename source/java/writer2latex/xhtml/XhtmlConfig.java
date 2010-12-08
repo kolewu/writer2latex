@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-11-22)
+ *  Version 1.2 (2010-11-28)
  *
  */
 
@@ -41,7 +41,7 @@ import writer2latex.util.Misc;
 
 public class XhtmlConfig extends writer2latex.base.ConfigBase {
     // Implement configuration methods
-    protected int getOptionCount() { return 46; }
+    protected int getOptionCount() { return 47; }
     protected String getDefaultConfigPath() { return "/writer2latex/xhtml/config/"; }
 	
     // Override setOption: To be backwards compatible, we must accept options
@@ -70,7 +70,7 @@ public class XhtmlConfig extends writer2latex.base.ConfigBase {
     public static final int CSS1_HACK = 1;
     public static final int HARD_LABELS = 2;
 
-    // Formulas (for xhtml 1.0 strict)
+    // Formulas (for XHTML 1.0 strict)
     public static final int STARMATH = 0;
     public static final int LATEX = 1;
     public static final int IMAGE_STARMATH = 2;
@@ -113,22 +113,23 @@ public class XhtmlConfig extends writer2latex.base.ConfigBase {
     private static final int TABSTOP_STYLE = 27;
     private static final int FORMULAS = 28;
     private static final int ENDNOTES_HEADING = 29;
-    private static final int SPLIT_LEVEL = 30;
-    private static final int REPEAT_LEVELS = 31;
-    private static final int PAGE_BREAK_SPLIT = 32;
-    private static final int CALC_SPLIT = 33;
-    private static final int DISPLAY_HIDDEN_SHEETS = 34;
-    private static final int DISPLAY_HIDDEN_ROWS_COLS = 35;
-    private static final int DISPLAY_FILTERED_ROWS_COLS = 36;
-    private static final int APPLY_PRINT_RANGES = 37;
-    private static final int USE_TITLE_AS_HEADING = 38;
-    private static final int USE_SHEET_NAMES_AS_HEADINGS = 39;
-    private static final int XSLT_PATH = 40;
-    private static final int SAVE_IMAGES_IN_SUBDIR = 41;
-    private static final int UPLINK = 42;
-    private static final int DIRECTORY_ICON = 43;
-    private static final int DOCUMENT_ICON = 44;
-    private static final int ZEN_HACK = 45; // temporary hack for ePub Zen Garden styles
+    private static final int EXTERNAL_TOC_DEPTH = 30;
+    private static final int SPLIT_LEVEL = 31;
+    private static final int REPEAT_LEVELS = 32;
+    private static final int PAGE_BREAK_SPLIT = 33;
+    private static final int CALC_SPLIT = 34;
+    private static final int DISPLAY_HIDDEN_SHEETS = 35;
+    private static final int DISPLAY_HIDDEN_ROWS_COLS = 36;
+    private static final int DISPLAY_FILTERED_ROWS_COLS = 37;
+    private static final int APPLY_PRINT_RANGES = 38;
+    private static final int USE_TITLE_AS_HEADING = 39;
+    private static final int USE_SHEET_NAMES_AS_HEADINGS = 40;
+    private static final int XSLT_PATH = 41;
+    private static final int SAVE_IMAGES_IN_SUBDIR = 42;
+    private static final int UPLINK = 43;
+    private static final int DIRECTORY_ICON = 44;
+    private static final int DOCUMENT_ICON = 45;
+    private static final int ZEN_HACK = 46; // temporary hack for ePub Zen Garden styles
 
     protected ComplexOption xheading = addComplexOption("heading-map");
     protected ComplexOption xpar = addComplexOption("paragraph-map");
@@ -184,6 +185,17 @@ public class XhtmlConfig extends writer2latex.base.ConfigBase {
         		else if ("starmath".equals(sValue)) { nValue = 	STARMATH; }
         		else { nValue = IMAGE_STARMATH; }
         	}
+        };
+        options[EXTERNAL_TOC_DEPTH] = new IntegerOption("external_toc_depth","auto")  {
+        	@Override public void setString(String sValue) {
+                super.setString(sValue);
+                if ("auto".equals(sValue)) {
+                	nValue = 0;
+                }
+                else {
+                	nValue = Misc.getPosInteger(sValue,1);
+                }
+            }
         };
         options[SPLIT_LEVEL] = new IntegerOption("split_level","0") {
         	@Override public void setString(String sValue) {
@@ -319,6 +331,7 @@ public class XhtmlConfig extends writer2latex.base.ConfigBase {
     public String getXhtmlTabstopStyle() { return options[TABSTOP_STYLE].getString(); }
     public String getEndnotesHeading() { return options[ENDNOTES_HEADING].getString(); }
     public int formulas() { return ((IntegerOption) options[FORMULAS]).getValue(); }
+    public int externalTocDepth() { return ((IntegerOption) options[EXTERNAL_TOC_DEPTH]).getValue(); }
     public int getXhtmlSplitLevel() { return ((IntegerOption) options[SPLIT_LEVEL]).getValue(); }
     public int getXhtmlRepeatLevels() { return ((IntegerOption) options[REPEAT_LEVELS]).getValue(); }
     public int pageBreakSplit() { return ((IntegerOption) options[PAGE_BREAK_SPLIT]).getValue(); }
