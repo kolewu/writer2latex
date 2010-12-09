@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-12-08)
+ *  Version 1.2 (2010-12-09)
  *
  */ 
  
@@ -33,6 +33,8 @@ import writer2latex.api.ComplexOption;
 
 import org.openoffice.da.comp.w2lcommon.filter.ConfigurationDialogBase;
 import org.openoffice.da.comp.w2lcommon.helper.DialogAccess;
+import org.openoffice.da.comp.w2lcommon.helper.FieldMasterNameProvider;
+import org.openoffice.da.comp.w2lcommon.helper.StyleNameProvider;
 
 import com.sun.star.lang.XServiceInfo;
 import com.sun.star.uno.XComponentContext;
@@ -82,8 +84,8 @@ public final class ConfigurationDialog extends ConfigurationDialogBase implement
     	pageHandlers.put("Characters", new CharactersHandler());
     	pageHandlers.put("Fonts", new FontsHandler());
     	pageHandlers.put("Pages", new PagesHandler());
-    	//pageHandlers.put("Tables", new Handler());
-    	//pageHandlers.put("Figures", new Handler());
+    	pageHandlers.put("Tables", new TablesHandler());
+    	pageHandlers.put("Figures", new FiguresHandler());
     	//pageHandlers.put("TextAndMath", new Handler());
     }
     
@@ -97,7 +99,7 @@ public final class ConfigurationDialog extends ConfigurationDialogBase implement
         		"UseSoulChange", "FormattingAttributeChange", "CustomAttributeChange", // Characters
         		"ExportGeometryChange", "ExportHeaderAndFooterChange", // Pages
         		"NoTablesChange", "UseSupertabularChange", "UseLongtableChange", // Tables
-        		"NoImagesChange", // Images
+        		"NoImagesChange", // Figures
         		"MathSymbolNameChange", "NewSymbolClick", "DeleteSymbolClick",
         		"TextInputChange", "NewTextClick", "DeleteTextClick" // Text and Math
         };
@@ -455,13 +457,18 @@ public final class ConfigurationDialog extends ConfigurationDialogBase implement
 			dlg.setCheckBoxStateAsBoolean("LineBreak", false);
 		}
 		
-		protected void prepareControls(DialogAccess dlg) {
-        	dlg.setControlEnabled("NextLabel", nCurrentFamily==2);
-        	dlg.setControlEnabled("Next", nCurrentFamily==2);
-        	dlg.setControlEnabled("AddNextButton", nCurrentFamily==2);
-        	dlg.setControlEnabled("RemoveNextButton", nCurrentFamily==2);
-        	dlg.setControlEnabled("Verbatim", nCurrentFamily<2);
-        	dlg.setControlEnabled("LineBreak", nCurrentFamily==1);
+		protected void prepareControls(DialogAccess dlg, boolean bHasMappings) {
+			dlg.setControlEnabled("BeforeLabel", bHasMappings);
+			dlg.setControlEnabled("Before", bHasMappings);
+			dlg.setControlEnabled("AfterLabel", bHasMappings);
+			dlg.setControlEnabled("After", bHasMappings);
+        	dlg.setControlEnabled("NextLabel", bHasMappings && nCurrentFamily==2);
+        	dlg.setControlEnabled("Next", bHasMappings && nCurrentFamily==2);
+        	dlg.setControlEnabled("AddNextButton", bHasMappings && nCurrentFamily==2);
+        	//dlg.setControlEnabled("RemoveNextButton", bHasMappings && nCurrentFamily==2);
+        	dlg.setControlEnabled("Verbatim", bHasMappings && nCurrentFamily<2);
+        	dlg.setControlEnabled("LineBreak", bHasMappings && nCurrentFamily==1);
+        	updateRemoveNextButton(dlg);
 		}
 		
 		// Define own event handlers
@@ -698,6 +705,147 @@ public final class ConfigurationDialog extends ConfigurationDialogBase implement
     	}
     }
     	
+    // The page "Tables"
+    // This page handles the options table_content, use_tabulary, use_colortbl, use_multirow, use_supertabular, use_longtable,
+    // table_first_head_style, table_head_style, table_foot_style, table_last_foot_style
+	// Limitation: Cannot handle the values "error" and "warning" for table_content
+    private class TablesHandler extends PageHandler {
+    	
+    	protected TablesHandler() {
+    	}
+    	
+    	@Override protected void setControls(DialogAccess dlg) {
+    		// Fill the table style combo boxes with style names
+    		StyleNameProvider styleNameProvider = new StyleNameProvider(xContext);
+    		Map<String,String> internalNames = styleNameProvider.getInternalNames("ParagraphStyles");
+    		if (internalNames!=null) {
+    			String[] styleNames = sortStringSet(internalNames.keySet());
+    			dlg.setListBoxStringItemList("TableFirstHeadStyle",styleNames);
+    			dlg.setListBoxStringItemList("TableHeadStyle",styleNames);
+    			dlg.setListBoxStringItemList("TableFootStyle",styleNames);
+    			dlg.setListBoxStringItemList("TableLastFootStyle",styleNames);
+    		}
+    		
+    		// Fill the table sequence combo box with sequence names
+    		FieldMasterNameProvider fieldMasterNameProvider = new FieldMasterNameProvider(xContext);
+    		dlg.setListBoxStringItemList("TableSequenceName",
+    				sortStringSet(fieldMasterNameProvider.getFieldMasterNames("com.sun.star.text.fieldmaster.SetExpression.")));
+
+    		dlg.setCheckBoxStateAsBoolean("NoTables", !"accept".equals(config.getOption("table_content")));
+        	checkBoxFromConfig(dlg,"UseColortbl","use_colortbl");
+        	checkBoxFromConfig(dlg,"UseTabulary","use_tabulary");
+        	//checkBoxFromConfig(dlg,"UseMultirow","use_multirow");
+        	checkBoxFromConfig(dlg,"UseSupertabular","use_supertabular");
+        	checkBoxFromConfig(dlg,"UseLongtable","use_longtable");
+        	textFieldFromConfig(dlg,"TableFirstHeadStyle","table_first_head_style");
+        	textFieldFromConfig(dlg,"TableHeadStyle","table_head_style");
+        	textFieldFromConfig(dlg,"TableFootStyle","table_foot_style");
+        	textFieldFromConfig(dlg,"TableLastFootStyle","table_last_foot_style");
+        	textFieldFromConfig(dlg,"TableSequenceName","table_sequence_name");
+        	
+        	checkBoxChange(dlg);
+    	}
+    	
+    	@Override protected void getControls(DialogAccess dlg) {
+        	config.setOption("table_content", dlg.getCheckBoxStateAsBoolean("NoTables") ? "ignore" : "accept");
+        	checkBoxToConfig(dlg,"UseColortbl","use_colortbl");
+        	checkBoxToConfig(dlg,"UseTabulary","use_tabulary");
+        	//checkBoxToConfig(dlg,"UseMultirow","use_multirow");
+        	checkBoxToConfig(dlg,"UseSupertabular","use_supertabular");
+        	checkBoxToConfig(dlg,"UseLongtable","use_longtable");
+        	textFieldToConfig(dlg,"TableFirstHeadStyle","table_first_head_style");
+        	textFieldToConfig(dlg,"TableHeadStyle","table_head_style");
+        	textFieldToConfig(dlg,"TableFootStyle","table_foot_style");
+        	textFieldToConfig(dlg,"TableLastFootStyle","table_last_foot_style");
+        	textFieldToConfig(dlg,"TableSequenceName","table_sequence_name");
+    	}
+    	
+    	@Override protected boolean handleEvent(DialogAccess dlg, String sMethod) {
+    		if (sMethod.equals("NoTablesChange")) {
+    			checkBoxChange(dlg);
+    			return true;
+    		}
+    		else if (sMethod.equals("UseSupertabularChange")) {
+    			checkBoxChange(dlg);
+    			return true;
+    		}
+    		else if (sMethod.equals("UseLongtableChange")) {
+    			checkBoxChange(dlg);
+    			return true;
+    		}
+    		return false;
+    	}
+    	
+    	private void checkBoxChange(DialogAccess dlg) {
+    		boolean bNoTables = dlg.getCheckBoxStateAsBoolean("NoTables");
+    		boolean bSupertabular = dlg.getCheckBoxStateAsBoolean("UseSupertabular");
+    		boolean bLongtable = dlg.getCheckBoxStateAsBoolean("UseLongtable");
+    		dlg.setControlEnabled("UseColortbl", !bNoTables);
+    		dlg.setControlEnabled("UseTabulary", !bNoTables);
+    		dlg.setControlEnabled("UseMultirow", false);
+    		dlg.setControlEnabled("UseSupertabular", !bNoTables);
+    		dlg.setControlEnabled("UseLongtable", !bNoTables && !bSupertabular);
+    		dlg.setControlEnabled("TableFirstHeadLabel", !bNoTables && (bSupertabular || bLongtable));
+    		dlg.setControlEnabled("TableFirstHeadStyle", !bNoTables && (bSupertabular || bLongtable));
+    		dlg.setControlEnabled("TableHeadLabel", !bNoTables && (bSupertabular || bLongtable));
+    		dlg.setControlEnabled("TableHeadStyle", !bNoTables && (bSupertabular || bLongtable));
+    		dlg.setControlEnabled("TableFootLabel", !bNoTables && (bSupertabular || bLongtable));
+    		dlg.setControlEnabled("TableFootStyle", !bNoTables && (bSupertabular || bLongtable));
+    		dlg.setControlEnabled("TableLastFootLabel", !bNoTables && (bSupertabular || bLongtable));
+    		dlg.setControlEnabled("TableLastFootStyle", !bNoTables && (bSupertabular || bLongtable));
+    		dlg.setControlEnabled("TableSequenceLabel", !bNoTables);
+    		dlg.setControlEnabled("TableSequenceName", !bNoTables);
+    	}    
+    	
+    }
+
+    // The page "Figures"
+    // This page handles the options use_caption, align_frames, figure_sequence_name, image_content,
+    // remove_graphics_extension and image_options
+	// Limitation: Cannot handle the values "error" and "warning" for image_content
+    private class FiguresHandler extends PageHandler {
+    	@Override protected void setControls(DialogAccess dlg) {
+    		// Fill the figure sequence combo box with sequence names
+    		FieldMasterNameProvider fieldMasterNameProvider = new FieldMasterNameProvider(xContext);
+    		dlg.setListBoxStringItemList("FigureSequenceName",
+    				sortStringSet(fieldMasterNameProvider.getFieldMasterNames("com.sun.star.text.fieldmaster.SetExpression.")));
+    		
+        	checkBoxFromConfig(dlg,"UseCaption","use_caption");
+        	checkBoxFromConfig(dlg,"AlignFrames","align_frames");
+        	textFieldFromConfig(dlg,"FigureSequenceName","figure_sequence_name");
+        	dlg.setCheckBoxStateAsBoolean("NoImages", !"accept".equals(config.getOption("image_content")));
+        	checkBoxFromConfig(dlg,"RemoveGraphicsExtension","remove_graphics_extension");
+        	textFieldFromConfig(dlg,"ImageOptions","image_options");
+        	
+        	noImagesChange(dlg);
+    	}
+    	
+    	@Override protected void getControls(DialogAccess dlg) {
+        	checkBoxToConfig(dlg,"UseCaption","use_caption");
+        	checkBoxToConfig(dlg,"AlignFrames","align_frames");
+        	textFieldToConfig(dlg,"FigureSequenceName","figure_sequence_name");
+        	config.setOption("image_content", dlg.getCheckBoxStateAsBoolean("NoImages") ? "ignore" : "accept");
+        	checkBoxToConfig(dlg,"RemoveGraphicsExtension","remove_graphics_extension");
+        	textFieldToConfig(dlg,"ImageOptions","image_options");
+    	}
+    	
+    	@Override protected boolean handleEvent(DialogAccess dlg, String sMethod) {
+    		if (sMethod.equals("NoImagesChange")) {
+    			noImagesChange(dlg);
+    			return true;
+    		}
+    		return false;
+    	}
+    	
+    	private void noImagesChange(DialogAccess dlg) {
+        	boolean bNoImages = dlg.getCheckBoxStateAsBoolean("NoImages");
+        	dlg.setControlEnabled("RemoveGraphicsExtension", !bNoImages);
+        	dlg.setControlEnabled("ImageOptionsLabel", !bNoImages);
+        	dlg.setControlEnabled("ImageOptions", !bNoImages);
+    	}    
+    	
+    }
+        
     
 	/*
 	
@@ -916,12 +1064,6 @@ public final class ConfigurationDialog extends ConfigurationDialogBase implement
     
 	// Set controls based on the config
     private void setControls() {
-    	else if ("Styles".equals(sTitle)) {
-    		loadStyles();
-    	}
-    	else if ("Tables".equals(sTitle)) {
-    		loadTables();
-    	}
     	else if ("Figures".equals(sTitle)) {
     		loadFigures();
     	}
@@ -932,107 +1074,12 @@ public final class ConfigurationDialog extends ConfigurationDialogBase implement
     
 	// Change the config based on the controls
     private void getControls() {
-    	else if ("Styles".equals(sTitle)) {
-    		saveStyles();
-    	}
-    	else if ("Tables".equals(sTitle)) {
-    		saveTables();
-    	}
     	else if ("Figures".equals(sTitle)) {
     		saveFigures();
     	}
     	else if ("TextAndMath".equals(sTitle)) {
     		saveTextAndMath();
     	}    	
-    }
-    
-    
-    
-    
-    // The page "Tables"
-    // This page handles the options table_content, use_tabulary, use_colortbl, use_multirow, use_supertabular, use_longtable,
-    // table_first_head_style, table_head_style, table_foot_style, table_last_foot_style
-	// Limitation: Cannot handle the values "error" and "warning" for table_content
-    
-    private void loadTables() {
-    	dlg.setCheckBoxStateAsBoolean("NoTables", !"accept".equals(config.getOption("table_content")));
-    	dlg.setCheckBoxStateAsBoolean("UseColortbl","true".equals(config.getOption("use_colortbl")));
-    	dlg.setCheckBoxStateAsBoolean("UseTabulary", "true".equals(config.getOption("use_tabulary")));
-    	//dlg.setCheckBoxStateAsBoolean("UseMultirow", "true".equals(config.getOption("use_multirow")));
-    	dlg.setCheckBoxStateAsBoolean("UseSupertabular","true".equals(config.getOption("use_supertabular")));
-    	dlg.setCheckBoxStateAsBoolean("UseLongtable", "true".equals(config.getOption("use_longtable")));
-    	dlg.setTextFieldText("TableFirstHeadStyle", config.getOption("table_first_head_style"));
-    	dlg.setTextFieldText("TableHeadStyle", config.getOption("table_head_style"));
-    	dlg.setTextFieldText("TableFootStyle", config.getOption("table_foot_style"));
-    	dlg.setTextFieldText("TableLastFootStyle", config.getOption("table_last_foot_style"));
-    	dlg.setTextFieldText("TableSequenceName", config.getOption("table_sequence_name"));
-    	updateTablesControls();
-    }
-    
-    private void saveTables() {
-    	config.setOption("table_content", dlg.getCheckBoxStateAsBoolean("NoTables") ? "ignore" : "accept");
-    	config.setOption("use_colortbl", Boolean.toString(dlg.getCheckBoxStateAsBoolean("UseColortbl")));    	
-    	config.setOption("use_tabulary", Boolean.toString(dlg.getCheckBoxStateAsBoolean("UseTabulary")));
-    	//config.setOption("use_multirow", Boolean.toString(dlg.getCheckBoxStateAsBoolean("UseMultirow")));
-    	config.setOption("use_supertabular", Boolean.toString(dlg.getCheckBoxStateAsBoolean("UseSupertabular")));
-    	config.setOption("use_longtable", Boolean.toString(dlg.getCheckBoxStateAsBoolean("UseLongtable")));
-    	config.setOption("table_first_head_style", dlg.getTextFieldText("TableFirstHeadStyle"));
-    	config.setOption("table_head_style", dlg.getTextFieldText("TableHeadStyle"));
-    	config.setOption("table_foot_style", dlg.getTextFieldText("TableFootStyle"));
-    	config.setOption("table_last_foot_style", dlg.getTextFieldText("TableLastFootStyle"));
-    	config.setOption("table_sequence_name", dlg.getTextFieldText("TableSequenceName"));
-    }
-    
-    private void updateTablesControls() {
-    	boolean bNoTables = dlg.getCheckBoxStateAsBoolean("NoTables");
-    	boolean bSupertabular = dlg.getCheckBoxStateAsBoolean("UseSupertabular");
-    	boolean bLongtable = dlg.getCheckBoxStateAsBoolean("UseLongtable");
-    	dlg.setControlEnabled("UseColortbl", !bNoTables);
-    	dlg.setControlEnabled("UseTabulary", !bNoTables);
-    	dlg.setControlEnabled("UseMultirow", false);
-    	dlg.setControlEnabled("UseSupertabular", !bNoTables);
-    	dlg.setControlEnabled("UseLongtable", !bNoTables && !bSupertabular);
-    	dlg.setControlEnabled("TableFirstHeadLabel", !bNoTables && (bSupertabular || bLongtable));
-    	dlg.setControlEnabled("TableFirstHeadStyle", !bNoTables && (bSupertabular || bLongtable));
-    	dlg.setControlEnabled("TableHeadLabel", !bNoTables && (bSupertabular || bLongtable));
-    	dlg.setControlEnabled("TableHeadStyle", !bNoTables && (bSupertabular || bLongtable));
-    	dlg.setControlEnabled("TableFootLabel", !bNoTables && (bSupertabular || bLongtable));
-    	dlg.setControlEnabled("TableFootStyle", !bNoTables && (bSupertabular || bLongtable));
-    	dlg.setControlEnabled("TableLastFootLabel", !bNoTables && (bSupertabular || bLongtable));
-    	dlg.setControlEnabled("TableLastFootStyle", !bNoTables && (bSupertabular || bLongtable));
-    	dlg.setControlEnabled("TableSequenceLabel", !bNoTables);
-    	dlg.setControlEnabled("TableSequenceName", !bNoTables);
-    }
-    
-    // The page "Figures"
-    // This page handles the options use_caption, align_frames, figure_sequence_name, image_content,
-    // remove_graphics_extension and image_options
-	// Limitation: Cannot handle the values "error" and "warning" for image_content
-    
-    private void loadFigures() {
-    	dlg.setCheckBoxStateAsBoolean("UseCaption", "true".equals(config.getOption("use_caption")));
-    	dlg.setCheckBoxStateAsBoolean("AlignFrames", "true".equals(config.getOption("align_frames")));
-    	dlg.setTextFieldText("FigureSequenceName", config.getOption("figure_sequence_name"));
-    	dlg.setCheckBoxStateAsBoolean("NoImages", !"accept".equals(config.getOption("image_content")));
-    	dlg.setCheckBoxStateAsBoolean("RemoveGraphicsExtension", "true".equals(config.getOption("remove_graphics_extension")));
-    	dlg.setTextFieldText("ImageOptions", config.getOption("image_options"));
-    	updateFiguresControls();
-     }
-    
-    private void saveFigures() {
-    	config.setOption("use_caption", Boolean.toString(dlg.getCheckBoxStateAsBoolean("UseCaption")));
-    	config.setOption("align_frames", Boolean.toString(dlg.getCheckBoxStateAsBoolean("AlignFrames")));
-    	config.setOption("figure_sequence_name", dlg.getTextFieldText("FigureSequenceName"));
-    	config.setOption("image_content", dlg.getCheckBoxStateAsBoolean("NoImages") ? "ignore" : "accept");
-    	config.setOption("remove_graphics_extension", Boolean.toString(dlg.getCheckBoxStateAsBoolean("RemoveGraphicsExtension")));
-    	config.setOption("image_options", dlg.getTextFieldText("ImageOptions"));
-    }
-
-    private void updateFiguresControls() {
-    	boolean bNoImages = dlg.getCheckBoxStateAsBoolean("NoImages");
-    	dlg.setControlEnabled("RemoveGraphicsExtension", !bNoImages);
-    	dlg.setControlEnabled("ImageOptionsLabel", !bNoImages);
-    	dlg.setControlEnabled("ImageOptions", !bNoImages);
     }
     
     // The page "TextAndMath"

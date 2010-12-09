@@ -17,12 +17,27 @@
   <dlg:text dlg:id="TableHeadLabel" dlg:tab-index="7" dlg:left="25" dlg:top="106" dlg:width="90" dlg:height="12" dlg:value="Style for head"/>
   <dlg:text dlg:id="TableFootLabel" dlg:tab-index="8" dlg:left="25" dlg:top="120" dlg:width="90" dlg:height="12" dlg:value="Style for foot"/>
   <dlg:text dlg:id="TableLastFootLabel" dlg:tab-index="9" dlg:left="25" dlg:top="134" dlg:width="90" dlg:height="12" dlg:value="Style for last foot"/>
-  <dlg:textfield dlg:id="TableFirstHeadStyle" dlg:tab-index="10" dlg:left="120" dlg:top="90" dlg:width="130" dlg:height="12" dlg:help-url="org.openoffice.da.writer2latex.oxt:ConfigTableFirstHeadStyle"/>
-  <dlg:textfield dlg:id="TableHeadStyle" dlg:tab-index="11" dlg:left="120" dlg:top="104" dlg:width="130" dlg:height="12" dlg:help-url="org.openoffice.da.writer2latex.oxt:ConfigTableHeadStyle"/>
-  <dlg:textfield dlg:id="TableFootStyle" dlg:tab-index="12" dlg:left="120" dlg:top="118" dlg:width="130" dlg:height="12" dlg:help-url="org.openoffice.da.writer2latex.oxt:ConfigTableFootStyle"/>
-  <dlg:textfield dlg:id="TableLastFootStyle" dlg:tab-index="13" dlg:left="120" dlg:top="132" dlg:width="130" dlg:height="12" dlg:help-url="org.openoffice.da.writer2latex.oxt:ConfigTableLastFootStyle"/>
+  <dlg:combobox dlg:id="TableFirstHeadStyle" dlg:tab-index="10" dlg:left="120" dlg:top="90" dlg:width="130" dlg:height="12" dlg:help-url="org.openoffice.da.writer2latex.oxt:ConfigTableFirstHeadStyle" dlg:spin="true" dlg:linecount="15">
+    <dlg:menupopup>
+    </dlg:menupopup>
+  </dlg:combobox>
+  <dlg:combobox dlg:id="TableHeadStyle" dlg:tab-index="11" dlg:left="120" dlg:top="104" dlg:width="130" dlg:height="12" dlg:help-url="org.openoffice.da.writer2latex.oxt:ConfigTableHeadStyle" dlg:spin="true" dlg:linecount="15">
+    <dlg:menupopup>
+    </dlg:menupopup>
+  </dlg:combobox>
+  <dlg:combobox dlg:id="TableFootStyle" dlg:tab-index="12" dlg:left="120" dlg:top="118" dlg:width="130" dlg:height="12" dlg:help-url="org.openoffice.da.writer2latex.oxt:ConfigTableFootStyle" dlg:spin="true" dlg:linecount="15">
+    <dlg:menupopup>
+    </dlg:menupopup>
+  </dlg:combobox>
+  <dlg:combobox dlg:id="TableLastFootStyle" dlg:tab-index="13" dlg:left="120" dlg:top="132" dlg:width="130" dlg:height="12" dlg:help-url="org.openoffice.da.writer2latex.oxt:ConfigTableLastFootStyle" dlg:spin="true" dlg:linecount="15">
+    <dlg:menupopup>
+    </dlg:menupopup>
+  </dlg:combobox>
   <dlg:text dlg:id="TableSequenceLabel" dlg:tab-index="14" dlg:left="10" dlg:top="150" dlg:width="90" dlg:height="12" dlg:value="Table sequence name"/>
-  <dlg:textfield dlg:id="TableSequenceName" dlg:tab-index="15" dlg:left="120" dlg:top="148" dlg:width="130" dlg:height="12" dlg:help-url="org.openoffice.da.writer2latex.oxt:ConfigTableSequenceName"/>
+  <dlg:combobox dlg:id="TableSequenceName" dlg:tab-index="15" dlg:left="120" dlg:top="148" dlg:width="130" dlg:height="12" dlg:help-url="org.openoffice.da.writer2latex.oxt:ConfigTableSequenceName" dlg:spin="true" dlg:linecount="10">
+    <dlg:menupopup>
+    </dlg:menupopup>
+  </dlg:combobox>
   <dlg:checkbox dlg:id="UseColortbl" dlg:tab-index="1" dlg:left="10" dlg:top="22" dlg:width="240" dlg:height="12" dlg:value="Use colortbl.sty (background color in cells)" dlg:checked="false" dlg:help-url="org.openoffice.da.writer2latex.oxt:ConfigUseColortbl"/>
  </dlg:bulletinboard>
 </dlg:window>

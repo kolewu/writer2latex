@@ -20,7 +20,7 @@
 *
 *  All Rights Reserved.
 * 
-*  Version 1.2 (2010-04-12)
+*  Version 1.2 (2010-12-09)
 *
 */ 
 
@@ -288,6 +288,14 @@ public abstract class ConfigurationDialogBase extends WeakBase implements XConta
 			config.setOption(sConfigName, sConfigValues[dlg.getListBoxSelectedItem(sListBoxName)]);
 		}
 				
+	    // Utilities
+	    protected String[] sortStringSet(Set<String> theSet) {
+	    	String[] theArray = theSet.toArray(new String[theSet.size()]);
+			// TODO: Get locale from OOo rather than the system
+			Collator collator = Collator.getInstance();
+			Arrays.sort(theArray, collator);
+	    	return theArray;
+	    }
 	}
 	
 	protected abstract class CustomFileHandler extends PageHandler {
@@ -506,13 +514,7 @@ public abstract class ConfigurationDialogBase extends WeakBase implements XConta
 		private String newItem(Set<String> suggestions) {
 		   	XDialog xDialog=getDialog(getDialogLibraryName()+".NewDialog");
 		   	if (xDialog!=null) {
-		   		int nCount = suggestions.size();
-		   		String[] sItems = new String[nCount];
-		   		int i=0;
-		   		for (String s : suggestions) {
-		   			sItems[i++] = s;
-		   		}
-		   		sortStringArray(sItems);
+		   		String[] sItems = sortStringSet(suggestions);
 		   		DialogAccess ndlg = new DialogAccess(xDialog);
 		   		ndlg.setListBoxStringItemList("Name", sItems);
 		   		String sResult = null;
@@ -547,23 +549,6 @@ public abstract class ConfigurationDialogBase extends WeakBase implements XConta
 		   	return sNewItem;
 		}
 		
-	    // Utilities
-	    protected String[] sortStringSet(Set<String> theSet) {
-	    	String[] theArray = new String[theSet.size()];
-	    	int i=0;
-	    	for (String s : theSet) {
-	    		theArray[i++] = s;
-	    	}
-	    	sortStringArray(theArray);
-	    	return theArray;
-	    }
-		
-		protected void sortStringArray(String[] theArray) {
-			// TODO: Get locale from OOo rather than the system
-			Collator collator = Collator.getInstance();
-			Arrays.sort(theArray, collator);
-		}
-
 	}
 	
 	protected abstract class StylesPageHandler extends UserListPageHandler {
@@ -588,7 +573,7 @@ public abstract class ConfigurationDialogBase extends WeakBase implements XConta
 		
 		protected abstract void clearControls(DialogAccess dlg);
 		
-		protected abstract void prepareControls(DialogAccess dlg);
+		protected abstract void prepareControls(DialogAccess dlg, boolean bHasDefinitions);
 		
 		// Constructor
 		protected StylesPageHandler(int nCount) {
@@ -682,8 +667,7 @@ public abstract class ConfigurationDialogBase extends WeakBase implements XConta
 	        		dlg.setListBoxSelectedItem("StyleName", (short)-1);
 	        	}
 	        	
-	        	updateDeleteButton(dlg);
-	        	prepareControls(dlg);
+	        	updateStyleControls(dlg);
 	        	styleNameChange(dlg);
 	    	}
 		}
@@ -711,7 +695,7 @@ public abstract class ConfigurationDialogBase extends WeakBase implements XConta
 					styleMap[nCurrentFamily].put(sNewName, new HashMap<String,String>());
 					clearControls(dlg);
 				}
-				updateDeleteButton(dlg);
+				updateStyleControls(dlg);
 			}
 		}
 
@@ -722,7 +706,7 @@ public abstract class ConfigurationDialogBase extends WeakBase implements XConta
 					styleMap[nCurrentFamily].remove(sStyleName);
 					styleNameChange(dlg);
 				}
-				updateDeleteButton(dlg);
+				updateStyleControls(dlg);
 			}
 		}
 		
@@ -776,8 +760,10 @@ public abstract class ConfigurationDialogBase extends WeakBase implements XConta
 			styleFamilyChange(dlg);
 		}
 		
-		private void updateDeleteButton(DialogAccess dlg) {
-			dlg.setControlEnabled("DeleteStyleButton", dlg.getListBoxStringItemList("StyleName").length>0);
+		private void updateStyleControls(DialogAccess dlg) {
+			boolean bHasMappings = dlg.getListBoxStringItemList("StyleName").length>0;
+			dlg.setControlEnabled("DeleteStyleButton", bHasMappings);
+			prepareControls(dlg,bHasMappings);
 		}
 
 		private void copyStyles(ComplexOption source, ComplexOption target, Map<String,String> nameTranslation) {

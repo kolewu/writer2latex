@@ -2,6 +2,12 @@ Changelog for Writer2LaTeX version 1.0 -> 1.2
 
 ---------- version 1.1.9 ----------
 
+[all] Custom config ui: Style controls are now disabled if there are no definitions for the current style famlily
+
+[w2l] Custom config ui: The table and figure sequence name can now be selected from existing field masters
+
+[w2l] Custom config ui: The four special styles for tables are now localized and can be selected from existing styles
+
 [w2x] In EPUB export, convert_to_px=true now (despite the name) exports relative font sizes
 
 [w2l] Custom config ui is now refactored to use ConfigurationDialogBase, fixing some minor bugs

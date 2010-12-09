@@ -43,7 +43,8 @@
     	<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2latex.oxt:ConfigTableFirstHeadStyle" id="bm_configtablefirstheadstyle"/>
         <paragraph role="heading" level="3" xml-lang="en-US">Style for first head</paragraph>
         <paragraph role="paragraph" xml-lang="en-US">This option is used to produce advanced tables, that are not supported in
-        %PRODUCTNAME Writer. Enter the name of a paragraph style. If the first paragraph of the first cell in a row is formatted
+        %PRODUCTNAME Writer. Enter the name of a paragraph style, or select a style in the list.
+        If the first paragraph of the first cell in a row is formatted
         with this paragraph style, the row in question will be used for the first head in a multipage table.</paragraph>
         
     	<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2latex.oxt:ConfigTableHeadStyle" id="bm_configtableheadstyle"/>
@@ -66,6 +67,8 @@
         <paragraph role="paragraph" xml-lang="en-US">This option can be set to a sequence name in the source document.
         OpenDocument has a very weak sense of table captions: A table caption is a paragraph containing a sequence number.
         If you use %PRODUCTNAME's defaults, Writer2LaTeX can guess which sequence name to use.
-        If it fails, you can type the name here. Normally it should be left empty.</paragraph>
+        If it fails, you can type the name here, or select the name from the list. (Note that %PRODUCTNAME Writer has four
+        basic sequence names which always will be displayed in English here. These are Drawing, Illustration, Table, Text.)
+        Normally this field should be left empty.</paragraph>
     </body>
 </helpdocument>

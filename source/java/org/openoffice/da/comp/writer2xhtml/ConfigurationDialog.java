@@ -20,7 +20,7 @@
 *
 *  All Rights Reserved.
 * 
-*  Version 1.2 (2010-06-20)
+*  Version 1.2 (2010-12-09)
 *
 */ 
 
@@ -114,7 +114,7 @@ public class ConfigurationDialog extends ConfigurationDialogBase implements XSer
     		checkBoxFromConfig(dlg, "Multilingual", "multilingual");
     		checkBoxFromConfig(dlg, "PrettyPrint", "pretty_print");
     		
-    		updateControls(dlg);
+    		encodingChange(dlg);
     	}
     	
     	@Override protected void getControls(DialogAccess dlg) {
@@ -131,13 +131,13 @@ public class ConfigurationDialog extends ConfigurationDialogBase implements XSer
     	
     	@Override protected boolean handleEvent(DialogAccess dlg, String sMethod) {
     		if (sMethod.equals("EncodingChange")) {
-    			updateControls(dlg);
+    			encodingChange(dlg);
     			return true;
     		}
     		return false;
     	}
 
-    	private void updateControls(DialogAccess dlg) {
+    	private void encodingChange(DialogAccess dlg) {
     		int nEncoding = dlg.getListBoxSelectedItem("Encoding");
     		dlg.setControlEnabled("AddBOM", nEncoding==0); // Only for UTF-8
     		dlg.setControlEnabled("HexadecimalEntitiesLabel", nEncoding>1); // Not for UNICODE
@@ -304,12 +304,17 @@ public class ConfigurationDialog extends ConfigurationDialogBase implements XSer
 			dlg.setTextFieldText("BlockCss", "");
 		}
 		
-		protected void prepareControls(DialogAccess dlg) {
+		protected void prepareControls(DialogAccess dlg, boolean bHasMappings) {
 			dlg.setListBoxStringItemList("Element", sElements[nCurrentFamily]);
 			dlg.setListBoxStringItemList("BlockElement", sBlockElements[nCurrentFamily]);
-			dlg.setControlEnabled("Element", nCurrentFamily<=2);			
-			dlg.setControlEnabled("BlockElement", nCurrentFamily==1 || nCurrentFamily==2);
-			dlg.setControlEnabled("BlockCss", nCurrentFamily==1 || nCurrentFamily==2);		
+			dlg.setControlEnabled("ElementLabel", bHasMappings && nCurrentFamily<=2);			
+			dlg.setControlEnabled("Element", bHasMappings && nCurrentFamily<=2);			
+			dlg.setControlEnabled("CssLabel", bHasMappings);			
+			dlg.setControlEnabled("Css", bHasMappings);			
+			dlg.setControlEnabled("BlockElementLabel", bHasMappings && (nCurrentFamily==1 || nCurrentFamily==2));
+			dlg.setControlEnabled("BlockElement", bHasMappings && (nCurrentFamily==1 || nCurrentFamily==2));
+			dlg.setControlEnabled("BlockCssLabel", bHasMappings && (nCurrentFamily==1 || nCurrentFamily==2));		
+			dlg.setControlEnabled("BlockCss", bHasMappings && (nCurrentFamily==1 || nCurrentFamily==2));		
 		}
 	}
     
