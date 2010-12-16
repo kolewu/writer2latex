@@ -20,11 +20,13 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-03-15)
+ *  Version 1.2 (2010-12-15)
  *
  */
 
 package writer2latex.api;
+
+import java.util.Map;
 
 /** This interface provides access to the predefined meta data of the
  *  source document (currently incomplete)
@@ -36,10 +38,45 @@ public interface MetaData {
 	 */
 	public String getTitle();
 	
+	/** Get the subject of the source document
+	 * 
+	 * @return the subject (may return an empty string)
+	 */
+	public String getSubject();
+	
+	/** Get the keywords of the source document
+	 * 
+	 * @return the keywords as a comma separated list (may return an empty string)
+	 */
+	public String getKeywords();
+	
+	/** Get the description of the source document
+	 * 
+	 * @return the description (may return an empty string)
+	 */
+	public String getDescription();
+	
+	/** Get the creator of the source document (or the initial creator if none is specified)
+	 * 
+	 * @return the creator (may return an empty string)
+	 */
+	public String getCreator();
+
 	/** Get the (main) language of the document
 	 * 
 	 * @return the language
 	 */
 	public String getLanguage();
 
+	/** Get the date of the source document
+	 * 
+	 * @return the date (may return an empty string)
+	 */
+	public String getDate();
+	
+	/** Get the user-defined meta data
+	 * 
+	 * @return the user-defined meta data as a name-value map
+	 */
+	public Map<String,String> getUserDefinedMetaData();
 }

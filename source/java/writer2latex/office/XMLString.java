@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-10-04)
+ *  Version 1.2 (2010-12-15)
  *
  */
 
@@ -61,6 +61,9 @@ public class XMLString {
     public static final String META_INITIAL_CREATOR="meta:initial-creator";
     public static final String META_KEYWORDS="meta:keywords";
     public static final String META_KEYWORD="meta:keyword";
+    public static final String META_USER_DEFINED="meta:user-defined";
+    // meta namespace - attributes
+    public static final String META_NAME="meta:name";
 
     // manifest namespace
     public static final String MANIFEST_FILE_ENTRY="manifest:file-entry";

@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-05-11) 
+ *  Version 1.2 (2010-12-15) 
  * 
  */
 
@@ -359,7 +359,7 @@ public class ClassicI18n extends I18n {
     }
 	
     /** Apply a language language
-     *  @param style the OOo style to read attributesfrom
+     *  @param style the OOo style to read attributes from
      *  @param bDecl true if declaration form is required
      *  @param bInherit true if inherited properties should be used
      *  @param ba the <code>BeforeAfter</code> to add LaTeX code to.
@@ -662,7 +662,8 @@ public class ClassicI18n extends I18n {
         babelLanguages.put("is", "icelandic"); // latin1
         babelLanguages.put("it", "italian"); // latin1
         babelLanguages.put("nl", "dutch"); // latin1
-        babelLanguages.put("no", "norsk"); // latin1
+        babelLanguages.put("nb", "norsk"); // latin1
+        babelLanguages.put("nn", "nynorsk"); // latin1
         babelLanguages.put("pl", "polish"); // latin2
         babelLanguages.put("pt", "portuges"); // latin1
         babelLanguages.put("ro", "romanian"); // latin2

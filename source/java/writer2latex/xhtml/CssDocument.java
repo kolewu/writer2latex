@@ -47,7 +47,7 @@ public class CssDocument implements OutputFile {
     
     /**
      *  Constructor (creates an empty document)
-     *  @param  name  <code>Document</code> name.
+     *  @param  sName  <code>Document</code> name.
      */
     public CssDocument(String sName) {
     	this.sName = sName;

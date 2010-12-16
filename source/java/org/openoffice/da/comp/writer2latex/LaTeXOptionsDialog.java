@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2009 by Henrik Just
+ *  Copyright: 2002-2010 by Henrik Just
  *
  *  All Rights Reserved.
  *  
- *  Version 1.2 (2009-03-31)
+ *  Version 1.2 (2010-12-14)
  *  
  */
 
@@ -37,7 +37,7 @@ import com.sun.star.uno.XComponentContext;
 import org.openoffice.da.comp.w2lcommon.helper.PropertyHelper;
 import org.openoffice.da.comp.w2lcommon.filter.OptionsDialogBase;
 
-/** This class provides a uno component which implements a filter ui for the
+/** This class provides a UNO component which implements a filter ui for the
  *  LaTeX export
  */
 public class LaTeXOptionsDialog extends OptionsDialogBase {
@@ -239,6 +239,10 @@ public class LaTeXOptionsDialog extends OptionsDialogBase {
         }
         else if ("inputencoding".equals(sOptionName)) {
         	// backend=xetex locks the encoding to utf8
+        	return getListBoxSelectedItem("Backend")==3 || super.isLocked(sOptionName);
+        }
+        else if ("greek_math".equals(sOptionName)) {
+        	// this option has no effect if backend=xetex
         	return getListBoxSelectedItem("Backend")==3 || super.isLocked(sOptionName);
         }
         else if ("additional_symbols".equals(sOptionName)) {

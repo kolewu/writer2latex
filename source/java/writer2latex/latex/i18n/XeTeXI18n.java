@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-11-30) 
+ *  Version 1.2 (2010-12-15)
  * 
  */
 
@@ -36,7 +36,7 @@ import writer2latex.latex.util.BeforeAfter;
  */
 public class XeTeXI18n extends I18n {
 
-    // **** Constructors ****
+    private Polyglossia polyglossia;
 
     /** Construct a new XeTeXI18n as ConverterHelper
      *  @param ofr the OfficeReader to get language information from
@@ -45,6 +45,7 @@ public class XeTeXI18n extends I18n {
      */
     public XeTeXI18n(OfficeReader ofr, LaTeXConfig config, ConverterPalette palette) {
     	super(ofr,config,palette);
+    	polyglossia = new Polyglossia();
     }
 	
     /** Add declarations to the preamble to load the required packages
@@ -56,17 +57,33 @@ public class XeTeXI18n extends I18n {
     		.append("\\usepackage{fontspec}").nl()
     		.append("\\usepackage{xunicode}").nl()
     		.append("\\usepackage{xltxtra}").nl();
-    		
+    	String[] polyglossiaDeclarations = polyglossia.getDeclarations();
+    	for (String s: polyglossiaDeclarations) {
+    		pack.append(s).nl();
+    	}
     }
 	
     /** Apply a language language
-     *  @param style the OOo style to read attributesfrom
+     *  @param style the OOo style to read attributes from
      *  @param bDecl true if declaration form is required
      *  @param bInherit true if inherited properties should be used
      *  @param ba the <code>BeforeAfter</code> to add LaTeX code to.
      */
     public void applyLanguage(StyleWithProperties style, boolean bDecl, boolean bInherit, BeforeAfter ba) {
-    	// TODO (polyglossia)
+        if (!bAlwaysUseDefaultLang && style!=null) {
+        	// TODO: Support CTL and CJK
+            String sISOLang = style.getProperty(XMLString.FO_LANGUAGE,bInherit);
+            String sISOCountry = style.getProperty(XMLString.FO_COUNTRY, bInherit);
+            if (sISOLang!=null) {
+            	String[] sCommand = polyglossia.applyLanguage(sISOLang, sISOCountry);
+            	if (bDecl) {
+            		ba.add(sCommand[1],sCommand[2]);
+            	} 
+            	else {
+            		ba.add(sCommand[0]+"{","}");
+            	}
+            }
+        }
     }
 
     /** Push a font to the font stack

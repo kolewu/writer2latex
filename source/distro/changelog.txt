@@ -2,7 +2,22 @@ Changelog for Writer2LaTeX version 1.0 -> 1.2
 
 ---------- version 1.1.9 ----------
 
-[all] Custom config ui: Style controls are now disabled if there are no definitions for the current style famlily
+[w2x] EPUB export now uses user-defined meta data to support meta data features that are not defined in ODF
+
+[w2x] The option use_dublin_core now also works for EPUB export
+
+[all] API extension: The metadata interface now provides title, subject, keywords, description, creator, language, date
+  and all user defined metadata
+
+[w2l] The default value for wrap_lines_after is changed to 120
+
+[w2l] Bugfix: Norwegian Nynorsk and Bokmål are exported correctly to babel languages
+
+[w2l] Added support for polyglossia.sty (if backend=xetex and multilingual=true)
+
+[w2l] The option "Use greek letters as symbols" is now disabled in the ui if the backend is XeTeX
+
+[all] Custom config ui: Style controls are now disabled if there are no definitions for the current style family
 
 [w2l] Custom config ui: The table and figure sequence name can now be selected from existing field masters
 

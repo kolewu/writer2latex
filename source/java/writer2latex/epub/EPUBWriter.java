@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  version 1.2 (2010-03-31)
+ *  version 1.2 (2010-12-15)
  *
  */
 
@@ -37,6 +37,7 @@ import java.util.zip.ZipOutputStream;
 import writer2latex.api.ConverterResult;
 import writer2latex.api.OutputFile;
 import writer2latex.util.Misc;
+import writer2latex.xhtml.XhtmlConfig;
 
 /** This class repackages an XHTML document into EPUB format.
  *  Some filenames are hard wired in this implementation: The main directory is OEBPS and
@@ -49,10 +50,12 @@ public class EPUBWriter implements OutputFile {
 	
 	private ConverterResult xhtmlResult;
 	private String sFileName;
+	private XhtmlConfig config;
 	
-	public EPUBWriter(ConverterResult xhtmlResult, String sFileName) {
+	public EPUBWriter(ConverterResult xhtmlResult, String sFileName, XhtmlConfig config) {
 		this.xhtmlResult = xhtmlResult;
 		this.sFileName = Misc.removeExtension(sFileName);
+		this.config = config;
 	}
 
 	public String getFileName() {
@@ -90,7 +93,7 @@ public class EPUBWriter implements OutputFile {
 		zos.closeEntry();
 		
 		// Then manifest
-		OutputFile manifest = new OPFWriter(xhtmlResult, sUUID);
+		OutputFile manifest = new OPFWriter(xhtmlResult, sUUID, config.xhtmlUseDublinCore());
 		ZipEntry manifestEntry = new ZipEntry("OEBPS/book.opf");
 		zos.putNextEntry(manifestEntry);
 		writeZipEntry(manifest,zos);

@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-10-09)
+ *  Version 1.2 (2010-12-15)
  *
  */
 
@@ -308,7 +308,7 @@ public class LaTeXConfig extends writer2latex.base.ConfigBase {
         };
         options[METADATA] = new BooleanOption("metadata","true");
         options[TABSTOP] = new Option("tabstop","");
-        options[WRAP_LINES_AFTER] = new IntegerOption("wrap_lines_after","72") {
+        options[WRAP_LINES_AFTER] = new IntegerOption("wrap_lines_after","120") {
             public void setString(String sValue) {
                 super.setString(sValue);
                 nValue = Misc.getPosInteger(sValue,0);

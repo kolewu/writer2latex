@@ -26,6 +26,9 @@
 
 package writer2latex.office;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -49,6 +52,8 @@ public class MetaData implements writer2latex.api.MetaData {
     private String sSubject = "";
     // Keywords
     private String sKeywords = "";
+    // User-defined
+    private Map<String,String> userdefined = new HashMap<String,String>();
  
     /** <p>Construct a new instance from an OOo Writer document.</p>
      *  @param oooDoc is the OOo document
@@ -74,28 +79,28 @@ public class MetaData implements writer2latex.api.MetaData {
             if (XMLString.DC_TITLE.equals(sName)) {
                 sTitle = getContent(child);
             }
-            if (XMLString.DC_CREATOR.equals(sName)) {
+            else if (XMLString.DC_CREATOR.equals(sName)) {
                 sCreator = getContent(child);
             }
-            if (XMLString.DC_DATE.equals(sName)) {
+            else if (XMLString.DC_DATE.equals(sName)) {
                 sDate = getContent(child);
             }
-            if (XMLString.DC_DESCRIPTION.equals(sName)) {
+            else if (XMLString.DC_DESCRIPTION.equals(sName)) {
                 sDescription = getContent(child);
             }
-            if (XMLString.DC_LANGUAGE.equals(sName)) {
+            else if (XMLString.DC_LANGUAGE.equals(sName)) {
                 sLanguage = getContent(child);
             }
-            if (XMLString.DC_SUBJECT.equals(sName)) {
+            else if (XMLString.DC_SUBJECT.equals(sName)) {
                 sSubject = getContent(child);
             }
-            if (XMLString.META_INITIAL_CREATOR.equals(sName)) {
+            else if (XMLString.META_INITIAL_CREATOR.equals(sName)) {
                 sInitialCreator = getContent(child);
             }
-            if (XMLString.META_KEYWORD.equals(sName)) { // oasis
+            else if (XMLString.META_KEYWORD.equals(sName)) { // oasis
                 keywords.addValue(getContent(child));
             }
-            if (XMLString.META_KEYWORDS.equals(sName)) {
+            else if (XMLString.META_KEYWORDS.equals(sName)) {
                 // Old format: Keywords are contained within meta:keywords
                 if (child.hasChildNodes()) {
                     // traverse the keywords
@@ -109,36 +114,42 @@ public class MetaData implements writer2latex.api.MetaData {
                     }
                 }
             }
+            else if (XMLString.META_USER_DEFINED.equals(sName)) {
+            	String sPropertyName = Misc.getAttribute(child, XMLString.META_NAME);
+            	if (sPropertyName!=null) {
+            		userdefined.put(sPropertyName,getContent(child));
+            	}
+            }
         }
         sKeywords = keywords.toString();
     }
 	
-    /** <p> Get the title of this document (may be null)</p>
+    /** <p> Get the title of this document (may be empty)</p>
      *  @return the title of the document
      */
     public String getTitle() { return sTitle; }
 
-    /** <p> Get the creator of this document (may be null)</p>
+    /** <p> Get the creator of this document (may be empty)</p>
      *  @return the creator of the document (or the initial creator if none is specified)
      */
     public String getCreator() { return sCreator==null ? sInitialCreator : sCreator; }
 
-    /** <p> Get the initial creator of this document (may be null)</p>
+    /** <p> Get the initial creator of this document (may be empty)</p>
      *  @return the initial creator of the document
      */
     public String getInitialCreator() { return sInitialCreator; }
 
-    /** <p> Get the date of this document (may be null)</p>
+    /** <p> Get the date of this document (may be empty)</p>
      *  @return the date of the document
      */
     public String getDate() { return sDate; }
 
-    /** <p> Get the description of this document (may be null)</p>
+    /** <p> Get the description of this document (may be empty)</p>
      *  @return the description of the document
      */
     public String getDescription() { return sDescription; }
 
-    /** <p> Get the language of this document (may be null)</p>
+    /** <p> Get the language of this document (may be empty)</p>
      *  @return the language of the document
      */
     public String getLanguage() { return sLanguage; }
@@ -147,27 +158,32 @@ public class MetaData implements writer2latex.api.MetaData {
     	this.sLanguage = sLanguage;
     }
 
-    /** <p> Get the subject of this document (may be null)</p>
+    /** <p> Get the subject of this document (may be empty)</p>
      *  @return the subject of the document
      */
     public String getSubject() { return sSubject; }
 
-    /** <p> Get the keywords of this document as a comma separated list (may be null)</p>
+    /** <p> Get the keywords of this document as a comma separated list (may be epmty)</p>
      *  @return the keywords of the document
      */
     public String getKeywords() { return sKeywords; }
 
+    /** Get the user-defined meta data
+	 * 
+	 * @return the user-defined meta data as a name-value map
+	 */
+    public Map<String,String> getUserDefinedMetaData() { return userdefined; }
+
     private String getContent(Node node) {
-        if (!node.hasChildNodes()) { return null; }
-        String s="";
-        NodeList list = node.getChildNodes();
-        int nLen = list.getLength();
-        for (int i=0; i<nLen; i++) {
-           if (list.item(i).getNodeType()==Node.TEXT_NODE) {
-               s+= list.item(i).getNodeValue();
-            }
+        StringBuffer buf = new StringBuffer();
+        Node child = node.getFirstChild();
+        while (child!=null) {
+           if (child.getNodeType()==Node.TEXT_NODE) {
+               buf.append(child.getNodeValue());
+           }
+           child = child.getNextSibling();
         }
-        return s;
+        return buf.toString();
     }
 
 }

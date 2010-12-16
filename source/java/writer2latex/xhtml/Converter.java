@@ -66,6 +66,8 @@ public class Converter extends ConverterBase {
     private XhtmlConfig config;
 	
     public Config getConfig() { return config; }
+    
+    protected XhtmlConfig getXhtmlConfig() { return config; }
 
     // The locale
     private L10n l10n;

@@ -20,13 +20,14 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-12-09)
+ *  Version 1.2 (2010-12-14)
  *
  */ 
  
 package org.openoffice.da.comp.writer2latex;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 import writer2latex.api.ComplexOption;
@@ -86,7 +87,7 @@ public final class ConfigurationDialog extends ConfigurationDialogBase implement
     	pageHandlers.put("Pages", new PagesHandler());
     	pageHandlers.put("Tables", new TablesHandler());
     	pageHandlers.put("Figures", new FiguresHandler());
-    	//pageHandlers.put("TextAndMath", new Handler());
+    	pageHandlers.put("TextAndMath", new TextAndMathHandler());
     }
     
     // Implement remaining method from XContainerWindowEventHandler
@@ -491,20 +492,16 @@ public final class ConfigurationDialog extends ConfigurationDialogBase implement
     // The page "Characters"
     // This page handles the options use_color, use_soul, use_ulem and use_hyperref
     // In addition it handles style maps for formatting attributes
-    // TODO: Should extend AttributePageHandler
-    private class CharactersHandler extends PageHandler {
-    	private final String[] sAttributeNames = { "bold", "italic", "small-caps", "superscript", "subscipt" };
-        private ComplexOption attributeMap = new ComplexOption(); // Cache of attribute maps
-        short nCurrentAttribute = -1; // Currently displayed map
-
+    private class CharactersHandler extends AttributePageHandler {
+    	private final String[] sLaTeXAttributeNames = { "bold", "italic", "small-caps", "superscript", "subscipt" };
+        
+        protected CharactersHandler() {
+        	super();
+        	sAttributeNames = sLaTeXAttributeNames;
+        }
+        
     	@Override protected void setControls(DialogAccess dlg) {
-        	// Load attribute style map from config and select the first map
-    		attributeMap.clear();
-    		attributeMap.copyAll(config.getComplexOption("text-attribute-map"));
-    		nCurrentAttribute = -1;
-    		dlg.setListBoxSelectedItem("FormattingAttribute", (short)0);
-
-        	// Load other controls from config
+    		super.setControls(dlg);
     		checkBoxFromConfig(dlg,"UseHyperref","use_hyperref");
     		checkBoxFromConfig(dlg,"UseColor","use_color");
     		checkBoxFromConfig(dlg,"UseSoul","use_soul");
@@ -512,37 +509,40 @@ public final class ConfigurationDialog extends ConfigurationDialogBase implement
     	}
     	
     	@Override protected void getControls(DialogAccess dlg) {
-        	updateAttributeMap(dlg);
-        	
-        	// Save the attribute style map to config
-        	config.getComplexOption("text-attribute-map").clear();
-        	for (String s : attributeMap.keySet()) {
-        		if (!attributeMap.get(s).containsKey("deleted")) {
-        			config.getComplexOption("text-attribute-map").copy(s, attributeMap.get(s));
-        		}
-        	}
-
-    		// Save other controls to config
+    		super.getControls(dlg);
     		checkBoxToConfig(dlg,"UseHyperref","use_hyperref");
     		checkBoxToConfig(dlg,"UseColor","use_color");
     		checkBoxToConfig(dlg,"UseSoul","use_soul");
     		checkBoxToConfig(dlg,"UseUlem","use_ulem");
     	}
     	
-    	@Override protected boolean handleEvent(DialogAccess dlg, String sMethod) {
+		@Override protected void setControls(DialogAccess dlg, Map<String, String> attr) {
+    		if (!attr.containsKey("before")) { attr.put("before", ""); }
+    		if (!attr.containsKey("after")) { attr.put("after", ""); }
+    		dlg.setTextFieldText("Before", attr.get("before"));
+    		dlg.setTextFieldText("After", attr.get("after"));			
+		}
+
+		@Override protected void getControls(DialogAccess dlg, Map<String, String> attr) {
+    		attr.put("before", dlg.getComboBoxText("Before"));
+    		attr.put("after", dlg.getComboBoxText("After"));
+		}
+		
+		@Override protected void prepareControls(DialogAccess dlg, boolean bEnable) {
+    		dlg.setControlEnabled("BeforeLabel", bEnable);
+    		dlg.setControlEnabled("Before", bEnable);
+    		dlg.setControlEnabled("AfterLabel", bEnable);
+    		dlg.setControlEnabled("After", bEnable);
+		}
+
+		@Override protected boolean handleEvent(DialogAccess dlg, String sMethod) {
     		if (sMethod.equals("UseSoulChange")) {
     			useSoulChange(dlg);
     			return true;
     		}
-    		else if (sMethod.equals("FormattingAttributeChange")) {
-    			formattingAttributeChange(dlg);
-    			return true;
+    		else {
+    			return super.handleEvent(dlg, sMethod);
     		}
-    		else if (sMethod.equals("CustomAttributeChange")) {
-    			customAttributeChange(dlg);
-    			return true;
-    		}
-    		return false;
     	}
     	
     	private void useSoulChange(DialogAccess dlg) {
@@ -552,49 +552,7 @@ public final class ConfigurationDialog extends ConfigurationDialogBase implement
         	//boolean bUseSoul = dlg.getCheckBoxStateAsBoolean("UseSoul");   	    	
         	//dlg.setControlEnabled("UseUlem", !bUseSoul);
     	}
-    	
-    	private void formattingAttributeChange(DialogAccess dlg) {
-        	updateAttributeMap(dlg);
-        	
-        	short nNewAttribute = dlg.getListBoxSelectedItem("FormattingAttribute");
-        	if (nNewAttribute>-1) {
-        		String sName = sAttributeNames[nNewAttribute];
-        		if (attributeMap.containsKey(sName)) {
-        			Map<String,String> attr = attributeMap.get(sName);
-        			dlg.setCheckBoxStateAsBoolean("CustomAttribute", !attr.containsKey("deleted"));
-        			dlg.setTextFieldText("Before", attr.containsKey("before") ? attr.get("before") : "");
-        			dlg.setTextFieldText("After", attr.containsKey("after") ? attr.get("after") : "");
-        		}
-        		else {
-        			dlg.setCheckBoxStateAsBoolean("CustomAttribute", false);
-        			dlg.setTextFieldText("Before", "");
-        			dlg.setTextFieldText("After", "");
-        		}
-        		customAttributeChange(dlg); // setCheckBoxStateAsBoolean does not trigger this
-        		nCurrentAttribute = nNewAttribute;
-        	}
-    	}
 
-    	private void customAttributeChange(DialogAccess dlg) {
-        	boolean bCustom = dlg.getCheckBoxStateAsBoolean("CustomAttribute");
-        	dlg.setControlEnabled("Before", bCustom);
-        	dlg.setControlEnabled("After", bCustom);    		
-    	}
-
-        private void updateAttributeMap(DialogAccess dlg) {
-        	// Save the current attribute map, if any
-        	if (nCurrentAttribute>-1) {
-        		Map<String,String> attr = new HashMap<String,String>();
-        		if (!dlg.getCheckBoxStateAsBoolean("CustomAttribute")) {
-        			// don't delete the map now, but defer this to the dialog is closed
-        			attr.put("deleted", "true");
-        		}
-        		attr.put("before", dlg.getTextFieldText("Before"));
-        		attr.put("after", dlg.getTextFieldText("After"));
-        		attributeMap.put(sAttributeNames[nCurrentAttribute], attr);
-        	}    	
-        }
-        
     }
 
     // The page "Fonts"
@@ -846,399 +804,203 @@ public final class ConfigurationDialog extends ConfigurationDialogBase implement
     	
     }
         
-    
-	/*
-	
-
-    private XComponentContext xContext;
-    private XSimpleFileAccess2 sfa2;
-    private String sConfigFileName = null;
-    Config config;
-    // Local cache of complex options
-    ComplexOption[] styleMap;
-    ComplexOption mathSymbols;
-    ComplexOption stringReplace;
-    short nCurrentFamily = -1;
-    String sCurrentStyleName = null;
-    String sCurrentMathSymbol = null;
-    String sCurrentText = null;
-    private String sTitle = null;
-    private DialogAccess dlg = null;
-    private StyleNameProvider styleNameProvider = null;
-    private CustomSymbolNameProvider customSymbolNameProvider = null;
-    
-    /** Create a new ConfigurationDialog */
-    /*public ConfigurationDialog(XComponentContext xContext) {
-        this.xContext = xContext;
-
-        // Get the SimpleFileAccess service
-        sfa2 = null;
-        try {
-            Object sfaObject = xContext.getServiceManager().createInstanceWithContext(
-                "com.sun.star.ucb.SimpleFileAccess", xContext);
-            sfa2 = (XSimpleFileAccess2) UnoRuntime.queryInterface(XSimpleFileAccess2.class, sfaObject);
-        }
-        catch (com.sun.star.uno.Exception e) {
-            // failed to get SimpleFileAccess service (should not happen)
-        }
-
-        // Create the config file name
-        XStringSubstitution xPathSub = null;
-        try {
-            Object psObject = xContext.getServiceManager().createInstanceWithContext(
-               "com.sun.star.util.PathSubstitution", xContext);
-            xPathSub = (XStringSubstitution) UnoRuntime.queryInterface(XStringSubstitution.class, psObject);
-            sConfigFileName = xPathSub.substituteVariables("$(user)/writer2latex.xml", false);
-        }
-        catch (com.sun.star.uno.Exception e) {
-            // failed to get PathSubstitution service (should not happen)
-        }
-        
-        // Create the configuration
-        config = ConverterFactory.createConverter("application/x-latex").getConfig();
-        
-        // Initialize the local cache of complex options
-        styleMap = new ComplexOption[5];
-        for (int i=0; i<5; i++) { styleMap[i]=new ComplexOption(); }
-        mathSymbols = new ComplexOption();
-        stringReplace = new ComplexOption();
-        
-        styleNameProvider = new StyleNameProvider(xContext);
-        customSymbolNameProvider = new CustomSymbolNameProvider(xContext);
-    }*/
-        	
-	
-    
-    /*// Display a dialog
-    private XDialog getDialog(String sDialogName) {
-    	XMultiComponentFactory xMCF = xContext.getServiceManager();
-    	try {
-    		Object provider = xMCF.createInstanceWithContext(
-    				"com.sun.star.awt.DialogProvider2", xContext);
-    		XDialogProvider2 xDialogProvider = (XDialogProvider2)
-    		UnoRuntime.queryInterface(XDialogProvider2.class, provider);
-    		String sDialogUrl = "vnd.sun.star.script:"+sDialogName+"?location=application";
-    		return xDialogProvider.createDialogWithHandler(sDialogUrl, this);
-    	}
-    	catch (Exception e) {
-    		return null;
-    	}
-     }
-
-    private boolean deleteItem(String sName) {
-    	XDialog xDialog=getDialog("W2LDialogs2.DeleteDialog");
-    	if (xDialog!=null) {
-    		DialogAccess ddlg = new DialogAccess(xDialog);
-    		String sLabel = ddlg.getLabelText("DeleteLabel");
-    		sLabel = sLabel.replaceAll("%s", sName);
-    		ddlg.setLabelText("DeleteLabel", sLabel);
-    		boolean bDelete = xDialog.execute()==ExecutableDialogResults.OK;
-    		xDialog.endExecute();
-    		return bDelete;
-    	}
-    	return false;
-    }
-    
-    private boolean deleteCurrentItem(String sListName) {
-    	String[] sItems = dlg.getListBoxStringItemList(sListName);
-    	short nSelected = dlg.getListBoxSelectedItem(sListName);
-    	if (nSelected>=0 && deleteItem(sItems[nSelected])) {
-    		int nOldLen = sItems.length;
-    		String[] sNewItems = new String[nOldLen-1];
-    		if (nSelected>0) {
-    			System.arraycopy(sItems, 0, sNewItems, 0, nSelected);
-    		}
-    		if (nSelected<nOldLen-1) {
-        		System.arraycopy(sItems, nSelected+1, sNewItems, nSelected, nOldLen-1-nSelected);
-    		}
-    		dlg.setListBoxStringItemList(sListName, sNewItems);
-    		short nNewSelected = nSelected<nOldLen-1 ? nSelected : (short)(nSelected-1);
-			dlg.setListBoxSelectedItem(sListName, nNewSelected);
-			return true;
-    	}
-    	return false;
-    }
-    
-    private String newItem(Set<String> suggestions) {
-    	XDialog xDialog=getDialog("W2LDialogs2.NewDialog");
-    	if (xDialog!=null) {
-    		int nCount = suggestions.size();
-    		String[] sItems = new String[nCount];
-    		int i=0;
-    		for (String s : suggestions) {
-    			sItems[i++] = s;
-    		}
-    		sortStringArray(sItems);
-    		DialogAccess ndlg = new DialogAccess(xDialog);
-    		ndlg.setListBoxStringItemList("Name", sItems);
-    		String sResult = null;
-    		if (xDialog.execute()==ExecutableDialogResults.OK) {
-    			DialogAccess dlg = new DialogAccess(xDialog);
-    			sResult = dlg.getTextFieldText("Name");
-    		}
-    		xDialog.endExecute();
-    		return sResult;
-    	}
-    	return null;
-    }
-    
-    private String appendItem(String sListName, Set<String> suggestions) {
-    	String[] sItems = dlg.getListBoxStringItemList(sListName);
-    	String sNewItem = newItem(suggestions);
-    	if (sNewItem!=null) {
-    		int nOldLen = sItems.length;
-    		for (short i=0; i<nOldLen; i++) {
-    			if (sNewItem.equals(sItems[i])) {
-    				// Item already exists, select the existing one
-    				dlg.setListBoxSelectedItem(sListName, i);
-    				return null;
-    			}
-    		}
-    		String[] sNewItems = new String[nOldLen+1];
-    		System.arraycopy(sItems, 0, sNewItems, 0, nOldLen);
-    		sNewItems[nOldLen]=sNewItem;
-    		dlg.setListBoxStringItemList(sListName, sNewItems);
-    		dlg.setListBoxSelectedItem(sListName, (short)nOldLen);
-    	}
-    	return sNewItem;
-    }
-    
-	// Load the user configuration from file
-    private void loadConfig() {
-        if (sfa2!=null && sConfigFileName!=null) {
-            try {
-                XInputStream xIs = sfa2.openFileRead(sConfigFileName);
-                if (xIs!=null) {
-                    InputStream is = new XInputStreamToInputStreamAdapter(xIs);
-                    config.read(is);
-                    is.close();
-                    xIs.closeInput();
-                }
-            }
-            catch (IOException e) {
-                // ignore
-            }
-            catch (NotConnectedException e) {
-                // ignore
-            }
-            catch (CommandAbortedException e) {
-                // ignore
-            }
-            catch (com.sun.star.uno.Exception e) {
-                // ignore
-            }
-        }
-    }
-    
-	// Save the user configuration
-    private void saveConfig() {
-        if (sfa2!=null && sConfigFileName!=null) {
-            try {
-            	// Remove the file if it exists
-            	if (sfa2.exists(sConfigFileName)) {
-            		sfa2.kill(sConfigFileName);
-            	}
-            	// Then write the new contents
-                XOutputStream xOs = sfa2.openFileWrite(sConfigFileName);
-                if (xOs!=null) {
-                    OutputStream os = new XOutputStreamToOutputStreamAdapter(xOs);
-                    config.write(os);
-                    os.close();
-                    xOs.closeOutput();
-                }
-            }
-            catch (IOException e) {
-                // ignore
-            }
-            catch (NotConnectedException e) {
-                // ignore
-            }
-            catch (CommandAbortedException e) {
-                // ignore
-            }
-            catch (com.sun.star.uno.Exception e) {
-                // ignore
-            }
-        }
-    }
-    
-	// Set controls based on the config
-    private void setControls() {
-    	else if ("Figures".equals(sTitle)) {
-    		loadFigures();
-    	}
-    	else if ("TextAndMath".equals(sTitle)) {
-    		loadTextAndMath();
-    	}
-    }
-    
-	// Change the config based on the controls
-    private void getControls() {
-    	else if ("Figures".equals(sTitle)) {
-    		saveFigures();
-    	}
-    	else if ("TextAndMath".equals(sTitle)) {
-    		saveTextAndMath();
-    	}    	
-    }
-    
     // The page "TextAndMath"
     // This page handles the options use_ooomath and tabstop as well as the 
     // text replacements and math symbol definitions
-    
-    private void loadTextAndMath() {
-		// Get math symbols from config
-		if (mathSymbols!=null) { mathSymbols.clear(); }
-		else { mathSymbols = new ComplexOption(); }
-		mathSymbols.copyAll(config.getComplexOption("math-symbol-map"));
-		sCurrentMathSymbol = null;
-    	dlg.setListBoxStringItemList("MathSymbolName", sortStringSet(mathSymbols.keySet()));
-    	dlg.setListBoxSelectedItem("MathSymbolName", (short)Math.min(0,mathSymbols.keySet().size()-1));
+    private class TextAndMathHandler extends UserListPageHandler {
+        private CustomSymbolNameProvider customSymbolNameProvider = null;
+        private ComplexOption mathSymbols;
+        private ComplexOption stringReplace;
+        private String sCurrentMathSymbol = null;
+        private String sCurrentText = null;
+        
+        protected TextAndMathHandler() {
+        	super();
+        	customSymbolNameProvider = new CustomSymbolNameProvider(xContext);
+        }
 
-    	// Get string replace from config
-    	if (stringReplace!=null) { stringReplace.clear(); }
-		else { stringReplace = new ComplexOption(); }
-		stringReplace.copyAll(config.getComplexOption("string-replace"));
-		sCurrentText = null;
-    	dlg.setListBoxStringItemList("TextInput", sortStringSet(stringReplace.keySet()));
-    	dlg.setListBoxSelectedItem("TextInput", (short)Math.min(0,stringReplace.keySet().size()-1));
-    	    	
-    	// Get other options from config
-    	dlg.setCheckBoxStateAsBoolean("UseOoomath","true".equals(config.getOption("use_ooomath")));
-    	dlg.setTextFieldText("TabStopLaTeX", config.getOption("tabstop"));
-    	
-    	updateTextAndMathControls();
-    }
-    
-    private void saveTextAndMath() {
-    	updateTextAndMathMaps();
-    	
-    	// Save math symbols to config
-		config.getComplexOption("math-symbol-map").clear();
-		config.getComplexOption("math-symbol-map").copyAll(mathSymbols);
-
-		// Save string replace to config
-		config.getComplexOption("string-replace").clear();
-		config.getComplexOption("string-replace").copyAll(stringReplace);
-    	
-		// Save other options to config
-		config.setOption("use_ooomath", Boolean.toString(dlg.getCheckBoxStateAsBoolean("UseOoomath")));
-    	config.setOption("tabstop", dlg.getTextFieldText("TabStopLaTeX"));
-    }
-    
-    private void updateTextAndMathMaps() {
-    	// Save the current math symbol in our cache
-    	if (sCurrentMathSymbol!=null) {
-    		Map<String,String> attr = new HashMap<String,String>();
-    		attr.put("latex", dlg.getTextFieldText("MathLaTeX"));
-    		mathSymbols.put(sCurrentMathSymbol, attr);
-    	}
-
-    	// Save the current string replace in our cache
-    	if (sCurrentText!=null) {
-    		Map<String,String> attr = new HashMap<String,String>();
-    		attr.put("latex-code", dlg.getTextFieldText("LaTeX"));
-    		attr.put("fontenc", "any");
-    		stringReplace.put(sCurrentText, attr);
-    	}
-    }
-    
-    private void updateTextAndMathControls() {
-    	updateTextAndMathMaps();
-    	
-    	// Get the current math symbol, if any
-    	short nSymbolItem = dlg.getListBoxSelectedItem("MathSymbolName");
-    	if (nSymbolItem>=0) {
-    		sCurrentMathSymbol = dlg.getListBoxStringItemList("MathSymbolName")[nSymbolItem];
-    		
-    		Map<String,String> attributes = mathSymbols.get(sCurrentMathSymbol);
-    		dlg.setTextFieldText("MathLaTeX", attributes.get("latex"));
-    		dlg.setControlEnabled("DeleteSymbolButton", true);
-    	}
-    	else {
+    	@Override protected void setControls(DialogAccess dlg) {
+    		// Get math symbols from config
+    		if (mathSymbols!=null) { mathSymbols.clear(); }
+    		else { mathSymbols = new ComplexOption(); }
+    		mathSymbols.copyAll(config.getComplexOption("math-symbol-map"));
     		sCurrentMathSymbol = null;
-    		dlg.setTextFieldText("MathLaTeX", "");
-    		dlg.setControlEnabled("DeleteSymbolButton", false);
+        	dlg.setListBoxStringItemList("MathSymbolName", sortStringSet(mathSymbols.keySet()));
+        	// This triggers an onchange event
+        	dlg.setListBoxSelectedItem("MathSymbolName", (short)Math.min(0,mathSymbols.keySet().size()-1));
+
+        	// Get string replace from config
+        	if (stringReplace!=null) { stringReplace.clear(); }
+    		else { stringReplace = new ComplexOption(); }
+    		stringReplace.copyAll(config.getComplexOption("string-replace"));
+    		sCurrentText = null;
+        	dlg.setListBoxStringItemList("TextInput", sortStringSet(stringReplace.keySet()));
+        	// This triggers an onchange event
+        	dlg.setListBoxSelectedItem("TextInput", (short)Math.min(0,stringReplace.keySet().size()-1));
+        	    	
+        	// Get other options from config
+        	checkBoxFromConfig(dlg,"UseOoomath","use_ooomath");
+        	textFieldFromConfig(dlg,"TabStopLaTeX", "tabstop");
     	}
     	
-    	// Get the current input string, if any
-    	short nItem = dlg.getListBoxSelectedItem("TextInput");
-    	if (nItem>=0) {
-    		sCurrentText = dlg.getListBoxStringItemList("TextInput")[nItem];
-    		
-    		Map<String,String> attributes = stringReplace.get(sCurrentText);
-    		dlg.setTextFieldText("LaTeX", attributes.get("latex-code"));
-    		//dlg.setTextFieldText("Fontenc", attributes.get("fontenc"));
-    		dlg.setControlEnabled("DeleteTextButton",
-    				!"\u00A0!".equals(sCurrentText) && !"\u00A0?".equals(sCurrentText) && 
-    				!"\u00A0:".equals(sCurrentText) && !"\u00A0;".equals(sCurrentText) &&
-    				!"\u00A0\u2014".equals(sCurrentText));
-    	}
-    	else {
-    		sCurrentText = null;
-    		dlg.setTextFieldText("LaTeX", "");
-    		//dlg.setTextFieldText("Fontenc", "any");
-    		dlg.setControlEnabled("DeleteTextButton", false);
+    	@Override protected void getControls(DialogAccess dlg) {        	
+        	// Save math symbols to config
+        	updateSymbol(dlg);
+    		config.getComplexOption("math-symbol-map").clear();
+    		config.getComplexOption("math-symbol-map").copyAll(mathSymbols);
+
+    		// Save string replace to config
+        	updateText(dlg);
+    		config.getComplexOption("string-replace").clear();
+    		config.getComplexOption("string-replace").copyAll(stringReplace);
+        	
+    		// Save other options to config
+        	checkBoxToConfig(dlg,"UseOoomath","use_ooomath");
+        	textFieldToConfig(dlg,"TabStopLaTeX", "tabstop");
     	}
     	
-    }
-    
-    private void newSymbolClick() {
-    	String sNewName = appendItem("MathSymbolName",customSymbolNameProvider.getNames());
-    	if (sNewName!=null) {
-    		Map<String,String> attr = new HashMap<String,String>();
-    		attr.put("latex", "");
-    		mathSymbols.put(sNewName, attr);
-        	saveTextAndMath();
-        	dlg.setTextFieldText("MathLaTeX", "");
-        	updateTextAndMathControls();
+    	@Override protected boolean handleEvent(DialogAccess dlg, String sMethod) {
+    		if (sMethod.equals("MathSymbolNameChange")) {
+    			mathSymbolNameChange(dlg);
+    			return true;
+    		}
+    		else if (sMethod.equals("NewSymbolClick")) {
+    			newSymbolClick(dlg);
+    			return true;
+    		}
+    		else if (sMethod.equals("DeleteSymbolClick")) {
+    			deleteSymbolClick(dlg);
+    			return true;
+    		}
+    		else if (sMethod.equals("TextInputChange")) {
+    			textInputChange(dlg);
+    			return true;
+    		}
+    		else if (sMethod.equals("NewTextClick")) {
+    			newTextClick(dlg);
+    			return true;
+    		}
+    		else if (sMethod.equals("DeleteTextClick")) {
+    			deleteTextClick(dlg);
+    			return true;
+    		}
+    		return false;
+    	}
+    	
+    	private void mathSymbolNameChange(DialogAccess dlg) {
+    		updateSymbol(dlg);
+    		updateSymbolControls(dlg);
+    	}
+    	
+    	private void newSymbolClick(DialogAccess dlg) {
+    		// This triggers an onchange event
+        	appendItem(dlg,"MathSymbolName",customSymbolNameProvider.getNames());
+    	}
+    	
+    	private void deleteSymbolClick(DialogAccess dlg) {
+    		String sMathSymbol = sCurrentMathSymbol; 
+    		// This triggers an onchange event
+        	if (deleteCurrentItem(dlg,"MathSymbolName")) {
+        		mathSymbols.remove(sMathSymbol);
+        	}    		
+    	}
+    	
+    	private void updateSymbol(DialogAccess dlg) {
+        	// Save the current math symbol in our cache
+        	if (sCurrentMathSymbol!=null) {
+        		Map<String,String> attr = new HashMap<String,String>();
+        		attr.put("latex", dlg.getTextFieldText("MathLaTeX"));
+        		mathSymbols.put(sCurrentMathSymbol, attr);
+        	}
+    	}
+    	
+    	// Update symbol controls based on currently selected list item
+    	private void updateSymbolControls(DialogAccess dlg) {
+        	short nSymbolItem = dlg.getListBoxSelectedItem("MathSymbolName");
+        	if (nSymbolItem>=0) {
+        		sCurrentMathSymbol = dlg.getListBoxStringItemList("MathSymbolName")[nSymbolItem];
+        		Map<String,String> attributes;
+        		if (mathSymbols.containsKey(sCurrentMathSymbol)) {
+        			attributes = mathSymbols.get(sCurrentMathSymbol);
+        		}
+        		else { // New symbol, add empty definition to cache
+        			attributes = new HashMap<String,String>();
+        			attributes.put("latex", "");
+        			mathSymbols.put(sCurrentMathSymbol, attributes);
+        		}
+        		dlg.setTextFieldText("MathLaTeX", attributes.get("latex"));
+        		dlg.setControlEnabled("MathLaTeX", true);
+        		dlg.setControlEnabled("DeleteSymbolButton", true);
+        	}
+        	else { // The list is empty, or nothing is selected
+        		sCurrentMathSymbol = null;
+        		dlg.setTextFieldText("MathLaTeX", "");
+        		dlg.setControlEnabled("MathLaTeX", false);
+        		dlg.setControlEnabled("DeleteSymbolButton", false);
+        	}
+    	}
+    	
+    	private void textInputChange(DialogAccess dlg) {
+    		updateText(dlg);
+    		updateTextControls(dlg);	
+    	}
+    	
+    	private void newTextClick(DialogAccess dlg) {
+    		// This triggers an onchange event
+        	appendItem(dlg, "TextInput", new HashSet<String>());
+    	}
+    	
+    	private void deleteTextClick(DialogAccess dlg) {
+    		String sText = sCurrentText; 
+    		// This triggers an onchange event
+    		if (deleteCurrentItem(dlg, "TextInput")) {
+        		stringReplace.remove(sText);
+        	}
+    	}
+    	
+    	private void updateText(DialogAccess dlg) {
+        	// Save the current string replace in our cache
+        	if (sCurrentText!=null) {
+        		Map<String,String> attr = new HashMap<String,String>();
+        		attr.put("latex-code", dlg.getTextFieldText("LaTeX"));
+        		attr.put("fontenc", "any");
+        		stringReplace.put(sCurrentText, attr);
+        	} 		
+    	}
+
+    	// Update text controls based on currently selected list item
+    	private void updateTextControls(DialogAccess dlg) {
+        	// Get the current input string, if any
+        	short nItem = dlg.getListBoxSelectedItem("TextInput");
+        	if (nItem>=0) {
+        		sCurrentText = dlg.getListBoxStringItemList("TextInput")[nItem];
+        		
+        		Map<String,String> attributes;
+        		if (stringReplace.containsKey(sCurrentText)) {
+        			attributes = stringReplace.get(sCurrentText);
+        		}
+        		else { // New string replace, add empty definition to cache
+        			attributes = new HashMap<String,String>();
+        			attributes.put("latex-code", "");
+        			attributes.put("fontenc", "any");
+        			stringReplace.put(sCurrentText, attributes);
+        		}
+
+        		dlg.setTextFieldText("LaTeX", attributes.get("latex-code"));
+        		//dlg.setTextFieldText("Fontenc", attributes.get("fontenc"));
+        		dlg.setControlEnabled("LaTeX", true);
+        		dlg.setControlEnabled("DeleteTextButton",
+        				!"\u00A0!".equals(sCurrentText) && !"\u00A0?".equals(sCurrentText) && 
+        				!"\u00A0:".equals(sCurrentText) && !"\u00A0;".equals(sCurrentText) &&
+        				!"\u00A0\u2014".equals(sCurrentText));
+        	}
+        	else { // The list is empty, or nothing is selected
+        		sCurrentText = null;
+        		dlg.setTextFieldText("LaTeX", "");
+        		//dlg.setTextFieldText("Fontenc", "any");
+        		dlg.setControlEnabled("DeleteTextButton", false);
+        	}
     	}
     }
     
-    private void deleteSymbolClick() {
-    	if (deleteCurrentItem("MathSymbolName")) {
-    		mathSymbols.remove(sCurrentMathSymbol);
-    		sCurrentMathSymbol = null;
-    		updateTextAndMathControls();
-    	}
-    }
-    
-    private void newTextClick() {
-    	String sNewName = appendItem("TextInput", new HashSet<String>());
-    	if (sNewName!=null) {
-    		Map<String,String> attr = new HashMap<String,String>();
-    		attr.put("latex-code", "");
-    		attr.put("fontenc", "any");
-    		stringReplace.put(sNewName, attr);
-    		dlg.setTextFieldText("LaTeX", "");
-        	saveTextAndMath();
-        	updateTextAndMathControls();	
-    	}
-    }
-    
-    private void deleteTextClick() {
-    	if (deleteCurrentItem("TextInput")) {
-    		stringReplace.remove(sCurrentText);
-    		sCurrentText = null;
-    		updateTextAndMathControls();
-    	}
-    }
-    
-    // Utilities
-    private String[] sortStringSet(Set<String> theSet) {
-    	String[] theArray = new String[theSet.size()];
-    	int i=0;
-    	for (String s : theSet) {
-    		theArray[i++] = s;
-    	}
-    	sortStringArray(theArray);
-    	return theArray;
-    }
-    
-    private void sortStringArray(String[] theArray) {
-    	// TODO: Get locale from OOo rather than the system
-        Collator collator = Collator.getInstance();
-    	Arrays.sort(theArray, collator);
-    }
-	*/
 }

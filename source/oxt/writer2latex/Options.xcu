@@ -36,7 +36,7 @@
             <value>true</value>
         </prop>
         <prop oor:name="WrapLinesAfter" oor:type="xs:int">
-            <value>72</value>
+            <value>120</value>
         </prop>
         <prop oor:name="SplitLinkedSections" oor:type="xs:boolean">
             <value>false</value>

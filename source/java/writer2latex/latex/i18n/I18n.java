@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-10-30) 
+ *  Version 1.2 (2010-12-14) 
  * 
  */
 
@@ -118,7 +118,7 @@ public abstract class I18n {
     
     /** Get the default language (either the document language or the most used language)
      * 
-     *  @param the default language
+     *  @return the default language
      */
     public String getDefaultLanguage() {
     	return sDefaultLanguage;

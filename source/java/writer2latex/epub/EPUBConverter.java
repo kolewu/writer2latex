@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  version 1.2 (2010-03-28)
+ *  version 1.2 (2010-12-15)
  *
  */
 
@@ -48,7 +48,7 @@ public final class EPUBConverter extends Xhtml11Converter {
     	ConverterResult xhtmlResult = super.convert(is, sTargetFileName);
     	
     	ConverterResultImpl epubResult = new ConverterResultImpl();
-    	epubResult.addDocument(new EPUBWriter(xhtmlResult,sTargetFileName));
+    	epubResult.addDocument(new EPUBWriter(xhtmlResult,sTargetFileName,getXhtmlConfig()));
     	epubResult.setMetaData(xhtmlResult.getMetaData());
     	return epubResult;
     }

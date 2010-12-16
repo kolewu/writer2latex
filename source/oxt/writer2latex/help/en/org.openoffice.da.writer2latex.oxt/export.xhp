@@ -118,7 +118,8 @@
         <paragraph role="heading" level="3" xml-lang="en-US">Use greek letters as symbols</paragraph>
    		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2latex.oxt:OptionsGreekMath" visibility="hidden">Check this treat greek characters as symbols rather than as text</ahelp></paragraph>
        	<paragraph role="paragraph" xml-lang="en-US">Greek letters used in latin text are often used as symbols, such as the
-       	number π or the word γ-radiation. By checking this option, all greek letters used within latin or cyrillic text
+       	number π or the word γ-radiation. By checking this option (not available if XeTeX is the backend),
+       	all greek letters used within latin or cyrillic text
        	will be treated as mathematical symbols, which will produce a slightly better result – and also not require that
        	greek text fonts are available in the LaTeX installation. This option has no effect on greek text (provided the language
        	is set correctly in the %PRODUCTNAME Writer document).</paragraph>
