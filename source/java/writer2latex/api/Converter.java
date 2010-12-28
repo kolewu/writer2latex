@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-04-12)
+ *  Version 1.2 (2010-12-21)
  *
  */
  
@@ -89,6 +89,29 @@ public interface Converter {
      *  while reading the style sheet
      */
     public void readStyleSheet(File file) throws IOException;
+
+    /** Read a resource to <em>include</em> with the converted document.
+     *  A resource can be any (binary) file and will be placed in the same directory as
+     *  the style sheet
+     *
+     *  @param is an <code>InputStream</code> from which to read the resource
+     *  @param sFileName the file name to use for the resource
+     *  @param sMediaType the media type of the resource
+     *  @throws IOException if some exception occurs while reading the resource
+     */
+    public void readResource(InputStream is, String sFileName, String sMediaType) throws IOException;
+
+    /** Read a style sheet to <em>include</em> with the converted document.
+     *  A resource can be any (binary) file and will be placed in the same directory as
+     *  the style sheet
+     *
+     *  @param file a file from which to read the style sheet
+     *  @param sFileName the file name to use for the resource
+     *  @param sMediaType the media type of the resource
+     *  @throws IOException if the file does not exist or some exception occurs
+     *  while reading the resource
+     */
+    public void readResource(File file, String sFileName, String sMediaType) throws IOException;
 
     /** Convert a document
      *

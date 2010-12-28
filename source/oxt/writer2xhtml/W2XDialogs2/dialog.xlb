@@ -12,4 +12,5 @@
  <library:element library:name="NewDialog"/>
  <library:element library:name="DeleteDialog"/>
  <library:element library:name="LoadDefaults"/>
+ <library:element library:name="EpubOptions"/>
 </library:library>

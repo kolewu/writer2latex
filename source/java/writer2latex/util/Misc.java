@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-12-08)
+ *  Version 1.2 (2010-12-19)
  *
  */
 
@@ -34,12 +34,14 @@ import java.io.UnsupportedEncodingException;
 import java.lang.Math;
 import java.net.URLEncoder;
 import java.net.URLDecoder;
+import java.text.Collator;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Set;
 //import java.util.Hashtable;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -356,6 +358,15 @@ public class Misc{
         }
         return buf.toString();
     }
+    
+    // Utility method to return a sorted string array based on a set
+    public static String[] sortStringSet(Set<String> theSet) {
+    	String[] theArray = theSet.toArray(new String[theSet.size()]);
+		Collator collator = Collator.getInstance();
+		Arrays.sort(theArray, collator);
+    	return theArray;
+    }
+
     
     /* Utility method that url encodes a string */
     public static String urlEncode(String s) {

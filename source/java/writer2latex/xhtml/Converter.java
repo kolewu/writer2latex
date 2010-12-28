@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-11-22)
+ *  Version 1.2 (2010-12-21)
  *
  */
 
@@ -28,8 +28,10 @@ package writer2latex.xhtml;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.HashSet;
 import java.util.ListIterator;
 import java.util.LinkedList;
+import java.util.Set;
 import java.util.Vector;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -82,8 +84,9 @@ public class Converter extends ConverterBase {
     // The template
     private XhtmlDocument template = null;
     
-    // The included style sheet
+    // The included style sheet and associated resources
     private CssDocument styleSheet = null;
+    private Set<ResourceDocument> resources = new HashSet<ResourceDocument>();
 
     // The xhtml output file(s)
     protected int nType = XhtmlDocument.XHTML10; // the doctype
@@ -109,7 +112,7 @@ public class Converter extends ConverterBase {
         this.nType = nType;
     }
 
-    // override methods to read templates and style sheets
+    // override methods to read templates, style sheets and resources
     @Override public void readTemplate(InputStream is) throws IOException {
         template = new XhtmlDocument("Template",nType);
         template.read(is);
@@ -129,6 +132,16 @@ public class Converter extends ConverterBase {
     @Override public void readStyleSheet(File file) throws IOException {
         readStyleSheet(new FileInputStream(file));
     }
+    
+    @Override public void readResource(InputStream is, String sFileName, String sMediaType) throws IOException {
+    	ResourceDocument doc = new ResourceDocument(sFileName, sMediaType);
+    	doc.read(is);
+    	resources.add(doc);
+    }
+    
+    @Override public void readResource(File file, String sFileName, String sMediaType) throws IOException {
+    	readResource(new FileInputStream(file), sFileName, sMediaType);
+    }    
 
     protected StyleConverter getStyleCv() { return styleCv; }
 	
@@ -252,7 +265,11 @@ public class Converter extends ConverterBase {
 
         // Add included style sheet, if any - and we are creating OPS content
         if (bOPS && styleSheet!=null) {
+        	// TODO: Move to subfolder
         	converterResult.addDocument(styleSheet);
+        	for (ResourceDocument doc : resources) {
+        		converterResult.addDocument(doc);
+        	}
         }
         
         // Export styles (temp.)

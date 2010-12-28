@@ -114,6 +114,9 @@
         	are exported using
 			<link href="http://dublincore.org/" name="Link to the Dublin Core standard">the Dublin Core standard</link>.</paragraph>
 		</section>
+		<paragraph role="paragraph" xml-lang="en-US">The EPUB format supports a number of additional meta data elements.
+		You can define these using <link href="org.openoffice.da.writer2xhtml.oxt/epub.xhp" name="EPUB">user-defined properties</link>.
+		</paragraph>
 
         <paragraph role="heading" level="2" xml-lang="en-US">AutoCorrect</paragraph>
 

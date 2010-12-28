@@ -2,6 +2,21 @@ Changelog for Writer2LaTeX version 1.0 -> 1.2
 
 ---------- version 1.1.9 ----------
 
+[w2x] *New option include_toc (default true) for EPUB export: If set to false, the table of content will not be exported
+
+[w2x] *New option split_after (default 0) for EPUB export: This sets the number of characters (in thousands) after
+  which an automatic split will occur (0 means no automatic split)
+
+[w2x] *New options use_default_font (default false) and default_font_name (default empty) for EPUB export.
+  If the former is true, font names are not exported, but the latter will be exported as default font (if non-empty)
+
+[w2x] *New options relative_font_size (default false) and font_scaling (default 100%) for EPUB export.
+  If the former is true, relative font sizes are used, scaled by the percentage given by the latter
+
+[w2x] *EPUB export now has its own export dialog
+
+[all] *API change: Added the method readResource to the Converter interface (only used by EPUB export currently)
+
 [w2x] EPUB export now uses user-defined meta data to support meta data features that are not defined in ODF
 
 [w2x] The option use_dublin_core now also works for EPUB export
@@ -22,8 +37,6 @@ Changelog for Writer2LaTeX version 1.0 -> 1.2
 [w2l] Custom config ui: The table and figure sequence name can now be selected from existing field masters
 
 [w2l] Custom config ui: The four special styles for tables are now localized and can be selected from existing styles
-
-[w2x] In EPUB export, convert_to_px=true now (despite the name) exports relative font sizes
 
 [w2l] Custom config ui is now refactored to use ConfigurationDialogBase, fixing some minor bugs
 

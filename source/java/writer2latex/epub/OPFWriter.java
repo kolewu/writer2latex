@@ -20,14 +20,16 @@
  *
  *  All Rights Reserved.
  * 
- *  version 1.2 (2010-12-16)
+ *  version 1.2 (2010-12-20)
  *
  */
 
 package writer2latex.epub;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -47,8 +49,9 @@ import writer2latex.xmerge.NewDOMDocument;
 /** This class writes an OPF-file for an EPUB document (see http://www.idpf.org/2007/opf/OPF_2.0_final_spec.html).
  */
 public class OPFWriter extends NewDOMDocument {
+	private String sUID=null;
 
-	public OPFWriter(ConverterResult cr, String sUUID, boolean bUseDublinCore) {
+	public OPFWriter(ConverterResult cr, boolean bUseDublinCore) {
 		super("book", "opf");
 		
         // create DOM
@@ -76,123 +79,113 @@ public class OPFWriter extends NewDOMDocument {
         metadata.setAttribute("xmlns:opf", "http://www.idpf.org/2007/opf");
         pack.appendChild(metadata);
         
-        Element title = contentDOM.createElement("dc:title");
-        metadata.appendChild(title);
-        title.appendChild(contentDOM.createTextNode(cr.getMetaData().getTitle()));
-        
-        Element language = contentDOM.createElement("dc:language");
-        metadata.appendChild(language);
-        language.appendChild(contentDOM.createTextNode(cr.getMetaData().getLanguage()));
+        appendElement(contentDOM, metadata, "dc:title", cr.getMetaData().getTitle());
+        appendElement(contentDOM, metadata, "dc:language", cr.getMetaData().getLanguage());
         
         // Additional meta data
         if (bUseDublinCore) {
         	// Subject and keywords in ODF both map to Dublin core subjects
         	if (cr.getMetaData().getSubject().length()>0) {
-        		Element subject = contentDOM.createElement("dc:subject");
-        		metadata.appendChild(subject);
-        		subject.appendChild(contentDOM.createTextNode(cr.getMetaData().getSubject()));
+        		appendElement(contentDOM, metadata, "dc:subject", cr.getMetaData().getSubject());
         	}
         	if (cr.getMetaData().getKeywords().length()>0) {
         		String[] sKeywords = cr.getMetaData().getKeywords().split(",");
         		for (String sKeyword : sKeywords) {
-        			Element subject = contentDOM.createElement("dc:subject");
-        			metadata.appendChild(subject);
-        			subject.appendChild(contentDOM.createTextNode(sKeyword.trim()));
+            		appendElement(contentDOM, metadata, "dc:subject", sKeyword.trim());
         		}
         	}
         	if (cr.getMetaData().getDescription().length()>0) {
-        		Element description = contentDOM.createElement("dc:description");
-        		metadata.appendChild(description);
-        		description.appendChild(contentDOM.createTextNode(cr.getMetaData().getDescription()));
+        		appendElement(contentDOM, metadata, "dc:description", cr.getMetaData().getDescription());
         	}
         }
         
         // User defined meta data
         // The identifier, creator, contributor and date has an optional attribute and there may be multiple instances of
-        // the first three. The key can be in any of the forms name, name.attribute, name.attribute.id, name..id
+        // the first three. The key must be in the form name[id][.attribute]
         // where the id is some unique id amongst the instances with the same name
-        // Thus you can have e.g. creator.aut.1="John Doe" and creator.aut.2="Jane Doe"
+        // Furthermore the instances will be sorted on the id
+        // Thus you can have e.g. creator1.aut="John Doe" and creator2.aut="Jane Doe", and "John Doe" will be the first author
         boolean bHasIdentifier = false;
         boolean bHasCreator = false;
         boolean bHasDate = false;
-        Map<String,String> userDefined = cr.getMetaData().getUserDefinedMetaData();
-        for (String sKey : userDefined.keySet()) {
+        // First rearrange the user-defined meta data
+        Map<String,String> userDefinedMetaData = cr.getMetaData().getUserDefinedMetaData();
+        Map<String,String[]> dc = new HashMap<String,String[]>();
+        for (String sKey : userDefinedMetaData.keySet()) {
         	if (sKey.length()>0) {
-        		String[] sKeyElements = sKey.toLowerCase().split("\\.");
-        		String sValue = userDefined.get(sKey);
-        		if ("identifier".equals(sKeyElements[0])) {
-        			Element identifier = contentDOM.createElement("dc:identifier");
-            		identifier.setAttribute("id", "BookId");
-        			if (sKeyElements.length>1 && sKeyElements[1].length()>0) {
-        				identifier.setAttribute("opf:scheme", sKeyElements[1]);
-        			}
-        			metadata.appendChild(identifier);
-        			identifier.appendChild(contentDOM.createTextNode(sValue));
-        			bHasIdentifier = true;
+        		String[] sValue = new String[2];
+    			sValue[0] = userDefinedMetaData.get(sKey);
+    			String sNewKey;
+        		int nDot = sKey.indexOf(".");
+        		if (nDot>0) {
+        			sNewKey = sKey.substring(0, nDot).toLowerCase();
+        			sValue[1] = sKey.substring(nDot+1);
         		}
-        		else if ("creator".equals(sKeyElements[0])) {
-        			Element creator = contentDOM.createElement("dc:creator");
-        			if (sKeyElements.length>1 && sKeyElements[1].length()>0) {
-        				creator.setAttribute("opf:role", sKeyElements[1]);
-        			}
-        			metadata.appendChild(creator);
-        			creator.appendChild(contentDOM.createTextNode(sValue));
-        			bHasCreator = true;
+        		else {
+        			sNewKey = sKey.toLowerCase();
+        			sValue[1] = null;
         		}
-        		else if ("contributor".equals(sKeyElements[0])) {
-        			Element contributor = contentDOM.createElement("dc:contributor");
-        			if (sKeyElements.length>1 && sKeyElements[1].length()>0) {
-        				contributor.setAttribute("opf:role", sKeyElements[1]);
-        			}
-        			metadata.appendChild(contributor);
-        			contributor.appendChild(contentDOM.createTextNode(sValue));
+        		dc.put(sNewKey, sValue);
+        	}
+        }
+        // Then export it
+        String[] sKeys = Misc.sortStringSet(dc.keySet());
+        for (String sKey : sKeys) {
+        	String sValue = dc.get(sKey)[0];
+        	String sAttributeValue = dc.get(sKey)[1];
+        	if (sKey.startsWith("identifier")) {
+        		Element identifier = appendElement(contentDOM, metadata, "dc:identifier", sValue);
+        		if (!bHasIdentifier) { // The first identifier is the unique ID
+        			identifier.setAttribute("id", "BookId");
+        			sUID = sValue;
         		}
-        		else if ("date".equals(sKeyElements[0])) {
-        			Element date = contentDOM.createElement("dc:date");
-        			if (sKeyElements.length>1 && sKeyElements[1].length()>0) {
-        				date.setAttribute("opf:event", sKeyElements[1]);
-        			}
-        			metadata.appendChild(date);
-        			date.appendChild(contentDOM.createTextNode(sValue));
-        			bHasDate = true;
+        		if (sAttributeValue!=null) {
+        			identifier.setAttribute("opf:scheme", sAttributeValue);
         		}
-        		else if (sKeyElements.length==1) {
-        			// Remaining meta data elements must be unique
-        			if ("publisher".equals(sKeyElements[0])) {
-        				Element publisher = contentDOM.createElement("dc:publisher");
-        				metadata.appendChild(publisher);
-        				publisher.appendChild(contentDOM.createTextNode(sValue));
-        			}
-        			else if ("type".equals(sKeyElements[0])) {
-        				Element type = contentDOM.createElement("dc:type");
-        				metadata.appendChild(type);
-        				type.appendChild(contentDOM.createTextNode(sValue));
-        			}
-        			else if ("format".equals(sKeyElements[0])) {
-        				Element format = contentDOM.createElement("dc:format");
-        				metadata.appendChild(format);
-        				format.appendChild(contentDOM.createTextNode(sValue));        			
-        			}
-        			else if ("source".equals(sKeyElements[0])) {
-        				Element source = contentDOM.createElement("dc:source");
-        				metadata.appendChild(source);
-        				source.appendChild(contentDOM.createTextNode(sValue));        			        			
-        			}
-        			else if ("relation".equals(sKeyElements[0])) {
-        				Element relation = contentDOM.createElement("dc:relation");
-        				metadata.appendChild(relation);
-        				relation.appendChild(contentDOM.createTextNode(sValue));        			        			
-        			}
-        			else if ("coverage".equals(sKeyElements[0])) {
-        				Element coverage = contentDOM.createElement("dc:coverage");
-        				metadata.appendChild(coverage);
-        				coverage.appendChild(contentDOM.createTextNode(sValue));        				
-        			}
-        			else if ("rights".equals(sKeyElements[0])) {
-        				Element rights = contentDOM.createElement("dc:rights");
-        				metadata.appendChild(rights);
-        				rights.appendChild(contentDOM.createTextNode(sValue));        					
-        			}
+        		bHasIdentifier = true;
+        	}
+        	else if (sKey.startsWith("creator")) {
+        		Element creator = appendElement(contentDOM, metadata, "dc:creator", sValue);
+        		if (sAttributeValue!=null) {
+        			creator.setAttribute("opf:role", sAttributeValue);
+        		}
+        		bHasCreator = true;
+        	}
+        	else if (sKey.startsWith("contributor")) {
+        		Element contributor = appendElement(contentDOM, metadata, "dc:contributor", sValue);
+        		if (sAttributeValue!=null) {
+        			contributor.setAttribute("opf:role", sAttributeValue);
+        		}
+        	}
+        	else if (sKey.startsWith("date")) {
+        		Element date = appendElement(contentDOM, metadata, "dc:date", sValue);
+        		if (sAttributeValue!=null) {
+        			date.setAttribute("opf:event", sAttributeValue);
+        		}
+        		bHasDate = true;
+        	}
+        	// Remaining properties must be unique and has not attributes, hence
+        	else if (sAttributeValue==null) {
+        		if ("publisher".equals(sKey)) {
+        			appendElement(contentDOM, metadata, "dc:publisher", sValue);
+        		}
+        		else if ("type".equals(sKey)) {
+        			appendElement(contentDOM, metadata, "dc:type", sValue);
+        		}
+        		else if ("format".equals(sKey)) {
+        			appendElement(contentDOM, metadata, "dc:format", sValue);
+        		}
+        		else if ("source".equals(sKey)) {
+        			appendElement(contentDOM, metadata, "dc:source", sValue);
+        		}
+        		else if ("relation".equals(sKey)) {
+        			appendElement(contentDOM, metadata, "dc:relation", sValue);
+        		}
+        		else if ("coverage".equals(sKey)) {
+        			appendElement(contentDOM, metadata, "dc:coverage", sValue);
+        		}
+        		else if ("rights".equals(sKey)) {
+        			appendElement(contentDOM, metadata, "dc:rights", sValue);
         		}
         	}
         }
@@ -200,21 +193,18 @@ public class OPFWriter extends NewDOMDocument {
         // Fall back values for creator and date
         if (bUseDublinCore) {
         	if (!bHasIdentifier) {
-        		Element identifier = contentDOM.createElement("dc:identifier");
+        		// Create a universal unique ID
+        		sUID = UUID.randomUUID().toString(); 
+        		Element identifier = appendElement(contentDOM, metadata, "dc:identifier", sUID);
         		identifier.setAttribute("id", "BookId");
         		identifier.setAttribute("opf:scheme", "UUID");
-        		metadata.appendChild(identifier);
-        		identifier.appendChild(contentDOM.createTextNode(sUUID));
         	}
         	if (!bHasCreator && cr.getMetaData().getCreator().length()>0) {
-        		Element creator = contentDOM.createElement("dc:creator");
-        		metadata.appendChild(creator);
-        		creator.appendChild(contentDOM.createTextNode(cr.getMetaData().getCreator()));
+        		appendElement(contentDOM, metadata, "dc:creator", cr.getMetaData().getCreator());
         	}
         	if (!bHasDate && cr.getMetaData().getDate().length()>0) {
-        		Element date = contentDOM.createElement("dc:date");
-        		metadata.appendChild(date);
-        		date.appendChild(contentDOM.createTextNode(cr.getMetaData().getDate()));
+        		// TODO: Support meta:creation-date?
+        		appendElement(contentDOM, metadata, "dc:date", cr.getMetaData().getDate());
         	}
         }
         
@@ -267,6 +257,22 @@ public class OPFWriter extends NewDOMDocument {
        	addGuideReference(contentDOM,guide,"bibliography",cr.getBibliographyFile());
         
         setContentDOM(contentDOM);
+	}
+	
+	/** Get the unique ID associated with this EPUB document (either collected from the user-defined
+	 *  meta data or a generated UUID)
+	 * 
+	 * @return the ID
+	 */
+	public String getUid() {
+		return sUID;
+	}
+	
+	private Element appendElement(Document contentDOM, Element node, String sTagName, String sContent) {
+		Element child = contentDOM.createElement(sTagName);
+		node.appendChild(child);
+		child.appendChild(contentDOM.createTextNode(sContent));
+		return child;
 	}
 	
 	private void addGuideReference(Document contentDOM, Element guide, String sType, ContentEntry entry) {

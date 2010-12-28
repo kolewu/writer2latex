@@ -54,6 +54,80 @@
             <value></value>
         </prop>
     </node>
+    <node oor:name="EpubOptions">
+        <prop oor:name="Config" oor:type="xs:short">
+            <value>0</value>
+        </prop>
+        <prop oor:name="ConfigName" oor:type="xs:string">
+            <value></value>
+        </prop>
+        <prop oor:name="ConvertToPx" oor:type="xs:boolean">
+            <value>true</value>
+        </prop>
+        <prop oor:name="Scaling" oor:type="xs:int">
+            <value>100</value>
+        </prop>
+        <prop oor:name="ColumnScaling" oor:type="xs:int">
+            <value>100</value>
+        </prop>
+        <prop oor:name="OriginalImageSize" oor:type="xs:boolean">
+            <value>false</value>
+        </prop>
+        <prop oor:name="RelativeFontSize" oor:type="xs:boolean">
+            <value>false</value>
+        </prop>
+        <prop oor:name="FontScaling" oor:type="xs:int">
+            <value>100</value>
+        </prop>
+        <prop oor:name="UseDefaultFont" oor:type="xs:boolean">
+            <value>true</value>
+        </prop>
+        <prop oor:name="DefaultFontName" oor:type="xs:string">
+            <value></value>
+        </prop>
+        <prop oor:name="DisplayHiddenText" oor:type="xs:boolean">
+            <value>false</value>
+        </prop>
+        <prop oor:name="Notes" oor:type="xs:boolean">
+            <value>true</value>
+        </prop>
+        <prop oor:name="UseDublinCore" oor:type="xs:boolean">
+            <value>true</value>
+        </prop>
+        <prop oor:name="IgnoreEmptyParagraphs" oor:type="xs:boolean">
+            <value>false</value>
+        </prop>
+        <prop oor:name="IgnoreHardLineBreaks" oor:type="xs:boolean">
+            <value>false</value>
+        </prop>
+        <prop oor:name="IgnoreDoubleSpaces" oor:type="xs:boolean">
+            <value>false</value>
+        </prop>
+        <prop oor:name="Split" oor:type="xs:boolean">
+            <value>false</value>
+        </prop>
+        <prop oor:name="SplitLevel" oor:type="xs:short">
+            <value>1</value>
+        </prop>
+        <prop oor:name="UsePageBreakSplit" oor:type="xs:boolean">
+            <value>false</value>
+        </prop>
+        <prop oor:name="PageBreakSplit" oor:type="xs:short">
+            <value>0</value>
+        </prop>
+        <prop oor:name="UseSplitAfter" oor:type="xs:boolean">
+            <value>true</value>
+        </prop>
+        <prop oor:name="SplitAfter" oor:type="xs:int">
+            <value>150</value>
+        </prop>
+        <prop oor:name="ExternalTocDepth" oor:type="xs:short">
+            <value>0</value>
+        </prop>
+        <prop oor:name="IncludeToc" oor:type="xs:boolean">
+            <value>true</value>
+        </prop>
+    </node>
     <node oor:name="XhtmlOptionsCalc">
         <prop oor:name="Config" oor:type="xs:short">
             <value>0</value>

@@ -32,8 +32,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.text.Collator;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -62,6 +60,7 @@ import com.sun.star.lib.uno.adapter.XOutputStreamToOutputStreamAdapter;
 import writer2latex.api.ComplexOption;
 import writer2latex.api.Config;
 import writer2latex.api.ConverterFactory;
+import writer2latex.util.Misc;
 
 import org.openoffice.da.comp.w2lcommon.helper.DialogAccess;
 import org.openoffice.da.comp.w2lcommon.helper.FilePicker;
@@ -288,14 +287,6 @@ public abstract class ConfigurationDialogBase extends WeakBase implements XConta
 			config.setOption(sConfigName, sConfigValues[dlg.getListBoxSelectedItem(sListBoxName)]);
 		}
 				
-	    // Utilities
-	    protected String[] sortStringSet(Set<String> theSet) {
-	    	String[] theArray = theSet.toArray(new String[theSet.size()]);
-			// TODO: Get locale from OOo rather than the system
-			Collator collator = Collator.getInstance();
-			Arrays.sort(theArray, collator);
-	    	return theArray;
-	    }
 	}
 	
 	protected abstract class CustomFileHandler extends PageHandler {
@@ -514,7 +505,7 @@ public abstract class ConfigurationDialogBase extends WeakBase implements XConta
 		private String newItem(Set<String> suggestions) {
 		   	XDialog xDialog=getDialog(getDialogLibraryName()+".NewDialog");
 		   	if (xDialog!=null) {
-		   		String[] sItems = sortStringSet(suggestions);
+		   		String[] sItems = Misc.sortStringSet(suggestions);
 		   		DialogAccess ndlg = new DialogAccess(xDialog);
 		   		ndlg.setListBoxStringItemList("Name", sItems);
 		   		String sResult = null;
@@ -658,7 +649,7 @@ public abstract class ConfigurationDialogBase extends WeakBase implements XConta
 		    	nCurrentFamily = nNewFamily;
 		    	sCurrentStyleName = null;
 
-	        	String[] sStyleNames = sortStringSet(styleMap[nNewFamily].keySet());
+	        	String[] sStyleNames = Misc.sortStringSet(styleMap[nNewFamily].keySet());
 	        	dlg.setListBoxStringItemList("StyleName", sStyleNames);
 	        	if (sStyleNames.length>0) {
 	        		dlg.setListBoxSelectedItem("StyleName", (short)0);

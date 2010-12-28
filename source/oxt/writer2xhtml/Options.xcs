@@ -12,6 +12,11 @@
             <prop oor:name="ConfigURL" oor:type="xs:string" />
             <prop oor:name="TargetTemplateURL" oor:type="xs:string" />
             <prop oor:name="StyleSheetURL" oor:type="xs:string" />
+            <set oor:name="Resources" oor:node-type="Resource" />			
+        </group>
+        <group oor:name="Resource">
+        	<prop oor:name="FileName" oor:type="xs:string" />
+        	<prop oor:name="MediaType" oor:type="xs:string" />
         </group>
         <group oor:name="Template">
             <prop oor:name="TemplateName" oor:type="xs:string" />
@@ -40,6 +45,40 @@
             <prop oor:name="RepeatLevels" oor:type="xs:short" />
             <prop oor:name="SaveImagesInSubdir" oor:type="xs:boolean" />
             <prop oor:name="XsltPath" oor:type="xs:string" />
+            <!-- Configurations -->
+            <set oor:name="Configurations" oor:node-type="Configuration" />
+            <set oor:name="Templates" oor:node-type="Template" />			
+        </group>
+        <group oor:name="EpubOptions">
+            <!-- Style -->
+            <prop oor:name="Config" oor:type="xs:short" />
+            <prop oor:name="ConfigName" oor:type="xs:string" />
+            <prop oor:name="Scaling" oor:type="xs:int" />
+            <prop oor:name="ColumnScaling" oor:type="xs:int" />
+            <prop oor:name="RelativeFontSize" oor:type="xs:boolean" />
+            <prop oor:name="FontScaling" oor:type="xs:int" />
+            <prop oor:name="UseDefaultFont" oor:type="xs:boolean" />
+            <prop oor:name="DefaultFontName" oor:type="xs:string" />
+            <prop oor:name="ConvertToPx" oor:type="xs:boolean" />
+            <prop oor:name="OriginalImageSize" oor:type="xs:boolean"/>
+            <!-- Special content -->
+            <prop oor:name="DisplayHiddenText" oor:type="xs:boolean" />
+            <prop oor:name="Notes" oor:type="xs:boolean" />
+            <prop oor:name="UseDublinCore" oor:type="xs:boolean" />
+            <!-- AutoCorrect -->
+            <prop oor:name="IgnoreEmptyParagraphs" oor:type="xs:boolean" />
+            <prop oor:name="IgnoreHardLineBreaks" oor:type="xs:boolean" />
+            <prop oor:name="IgnoreDoubleSpaces" oor:type="xs:boolean" />
+            <!-- Files -->
+            <prop oor:name="Split" oor:type="xs:boolean" />
+            <prop oor:name="SplitLevel" oor:type="xs:short" />
+            <prop oor:name="UsePageBreakSplit" oor:type="xs:boolean" />
+            <prop oor:name="PageBreakSplit" oor:type="xs:short" />
+            <prop oor:name="UseSplitAfter" oor:type="xs:boolean" />
+            <prop oor:name="SplitAfter" oor:type="xs:int" />
+            <!-- Table of contents -->
+            <prop oor:name="ExternalTocDepth" oor:type="xs:short" />
+            <prop oor:name="IncludeToc" oor:type="xs:boolean" />
             <!-- Configurations -->
             <set oor:name="Configurations" oor:node-type="Configuration" />
             <set oor:name="Templates" oor:node-type="Template" />			

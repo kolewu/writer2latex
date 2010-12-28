@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  version 1.2 (2010-12-15)
+ *  version 1.2 (2010-12-20)
  *
  */
 
@@ -30,7 +30,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Iterator;
-import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -70,10 +69,7 @@ public class EPUBWriter implements OutputFile {
 		return true;
 	}
 
-	public void write(OutputStream os) throws IOException {
-		// Create a universal unique ID
-		String sUUID = UUID.randomUUID().toString(); 
-		
+	public void write(OutputStream os) throws IOException {		
 		ZipOutputStream zos = new ZipOutputStream(os);
 		
 		// Write uncompressed MIME type as first entry
@@ -93,14 +89,14 @@ public class EPUBWriter implements OutputFile {
 		zos.closeEntry();
 		
 		// Then manifest
-		OutputFile manifest = new OPFWriter(xhtmlResult, sUUID, config.xhtmlUseDublinCore());
+		OPFWriter manifest = new OPFWriter(xhtmlResult, config.xhtmlUseDublinCore());
 		ZipEntry manifestEntry = new ZipEntry("OEBPS/book.opf");
 		zos.putNextEntry(manifestEntry);
 		writeZipEntry(manifest,zos);
 		zos.closeEntry();
 		
 		// And content table
-		OutputFile ncx = new NCXWriter(xhtmlResult, sUUID);
+		OutputFile ncx = new NCXWriter(xhtmlResult, manifest.getUid());
 		ZipEntry ncxEntry = new ZipEntry("OEBPS/book.ncx");
 		zos.putNextEntry(ncxEntry);
 		writeZipEntry(ncx,zos);

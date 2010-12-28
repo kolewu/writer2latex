@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-12-14)
+ *  Version 1.2 (2010-12-21)
  *
  */ 
  
@@ -31,6 +31,7 @@ import java.util.HashSet;
 import java.util.Map;
 
 import writer2latex.api.ComplexOption;
+import writer2latex.util.Misc;
 
 import org.openoffice.da.comp.w2lcommon.filter.ConfigurationDialogBase;
 import org.openoffice.da.comp.w2lcommon.helper.DialogAccess;
@@ -677,7 +678,7 @@ public final class ConfigurationDialog extends ConfigurationDialogBase implement
     		StyleNameProvider styleNameProvider = new StyleNameProvider(xContext);
     		Map<String,String> internalNames = styleNameProvider.getInternalNames("ParagraphStyles");
     		if (internalNames!=null) {
-    			String[] styleNames = sortStringSet(internalNames.keySet());
+    			String[] styleNames = Misc.sortStringSet(internalNames.keySet());
     			dlg.setListBoxStringItemList("TableFirstHeadStyle",styleNames);
     			dlg.setListBoxStringItemList("TableHeadStyle",styleNames);
     			dlg.setListBoxStringItemList("TableFootStyle",styleNames);
@@ -687,7 +688,7 @@ public final class ConfigurationDialog extends ConfigurationDialogBase implement
     		// Fill the table sequence combo box with sequence names
     		FieldMasterNameProvider fieldMasterNameProvider = new FieldMasterNameProvider(xContext);
     		dlg.setListBoxStringItemList("TableSequenceName",
-    				sortStringSet(fieldMasterNameProvider.getFieldMasterNames("com.sun.star.text.fieldmaster.SetExpression.")));
+    				Misc.sortStringSet(fieldMasterNameProvider.getFieldMasterNames("com.sun.star.text.fieldmaster.SetExpression.")));
 
     		dlg.setCheckBoxStateAsBoolean("NoTables", !"accept".equals(config.getOption("table_content")));
         	checkBoxFromConfig(dlg,"UseColortbl","use_colortbl");
@@ -766,7 +767,7 @@ public final class ConfigurationDialog extends ConfigurationDialogBase implement
     		// Fill the figure sequence combo box with sequence names
     		FieldMasterNameProvider fieldMasterNameProvider = new FieldMasterNameProvider(xContext);
     		dlg.setListBoxStringItemList("FigureSequenceName",
-    				sortStringSet(fieldMasterNameProvider.getFieldMasterNames("com.sun.star.text.fieldmaster.SetExpression.")));
+    				Misc.sortStringSet(fieldMasterNameProvider.getFieldMasterNames("com.sun.star.text.fieldmaster.SetExpression.")));
     		
         	checkBoxFromConfig(dlg,"UseCaption","use_caption");
         	checkBoxFromConfig(dlg,"AlignFrames","align_frames");
@@ -825,7 +826,7 @@ public final class ConfigurationDialog extends ConfigurationDialogBase implement
     		else { mathSymbols = new ComplexOption(); }
     		mathSymbols.copyAll(config.getComplexOption("math-symbol-map"));
     		sCurrentMathSymbol = null;
-        	dlg.setListBoxStringItemList("MathSymbolName", sortStringSet(mathSymbols.keySet()));
+        	dlg.setListBoxStringItemList("MathSymbolName", Misc.sortStringSet(mathSymbols.keySet()));
         	// This triggers an onchange event
         	dlg.setListBoxSelectedItem("MathSymbolName", (short)Math.min(0,mathSymbols.keySet().size()-1));
 
@@ -834,7 +835,7 @@ public final class ConfigurationDialog extends ConfigurationDialogBase implement
     		else { stringReplace = new ComplexOption(); }
     		stringReplace.copyAll(config.getComplexOption("string-replace"));
     		sCurrentText = null;
-        	dlg.setListBoxStringItemList("TextInput", sortStringSet(stringReplace.keySet()));
+        	dlg.setListBoxStringItemList("TextInput", Misc.sortStringSet(stringReplace.keySet()));
         	// This triggers an onchange event
         	dlg.setListBoxSelectedItem("TextInput", (short)Math.min(0,stringReplace.keySet().size()-1));
         	    	
