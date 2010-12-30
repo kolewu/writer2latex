@@ -190,15 +190,15 @@ public class OPFWriter extends NewDOMDocument {
         	}
         }
         
-        // Fall back values for creator and date
+        // Fall back values for identifier, creator and date
+    	if (!bHasIdentifier) {
+    		// Create a universal unique ID
+    		sUID = UUID.randomUUID().toString(); 
+    		Element identifier = appendElement(contentDOM, metadata, "dc:identifier", sUID);
+    		identifier.setAttribute("id", "BookId");
+    		identifier.setAttribute("opf:scheme", "UUID");
+    	}
         if (bUseDublinCore) {
-        	if (!bHasIdentifier) {
-        		// Create a universal unique ID
-        		sUID = UUID.randomUUID().toString(); 
-        		Element identifier = appendElement(contentDOM, metadata, "dc:identifier", sUID);
-        		identifier.setAttribute("id", "BookId");
-        		identifier.setAttribute("opf:scheme", "UUID");
-        	}
         	if (!bHasCreator && cr.getMetaData().getCreator().length()>0) {
         		appendElement(contentDOM, metadata, "dc:creator", cr.getMetaData().getCreator());
         	}

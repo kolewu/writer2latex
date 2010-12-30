@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-05-09)
+ *  Version 1.2 (2010-12-29)
  *
  */
 
@@ -138,6 +138,9 @@ class StyleConverter extends ConverterHelper {
                 CSVList props = new CSVList(";");
                 // text properties only!
                 getTextSc().cssTextCommon(defaultStyle,props,true);
+                if (config.useDefaultFont() && config.defaultFontName().length()>0) {
+                	props.addValue("font-family", "'"+config.defaultFontName()+"'");
+                }
                 buf.append(sIndent)
                    .append("body {").append(props.toString()).append("}").append(config.prettyPrint() ? "\n" : " ");
             }

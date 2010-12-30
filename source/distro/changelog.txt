@@ -2,18 +2,18 @@ Changelog for Writer2LaTeX version 1.0 -> 1.2
 
 ---------- version 1.1.9 ----------
 
-[w2x] *New option include_toc (default true) for EPUB export: If set to false, the table of content will not be exported
+[w2x] New option include_toc (default true) for EPUB export: If set to false, the table of content will not be exported
 
-[w2x] *New option split_after (default 0) for EPUB export: This sets the number of characters (in thousands) after
+[w2x] New option split_after (default 0) for EPUB export: This sets the number of characters (in thousands) after
   which an automatic split will occur (0 means no automatic split)
 
-[w2x] *New options use_default_font (default false) and default_font_name (default empty) for EPUB export.
+[w2x] New options use_default_font (default false) and default_font_name (default empty).
   If the former is true, font names are not exported, but the latter will be exported as default font (if non-empty)
 
-[w2x] *New options relative_font_size (default false) and font_scaling (default 100%) for EPUB export.
+[w2x] New options relative_font_size (default false) and font_scaling (default 100%) for EPUB export.
   If the former is true, relative font sizes are used, scaled by the percentage given by the latter
 
-[w2x] *EPUB export now has its own export dialog
+[w2x] EPUB export now has its own export dialog
 
 [all] *API change: Added the method readResource to the Converter interface (only used by EPUB export currently)
 

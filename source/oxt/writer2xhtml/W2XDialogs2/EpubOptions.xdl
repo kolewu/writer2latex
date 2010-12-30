@@ -88,7 +88,7 @@
     <dlg:menuitem dlg:value="10"/>
    </dlg:menupopup>
   </dlg:menulist>
-  <dlg:text dlg:id="TocLabel" dlg:tab-index="43" dlg:left="205" dlg:top="162" dlg:width="180" dlg:height="12" dlg:value="Table of contents"/>
+  <dlg:text dlg:id="TocLabel" dlg:tab-index="43" dlg:left="205" dlg:top="162" dlg:width="180" dlg:height="12" dlg:value="Navigation table"/>
   <dlg:text dlg:id="DocumentDivisionLabel" dlg:tab-index="31" dlg:left="205" dlg:top="64" dlg:width="180" dlg:height="12" dlg:value="Document division"/>
  </dlg:bulletinboard>
 </dlg:window>

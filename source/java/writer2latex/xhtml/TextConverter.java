@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-11-28)
+ *  Version 1.2 (2010-12-29)
  *
  */
 
@@ -83,7 +83,7 @@ public class TextConverter extends ConverterHelper {
 	// Some (Sony?) EPUB readers have a limit on the file size of individual files
 	// In any case very large files could be a performance problem, hence we do automatic splitting
 	// after this number of characters. TODO: Make configurable.
-	private static final int EPUB_CHARACTER_COUNT_TRESHOLD = 150000;
+	private int nSplitAfter = 150000;
 	private int nPageBreakSplit = XhtmlConfig.NONE; // Should we split at page breaks?
 	// TODO: Collect soft page breaks between table rows
 	private boolean bPendingPageBreak = false; // We have encountered a page break which should be inserted asap
@@ -145,9 +145,10 @@ public class TextConverter extends ConverterHelper {
 
     public TextConverter(OfficeReader ofr, XhtmlConfig config, Converter converter) {
         super(ofr,config,converter);
+        nSplitAfter = 1000*config.splitAfter();
         nPageBreakSplit = config.pageBreakSplit();
         nSplit = config.getXhtmlSplitLevel();
-        nRepeatLevels = config.getXhtmlRepeatLevels();
+        nRepeatLevels = converter.isOPS() ? 0 : config.getXhtmlRepeatLevels(); // never repeat headings in EPUB
         nExternalTocDepth = config.externalTocDepth();
         if (nExternalTocDepth==0) { // A value of zero means auto (i.e. determine from split level)
         	nExternalTocDepth = Math.max(nSplit,1);
@@ -537,7 +538,7 @@ public class TextConverter extends ConverterHelper {
     	if (getPageBreak(style)) {
     		return doMaybeSplit(node, 0);
     	}
-    	if (converter.isOPS() && nCharacterCount>EPUB_CHARACTER_COUNT_TRESHOLD) {
+    	if (converter.isOPS() && nSplitAfter>0 && nCharacterCount>nSplitAfter) {
     		return doMaybeSplit(node, 0);
     	}
     	if (nLevel>=0) {
@@ -1168,25 +1169,29 @@ public class TextConverter extends ConverterHelper {
     /* Process table of contents
      */
     private void handleTOC(Node onode, Node hnode) {
-        if (!ofr.getTocReader((Element)onode).isByChapter()) { 
-            nTocFileIndex = converter.getOutFileIndex(); 
-        }
-        
-        converter.setTocFile(null);
+    	if (!config.includeToc()) { return; }
 
-        Element div = converter.createElement("div");
-        hnode.appendChild(div);
+    	if (!ofr.getTocReader((Element)onode).isByChapter()) { 
+    		nTocFileIndex = converter.getOutFileIndex(); 
+    	}
 
-        IndexData data = new IndexData();
-        data.nOutFileIndex = converter.getOutFileIndex();
-        data.onode = (Element) onode;
-        data.chapter = currentChapter;
-        data.hnode = (Element) div;
-        indexes.add(data); // to be processed later with generateTOC
+    	converter.setTocFile(null);
+
+    	Element div = converter.createElement("div");
+    	hnode.appendChild(div);
+
+    	IndexData data = new IndexData();
+    	data.nOutFileIndex = converter.getOutFileIndex();
+    	data.onode = (Element) onode;
+    	data.chapter = currentChapter;
+    	data.hnode = (Element) div;
+    	indexes.add(data); // to be processed later with generateTOC
     }
 
     private void generateToc(IndexData data) {
-        Element onode = data.onode;
+    	if (!config.includeToc()) { return; }
+
+    	Element onode = data.onode;
         Element chapter = data.chapter;
         Element div = data.hnode;
 

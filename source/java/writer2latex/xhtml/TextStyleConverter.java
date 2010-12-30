@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-12-08)
+ *  Version 1.2 (2010-12-29)
  *
  */
 
@@ -66,20 +66,25 @@ public class TextStyleConverter extends StyleWithPropertiesConverterHelper {
     
     // Export font sizes as percentages?
     private boolean bRelativeFontSize = false;
+    private String sFontScaling = "100%";
     private String sBaseFontSize = "12pt";
+    
+    // Use default font?
+    private boolean bConvertFont = false;
 
     /** Create a new <code>TextStyleConverter</code>
      *  @param ofr an <code>OfficeReader</code> to read style information from
      *  @param config the configuration to use
      *  @param converter the main <code>Converter</code> class
-     *  @param nType the type of xhtml to use
+     *  @param nType the type of XHTML to use
      */
     public TextStyleConverter(OfficeReader ofr, XhtmlConfig config, Converter converter, int nType) {
         super(ofr,config,converter,nType);
         this.styleMap = config.getXTextStyleMap();
         this.bConvertStyles = config.xhtmlFormatting()==XhtmlConfig.CONVERT_ALL || config.xhtmlFormatting()==XhtmlConfig.IGNORE_HARD;
         this.bConvertHard = config.xhtmlFormatting()==XhtmlConfig.CONVERT_ALL || config.xhtmlFormatting()==XhtmlConfig.IGNORE_STYLES;
-        this.bRelativeFontSize = converter.isOPS() && config.xhtmlConvertToPx();
+        this.bRelativeFontSize = converter.isOPS() && config.relativeFontSize();
+        this.sFontScaling = config.fontScaling();
         StyleWithProperties defaultStyle = ofr.getDefaultParStyle();
         if (defaultStyle!=null) {
         	String sFontSize = defaultStyle.getProperty(XMLString.FO_FONT_SIZE,false);
@@ -87,6 +92,7 @@ public class TextStyleConverter extends StyleWithPropertiesConverterHelper {
         		sBaseFontSize = sFontSize;
         	}
         }
+        this.bConvertFont = !config.useDefaultFont();
     }
 
     /** Apply a link style, using a combination of two text styles
@@ -249,7 +255,7 @@ public class TextStyleConverter extends StyleWithPropertiesConverterHelper {
         CSVList val;
 		
         // Font family
-        if (bInherit || style.getProperty(XMLString.STYLE_FONT_NAME,false)!=null) {
+        if (bConvertFont && (bInherit || style.getProperty(XMLString.STYLE_FONT_NAME,false)!=null)) {
             val = new CSVList(","); // multivalue property!
             // Get font family information from font declaration or from style
             s = style.getProperty(XMLString.STYLE_FONT_NAME);
@@ -312,7 +318,7 @@ public class TextStyleConverter extends StyleWithPropertiesConverterHelper {
                 }
                 if (s!=null) {
                 	if (bRelativeFontSize) {
-                		String sFontSize = Misc.divide(Misc.multiply(s4,s), sBaseFontSize);
+                		String sFontSize = Misc.divide(Misc.multiply(sFontScaling, Misc.multiply(s4,s)), sBaseFontSize);
                 		if (!"100%".equals(sFontSize)) props.addValue("font-size", sFontSize);
                 	}
                 	else {
@@ -328,7 +334,7 @@ public class TextStyleConverter extends StyleWithPropertiesConverterHelper {
             }
             else if (s!=null) {
             	if (bRelativeFontSize) {
-            		String sFontSize = Misc.divide(s,sBaseFontSize);
+            		String sFontSize = Misc.divide(Misc.multiply(sFontScaling, s),sBaseFontSize);
             		if (!"100%".equals(sFontSize)) props.addValue("font-size", sFontSize);
             	}
             	else {

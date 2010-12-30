@@ -20,13 +20,13 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-12-28)
+ *  Version 1.2 (2010-12-29)
  *
  */
 
 // TODO: Add to doc:
 // New options relative_font_size, font_scaling, use_default_font, default_font_name, split_after, page_break_split, include_toc
-// Also add to list of possible locked options external_toc_depth
+// Also add to list of possible locked options external_toc_depth, display_hidden_text
  
 package org.openoffice.da.comp.writer2xhtml;
 
@@ -39,7 +39,7 @@ import com.sun.star.uno.XComponentContext;
 import org.openoffice.da.comp.w2lcommon.helper.PropertyHelper;
 import org.openoffice.da.comp.w2lcommon.filter.OptionsDialogBase;
 
-/** This class provides a uno component which implements a filter ui for the
+/** This class provides a UNO component which implements a filter UI for the
  *  EPUB export
  */
 public class EpubOptionsDialog extends OptionsDialogBase {
@@ -98,7 +98,7 @@ public class EpubOptionsDialog extends OptionsDialogBase {
         loadCheckBoxOption(xProps, "IgnoreEmptyParagraphs");
         loadCheckBoxOption(xProps, "IgnoreDoubleSpaces");
 
-        // Files
+        // Document division
         loadCheckBoxOption(xProps, "Split");
         loadListBoxOption(xProps, "SplitLevel");
         loadCheckBoxOption(xProps, "UsePageBreakSplit");
@@ -106,7 +106,7 @@ public class EpubOptionsDialog extends OptionsDialogBase {
         loadCheckBoxOption(xProps, "UseSplitAfter");
         loadNumericOption(xProps, "SplitAfter");
         
-        // Table of contents
+        // Navigation table
         loadListBoxOption(xProps, "ExternalTocDepth");
         loadCheckBoxOption(xProps, "IncludeToc");
 
@@ -145,7 +145,7 @@ public class EpubOptionsDialog extends OptionsDialogBase {
         saveCheckBoxOption(xProps, helper, "IgnoreEmptyParagraphs", "ignore_empty_paragraphs");
         saveCheckBoxOption(xProps, helper, "IgnoreDoubleSpaces", "ignore_double_spaces");
 
-        // Files
+        // Document division
         boolean bSplit = saveCheckBoxOption(xProps, "Split");
         short nSplitLevel = saveListBoxOption(xProps, "SplitLevel");
         if (!isLocked("split_level")) {
@@ -176,17 +176,17 @@ public class EpubOptionsDialog extends OptionsDialogBase {
         int nSplitAfter = saveNumericOption(xProps, "SplitAfter");
         if (!isLocked("split_after")) {
         	if (bUseSplitAfter) {
-        		helper.put("split_after", nSplitAfter);
+        		helper.put("split_after", Integer.toString(nSplitAfter));
         	}
         	else {
-        		helper.put("split_after", 0);
+        		helper.put("split_after", "0");
         	}
         }
         
-        // Table of contents
+        // Navigation table
         short nExternalTocDepth = saveListBoxOption(xProps, "ExternalTocDepth");
-        helper.put("external_toc_depth", nExternalTocDepth+1);
-        saveCheckBoxOption(xProps, "IncludeToc");
+        helper.put("external_toc_depth", Integer.toString(nExternalTocDepth+1));
+        saveCheckBoxOption(xProps, helper, "IncludeToc", "include_toc");
     }
 	
 	
@@ -251,7 +251,7 @@ public class EpubOptionsDialog extends OptionsDialogBase {
         setControlEnabled("IgnoreEmptyParagraphs",!isLocked("ignore_empty_paragraphs"));
         setControlEnabled("IgnoreDoubleSpaces",!isLocked("ignore_double_spaces"));
 
-        // Files
+        // Document division
         boolean bSplit = getCheckBoxStateAsBoolean("Split");
         setControlEnabled("Split",!isLocked("split_level"));
         setControlEnabled("SplitLevelLabel",!isLocked("split_level") && bSplit);
@@ -267,7 +267,7 @@ public class EpubOptionsDialog extends OptionsDialogBase {
         setControlEnabled("SplitAfterLabel",!isLocked("split_after") && bUseSplitAfter);
         setControlEnabled("SplitAfter",!isLocked("split_after") && bUseSplitAfter);
         
-        // Table of contents
+        // Navigation table
         setControlEnabled("ExternalTocDepthLabel", !isLocked("external_toc_depth"));
         setControlEnabled("ExternalTocDepth", !isLocked("external_toc_depth"));
         setControlEnabled("IncludeToc", !isLocked("include_toc"));
