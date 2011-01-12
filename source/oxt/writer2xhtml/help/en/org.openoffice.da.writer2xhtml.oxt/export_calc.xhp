@@ -32,7 +32,9 @@
 		
     	<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:OptionsCalcScaling" id="bm_optionscalc_scaling"/>
 		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2latex.oxt:OptionsCalcScaling" visibility="hidden">Select a scaling to apply to all dimensions in the document</ahelp></paragraph>
-		<embed href="org.openoffice.da.writer2xhtml.oxt/export.xhp#scaling"/>
+		<embed href="org.openoffice.da.writer2xhtml.oxt/export.xhp#scaling1"/>
+		<embed href="org.openoffice.da.writer2xhtml.oxt/export.xhp#scaling2"/>
+		<embed href="org.openoffice.da.writer2xhtml.oxt/export.xhp#scaling3"/>
 		
     	<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:OptionsCalcColumnScaling" id="bm_optionscalc_columnscaling"/>
 		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2latex.oxt:OptionsCalcColumnScaling" visibility="hidden">Select a scaling to apply to all column dimensions in the document</ahelp></paragraph>
@@ -40,7 +42,10 @@
 		
     	<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:OptionsCalcConvertToPx" id="bm_optionscalc_converttopx"/>
 		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2latex.oxt:OptionsCalcConvertToPx" visibility="hidden">Check this if you want to convert all units to px rather than using the original units</ahelp></paragraph>
-		<embed href="org.openoffice.da.writer2xhtml.oxt/export.xhp#converttopx"/>
+		<embed href="org.openoffice.da.writer2xhtml.oxt/export.xhp#converttopx1"/>
+		<embed href="org.openoffice.da.writer2xhtml.oxt/export.xhp#converttopx2"/>
+		<embed href="org.openoffice.da.writer2xhtml.oxt/export.xhp#converttopx3"/>
+		<embed href="org.openoffice.da.writer2xhtml.oxt/export.xhp#converttopx4"/>
 		
     	<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:OptionsCalcOriginalImageSize" id="bm_optionscalc_originalimagesize"/>
 		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2latex.oxt:OptionsCalcOriginalImageSize" visibility="hidden">Check this to use the natural size of images rather than the size defined in the document</ahelp></paragraph>
@@ -50,7 +55,8 @@
 		
     	<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:OptionsCalcNotes" id="bm_optionscalc_notes"/>
 		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2latex.oxt:OptionsCalcOriginalImageSize" visibility="hidden">Check this if you want to export notes (annotations) in the document</ahelp></paragraph>
-		<embed href="org.openoffice.da.writer2xhtml.oxt/export.xhp#notes"/>
+		<embed href="org.openoffice.da.writer2xhtml.oxt/export.xhp#notes1"/>
+		<embed href="org.openoffice.da.writer2xhtml.oxt/export.xhp#notes2"/>
 		
     	<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:OptionsCalcUseDublinCore" id="bm_optionscalc_usedublincore"/>
 		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2latex.oxt:OptionsCalcUseDublinCore" visibility="hidden">Check this if you want to export all meta data (using the Dublin Core standard)</ahelp></paragraph>

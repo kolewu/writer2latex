@@ -2,26 +2,25 @@
 <helpdocument version="1.0">
 	<meta>
         <topic id="writer2xhtml-export-writer" indexer="include">
-            <title xml-lang="en-US">XHTML and EPUB Export (Writer)</title>
+            <title xml-lang="en-US">XHTML Export (Writer)</title>
             <filename>org.openoffice.da.writer2xhtml.oxt/export.xhp</filename>
         </topic>
     </meta>
     <body>
     	<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:Options" id="bm_options"/>
         <paragraph role="heading" level="1" xml-lang="en-US">XHTML Export (Writer)</paragraph>
-        <paragraph role="paragraph" xml-lang="en-US">Exports the current document to XHTML or EPUB format.</paragraph>
+        <paragraph role="paragraph" xml-lang="en-US">Exports the current document to XHTML format.</paragraph>
         <section id="howtoget" xml-lang="en-US">
         	Choose <emph>File - Export - XHTML 1.0 strict</emph><br/>
         	or <emph>File - Export - XHTML 1.1</emph><br/>
         	or <emph>File - Export - XHTML 1.1 + MathML 2.0</emph><br/>
-        	or <emph>File - Export - XHTML 1.1 + MathML 2.0 (xsl)</emph><br/>
-        	or <emph>File - Export - EPUB</emph>
+        	or <emph>File - Export - XHTML 1.1 + MathML 2.0 (xsl)</emph>
         </section>
         
         <paragraph role="heading" level="2" xml-lang="en-US">Style</paragraph>
         
     	<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:OptionsConfig" id="bm_options_config"/>
-		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2latex.oxt:OptionsConfig" visibility="hidden">Select the style to use for the XHTML document</ahelp></paragraph>
+		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2xhtml.oxt:OptionsConfig" visibility="hidden">Select the style to use for the XHTML document</ahelp></paragraph>
 		<section id="split1">
 	        <paragraph role="heading" level="3" xml-lang="en-US">Use style</paragraph>
         	<paragraph role="paragraph" xml-lang="en-US">This option allows you to choose between various styles to apply to the
@@ -55,18 +54,23 @@
         </section>
 
    		<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:OptionsScaling" id="bm_options_scaling"/>
-		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2latex.oxt:OptionsScaling" visibility="hidden">Select a scaling to apply to all dimensions in the document</ahelp></paragraph>
-		<section id="scaling">
+		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2xhtml.oxt:OptionsScaling" visibility="hidden">Select a scaling to apply to all dimensions in the document</ahelp></paragraph>
+		<section id="scaling1">
         	<paragraph role="heading" level="3" xml-lang="en-US">Scaling</paragraph>
+       	</section>
+		<section id="scaling2">
         	<paragraph role="paragraph" xml-lang="en-US">Viewing the document in a web browser may require different dimensions
-        	(e.g. font sizes) than the original document. Using this option you can define a percentage used to scale all
-        	dimensions, thus with the setting 140, all dimensions will be 40% larger than in the original document. Depending on the
+        	(e.g. font sizes) than the original document.</paragraph>
+       	</section>
+		<section id="scaling3">
+        	<paragraph role="paragraph" xml-lang="en-US">Using this option you can define a percentage used to scale all
+        	dimensions. Thus with the setting 140, all dimensions will be 40% larger than in the original document. Depending on the
         	style you have selected and on the option <emph>Use original image size</emph>, some dimensions may be unaffected by
         	this option.</paragraph>
        	</section>
         
    		<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:OptionsColumnScaling" id="bm_options_columnscaling"/>
-		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2latex.oxt:OptionsColumnScaling" visibility="hidden">Select a scaling to apply to all column dimensions in the document</ahelp></paragraph>
+		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2xhtml.oxt:OptionsColumnScaling" visibility="hidden">Select a scaling to apply to all column dimensions in the document</ahelp></paragraph>
 		<section id="columnscaling">
         	<paragraph role="heading" level="3" xml-lang="en-US">Column scaling</paragraph>
         	<paragraph role="paragraph" xml-lang="en-US">This is a similar option, which only affects table columns. Thus you can further
@@ -74,22 +78,28 @@
        	</section>
 
     	<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:OptionsConvertToPx" id="bm_options_converttopx"/>
-		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2latex.oxt:OptionsConvertToPx" visibility="hidden">Check this if you want to convert all units to px rather than using the original units</ahelp></paragraph>
-		<section id="converttopx">
+		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2xhtml.oxt:OptionsConvertToPx" visibility="hidden">Check this if you want to convert all units to px rather than using the original units</ahelp></paragraph>
+		<section id="converttopx1">
     	    <paragraph role="heading" level="3" xml-lang="en-US">Convert units to px (pixels)</paragraph>
+        </section>
+		<section id="converttopx2">
 	        <paragraph role="paragraph" xml-lang="en-US">In %PRODUCTNAME, font sizes are usually given in points and other dimensions
-    	    in e.g. cm or inches. For XHTML it is recommended to use the unit px instead, and using this option you can require that
-        	all dimensions are converted to px. For EPUB it is recommended to use relative font sizes, and using this option will
-        	export all font sizes as percentages (and use px for all other dimensions).</paragraph>
-        	<paragraph role="paragraph" xml-lang="en-US">If you choose not to check this option,the original units will always be used.</paragraph>
+    	    in e.g. cm or inches.</paragraph>
+        </section>
+		<section id="converttopx3">
+	        <paragraph role="paragraph" xml-lang="en-US">For XHTML it is recommended to use the unit px instead, and using this option you can require that
+        	all dimensions are converted to px.</paragraph>
+        </section>
+		<section id="converttopx4">
+        	<paragraph role="paragraph" xml-lang="en-US">If you choose not to check this option, the original units will always be used.</paragraph>
         </section>
 
     	<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:OptionsOriginalImageSize" id="bm_options_originalimagesize"/>
-		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2latex.oxt:OptionsOriginalImageSize" visibility="hidden">Check this to use the natural size of images rather than the size defined in the document</ahelp></paragraph>
+		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2xhtml.oxt:OptionsOriginalImageSize" visibility="hidden">Check this to use the natural size of images rather than the size defined in the document</ahelp></paragraph>
 		<section id="originalimagesize">
     	    <paragraph role="heading" level="3" xml-lang="en-US">Use original image size</paragraph>
 	        <paragraph role="paragraph" xml-lang="en-US">Often images in a %PRODUCTNAME document are scaled up or down from their original size.
-    	    Normally the same scaling will be used in the XHTML document, but if you select this option, the original (unscaled) image
+    	    Normally the same scaling will be used in the exported document, but if you select this option, the original (unscaled) image
         	size will be used.</paragraph>
         </section>
 
@@ -98,47 +108,50 @@
 	    </section>
 
     	<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:OptionsNotes" id="bm_options_notes"/>
-   		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2latex.oxt:OptionsNotes" visibility="hidden">Check this if you want to export notes (annotations) in the document</ahelp></paragraph>
-		<section id="notes">
+   		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2xhtml.oxt:OptionsNotes" visibility="hidden">Check this if you want to export notes (annotations) in the document</ahelp></paragraph>
+		<section id="notes1">
         	<paragraph role="heading" level="3" xml-lang="en-US">Export notes</paragraph>
+	    </section>
+		<section id="notes2">
     	    <paragraph role="paragraph" xml-lang="en-US">If you select this option, notes (also known as annotations) in the
         	%PRODUCTNAME document are exported as comments in the XHTML document. They will not be directly visible in the browser,
 	        only in the XHTML source. If the option is not selected, notes are completely ignored.</paragraph>
 	    </section>
 
     	<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:OptionsUseDublinCore" id="bm_options_usedublincore"/>
-   		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2latex.oxt:OptionsUseDublinCore" visibility="hidden">Check this if you want to export all meta data (using the Dublin Core standard)</ahelp></paragraph>
+   		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2xhtml.oxt:OptionsUseDublinCore" visibility="hidden">Check this if you want to export all meta data (using the Dublin Core standard)</ahelp></paragraph>
 		<section id="usedublincore">
         	<paragraph role="heading" level="3" xml-lang="en-US">Export document properties (Dublin Core Meta data)</paragraph>
     	    <paragraph role="paragraph" xml-lang="en-US">If you select this option, the document properties (File – Properties)
         	are exported using
 			<link href="http://dublincore.org/" name="Link to the Dublin Core standard">the Dublin Core standard</link>.</paragraph>
 		</section>
-		<paragraph role="paragraph" xml-lang="en-US">The EPUB format supports a number of additional meta data elements.
-		You can define these using <link href="org.openoffice.da.writer2xhtml.oxt/epub.xhp" name="EPUB">user-defined properties</link>.
-		</paragraph>
 
         <paragraph role="heading" level="2" xml-lang="en-US">AutoCorrect</paragraph>
 
     	<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:OptionsIgnoreHardLineBreaks" id="bm_options_ignorehardlinebreaks"/>
         <paragraph role="heading" level="3" xml-lang="en-US">Ignore hard line breaks</paragraph>
-   		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2latex.oxt:OptionsIgnoreHardLineBreaks" visibility="hidden">Check this if you don't want to export hard (manual) line breaks</ahelp></paragraph>
+   		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2xhtml.oxt:OptionsIgnoreHardLineBreaks" visibility="hidden">Check this if you don't want to export hard (manual) line breaks</ahelp></paragraph>
         <paragraph role="paragraph" xml-lang="en-US">Sometimes hard (or manual) line breaks are used in Writer to optimize
         the placement of the line breaks. Since line breaking in a browser is completely different, you may want to ignore
         all hard line breaks by selecting this option.</paragraph>
 
     	<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:OptionsIgnoreEmptyParagraphs" id="bm_options_ignoreemptyparagraphs"/>
-        <paragraph role="heading" level="3" xml-lang="en-US">Ignore empty paragraphs</paragraph>
-   		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2latex.oxt:OptionsIgnoreEmptyParagraphs" visibility="hidden">Check this if you don't want to export empty paragraphs</ahelp></paragraph>
-        <paragraph role="paragraph" xml-lang="en-US">Empty paragraphs are sometimes used a simple means to create vertical
-        spacing in Writer. In a well-structured document, an empty paragraph is probably a mistake. Hence you can select
-        this option to ignore empty paragraphs in the document in the export.</paragraph>
+		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2xhtml.oxt:OptionsIgnoreEmptyParagraphs" visibility="hidden">Check this if you don't want to export empty paragraphs</ahelp></paragraph>
+        <section id="ignoreemptyparagraphs">
+        	<paragraph role="heading" level="3" xml-lang="en-US">Ignore empty paragraphs</paragraph>
+        	<paragraph role="paragraph" xml-lang="en-US">Empty paragraphs are sometimes used a simple means to create vertical
+        	spacing in Writer. In a well-structured document, an empty paragraph is probably a mistake. Hence you can select
+        	this option to ignore empty paragraphs in the document in the export.</paragraph>
+        </section>
 
     	<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:OptionsIgnoreDoubleSpaces" id="bm_options_ignoredoublespaces"/>
-        <paragraph role="heading" level="3" xml-lang="en-US">Ignore double spaces</paragraph>
-   		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2latex.oxt:OptionsIgnoreDoubleSpaces" visibility="hidden">Check this to treat several spaces as a single space in the export</ahelp></paragraph>
-        <paragraph role="paragraph" xml-lang="en-US">For similar reasons you can choose to ignore two or more spaces in a
-        row using this option.</paragraph>
+		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2xhtml.oxt:OptionsIgnoreDoubleSpaces" visibility="hidden">Check this to treat several spaces as a single space in the export</ahelp></paragraph>
+        <section id="ignoredoublespaces">
+        	<paragraph role="heading" level="3" xml-lang="en-US">Ignore double spaces</paragraph>
+        	<paragraph role="paragraph" xml-lang="en-US">For similar reasons you can choose to ignore two or more spaces in a
+        	row using this option.</paragraph>
+        </section>
 
 		<section id="filesheading">
         	<paragraph role="heading" level="2" xml-lang="en-US">Files</paragraph>
@@ -149,33 +162,30 @@
    		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2latex.oxt:OptionsSplit" visibility="hidden">Check this to create a new document for each heading</ahelp></paragraph>
         <paragraph role="paragraph" xml-lang="en-US">To make a long Writer document easier to read in the browser, you can use
         this option to split the document in several small files.</paragraph>
-        <paragraph role="paragraph" xml-lang="en-US">For the XHTML export, Writer2xhtml will add a simple navigation panel that lets you
+        <paragraph role="paragraph" xml-lang="en-US">Writer2xhtml will add a simple navigation panel that lets you
         move between pages. The navigation links will be in the same language as the document (as defined
         under <emph>Tools – Options – Language Settings – Languages</emph>).</paragraph>
-        <paragraph role="paragraph" xml-lang="en-US">For the EPUB export it is highly recommended that you split at headings.
-        Some EPUB readers have a limitation on the size of the individual files in the document.
-        To avoid this, Writer2xhtml will always split your document to avoid very large files. This happens even if you have set the
-        heading level to 0 here.</paragraph>
         <paragraph role="paragraph" xml-lang="en-US">Note that this option has no effect for headings
         inside tables.</paragraph>
 
     	<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:OptionsSplitLevel" id="bm_options_splitlevel"/>
-        <paragraph role="heading" level="3" xml-lang="en-US">Heading level</paragraph>
-   		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2latex.oxt:OptionsSplitLevel" visibility="hidden">Select the heading level at which the spliting should occur</ahelp></paragraph>
-        <paragraph role="paragraph" xml-lang="en-US">If you have chosen to split the document at headings, you can use this option
-        to define at which level splitting should occur. For example 2 to split the document at all headings of level 1 or 2.</paragraph>
-
+   		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2xhtml.oxt:OptionsSplitLevel" visibility="hidden">Select the heading level at which the spliting should occur</ahelp></paragraph>
+   		<section id="splitlevel">
+        	<paragraph role="heading" level="3" xml-lang="en-US">Heading level</paragraph>
+        	<paragraph role="paragraph" xml-lang="en-US">If you have chosen to split the document at headings, you can use this option
+        	to define at which level splitting should occur. For example 2 to split the document at all headings of level 1 or 2.</paragraph>
+		</section>
+		
     	<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:OptionsRepeatLevels" id="bm_options_repeatlevels"/>
         <paragraph role="heading" level="3" xml-lang="en-US">Repeat heading levels</paragraph>
-   		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2latex.oxt:OptionsRepeatLevels" visibility="hidden">Select the number of heading levels to repeat at the top of new documents</ahelp></paragraph>
+   		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2xhtml.oxt:OptionsRepeatLevels" visibility="hidden">Select the number of heading levels to repeat at the top of new documents</ahelp></paragraph>
         <paragraph role="paragraph" xml-lang="en-US">To help the reader to identify the current position within the document,
         you can use this option to repeat the parent headings whenever the document is split. If you for example split at
         headings of level 3 and set this option to 2, the headings of level 1 and 2 will be repeated before the heading of level 3,
         providing precise information as to where in the document the section belongs.</paragraph>
-        <paragraph role="paragraph" xml-lang="en-US">For the EPUB export it is recommended to set this option to 0.</paragraph>
 
    		<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:OptionsSaveImagesInSubdir" id="bm_options_saveimagesinsubdir"/>
-		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2latex.oxt:OptionsSaveImagesInSubdir" visibility="hidden">Check this to save images in a subdirectory relative to the exported document</ahelp></paragraph>
+		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2xhtml.oxt:OptionsSaveImagesInSubdir" visibility="hidden">Check this to save images in a subdirectory relative to the exported document</ahelp></paragraph>
 		<section id="saveimagesinsubdir">
         	<paragraph role="heading" level="3" xml-lang="en-US">Save images in subdirectory</paragraph>
         	<paragraph role="paragraph" xml-lang="en-US">Writer2xhtml normally saves images associated with the document in the same
@@ -186,7 +196,7 @@
 
     	<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:OptionsXsltPath" id="bm_options_xsltpath"/>
         <paragraph role="heading" level="3" xml-lang="en-US">XSLT path</paragraph>
-   		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2latex.oxt:OptionsXsltPath" visibility="hidden">Enter the path to pmathml.xsl and pmathmlcss.xsl</ahelp></paragraph>
+   		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2xhtml.oxt:OptionsXsltPath" visibility="hidden">Enter the path to pmathml.xsl and pmathmlcss.xsl</ahelp></paragraph>
         <paragraph role="paragraph" xml-lang="en-US">If you choose the export filter
         <emph>XHTML 1.1 + MathML 2.0 (xsl)</emph>, two XSLT style sheets provided by the World Wide Web Consortium are required.
         If they are not available in the same directory as the exported document, you can give the path here.</paragraph>

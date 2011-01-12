@@ -13,7 +13,7 @@ Changelog for Writer2LaTeX version 1.0 -> 1.2
 [w2x] New options relative_font_size (default false) and font_scaling (default 100%) for EPUB export.
   If the former is true, relative font sizes are used, scaled by the percentage given by the latter
 
-[w2x] EPUB export now has its own export dialog
+[w2x] EPUB export now has its own export dialog and own help content
 
 [all] *API change: Added the method readResource to the Converter interface (only used by EPUB export currently)
 

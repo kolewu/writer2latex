@@ -2,9 +2,9 @@
 <tree_view version="17-apr-2010">
   <help_section application="writer2xhtml" id="w2x01" title="Writer2xhtml">
       <!--<topic id="writer2xhtml/org.openoffice.da.writer2xhtml.oxt/general.xhp">General information</topic>-->
-      <topic id="writer2xhtml/org.openoffice.da.writer2xhtml.oxt/export.xhp">XHTML and EPUB Export (Writer)</topic>
+      <topic id="writer2xhtml/org.openoffice.da.writer2xhtml.oxt/export.xhp">XHTML Export (Writer)</topic>
       <topic id="writer2xhtml/org.openoffice.da.writer2xhtml.oxt/export_calc.xhp">XHTML Export (Calc)</topic>
-      <topic id="writer2xhtml/org.openoffice.da.writer2xhtml.oxt/epub.xhp">EPUB meta data (Writer)</topic>
+      <topic id="writer2xhtml/org.openoffice.da.writer2xhtml.oxt/epub_export.xhp">EPUB Export (Writer)</topic>
       <node id="w2l0x_configuration" title="Custom style">
       	<topic id="writer2latex/org.openoffice.da.writer2xhtml.oxt/Configuration/Introduction.xhp">Introduction</topic>
       	<topic id="writer2latex/org.openoffice.da.writer2xhtml.oxt/Configuration/General.xhp">General</topic>
