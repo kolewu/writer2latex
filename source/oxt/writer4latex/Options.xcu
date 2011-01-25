@@ -87,19 +87,19 @@
         </node>
     </node>
     <node oor:name="BibliographyOptions">
+        <prop oor:name="UseExternalBibTeXFiles" oor:type="xs:boolean">
+            <value>false</value>
+        </prop>
         <prop oor:name="ConvertZoteroCitations" oor:type="xs:boolean">
             <value>false</value>
         </prop>
-        <prop oor:name="ZoteroBibTeXDir" oor:type="xs:string">
-            <value></value>
+        <prop oor:name="ConvertJabRefCitations" oor:type="xs:boolean">
+            <value>false</value>
         </prop>
         <prop oor:name="NatbibOptions" oor:type="xs:string">
             <value></value>
         </prop>
-        <prop oor:name="UseExternalBibTeXFiles" oor:type="xs:boolean">
-            <value>false</value>
-        </prop>
-        <prop oor:name="ExternalBibTeXDir" oor:type="xs:string">
+        <prop oor:name="BibTeXDir" oor:type="xs:string">
             <value></value>
         </prop>
     </node>

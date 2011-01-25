@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2009 by Henrik Just
+ *  Copyright: 2002-2010 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2009-11-29)
+ *  Version 1.2 (2011-01-25)
  *
  */ 
  
@@ -28,10 +28,12 @@ package org.openoffice.da.comp.writer4latex;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.sun.star.uno.XComponentContext;
        
-/** This class builds LaTeX documents into dvi, postscript or pdf and displays
+/** This class builds LaTeX documents into DVI, Postscript or PDF and displays
  *  the result.
  */
 public final class TeXify {
@@ -74,12 +76,13 @@ public final class TeXify {
 	
     /** Process a document
      *  @param file the LaTeX file to process
+     *  @param sBibinputs value for the BIBINPUTS environment variable (or null if it should not be extended)
      *  @param nBackend the desired backend format (generic, dvips, pdftex)
      *  @param bView set the true if the result should be displayed in the viewer
      *  @throws IOException if the document cannot be read
-     *  @return true if the first LaTeX run was succesful
+     *  @return true if the first LaTeX run was successful
      */
-    public boolean process(File file, short nBackend, boolean bView) throws IOException {
+    public boolean process(File file, String sBibinputs, short nBackend, boolean bView) throws IOException {
         // Remove extension from file
         if (file.getName().endsWith(".tex")) {
             file = new File(file.getParentFile(),
@@ -92,38 +95,38 @@ public final class TeXify {
         // Process LaTeX document
         boolean bResult = false;
         if (nBackend==GENERIC) {
-            bResult = doTeXify(genericTexify, file);
+            bResult = doTeXify(genericTexify, file, sBibinputs);
             if (!bResult) return false;
             if (externalApps.execute(ExternalApps.DVIVIEWER,
                 new File(file.getParentFile(),file.getName()+".dvi").getPath(),
-                file.getParentFile(), false)>0) {
+                file.getParentFile(), null, false)>0) {
                 throw new IOException("Error executing dvi viewer");
             }
         }
         else if (nBackend==PDFTEX) {
-        	bResult = doTeXify(pdfTexify, file);
+        	bResult = doTeXify(pdfTexify, file, sBibinputs);
             if (!bResult) return false;
             if (externalApps.execute(ExternalApps.PDFVIEWER,
                 new File(file.getParentFile(),file.getName()+".pdf").getPath(),
-                file.getParentFile(), false)>0) {
+                file.getParentFile(), null, false)>0) {
                 throw new IOException("Error executing pdf viewer");
             }
         }
         else if (nBackend==DVIPS) {
-        	bResult = doTeXify(dvipsTexify, file);
+        	bResult = doTeXify(dvipsTexify, file, sBibinputs);
             if (!bResult) return false;
             if (externalApps.execute(ExternalApps.POSTSCRIPTVIEWER,
                 new File(file.getParentFile(),file.getName()+".ps").getPath(),
-                file.getParentFile(), false)>0) {
+                file.getParentFile(), null, false)>0) {
                 throw new IOException("Error executing postscript viewer");
             }
         }
         else if (nBackend==XETEX) {
-        	bResult = doTeXify(xeTexify, file);
+        	bResult = doTeXify(xeTexify, file, sBibinputs);
             if (!bResult) return false;
             if (externalApps.execute(ExternalApps.PDFVIEWER,
                     new File(file.getParentFile(),file.getName()+".pdf").getPath(),
-                    file.getParentFile(), false)>0) {
+                    file.getParentFile(), null, false)>0) {
                     throw new IOException("Error executing pdf viewer");
                 }
         }
@@ -131,11 +134,16 @@ public final class TeXify {
 
     }
 	
-    private boolean doTeXify(String[] sAppList, File file) throws IOException {
+    private boolean doTeXify(String[] sAppList, File file, String sBibinputs) throws IOException {
         for (int i=0; i<sAppList.length; i++) {
             // Execute external application
+        	Map<String,String> env =null;
+        	if (ExternalApps.BIBTEX.equals(sAppList[i])) {
+        		env = new HashMap<String,String>();
+        		env.put("BIBINPUTS", sBibinputs);
+        	}
             int nReturnCode = externalApps.execute(
-                sAppList[i], file.getName(), file.getParentFile(), true);
+                sAppList[i], file.getName(), file.getParentFile(), env, true);
             System.out.println("Return code from "+sAppList[i]+": "+nReturnCode);
             if (i==0 && nReturnCode>0) {
             	return false;

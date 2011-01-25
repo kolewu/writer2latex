@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2010 by Henrik Just
+ *  Copyright: 2002-2011 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-10-04) 
+ *  Version 1.2 (2011-01-24) 
  *
  */
 
@@ -78,8 +78,8 @@ public class Context {
     // within a caption
     private boolean bInCaption = false;
     
-    // within a Zotero citation
-    private boolean bInZoteroText = false;
+    // within a Zotero/JabRef citation
+    private boolean bInZoteroJabRefText = false;
 	
     // within a floating figure (figure environment)
     private boolean bInFigureFloat = false;
@@ -194,9 +194,9 @@ public class Context {
 	
     public boolean isInCaption() { return bInCaption; }
     
-    public void setInZoteroText(boolean bInZoteroText) { this.bInZoteroText = bInZoteroText; }
+    public void setInZoteroJabRefText(boolean bInZoteroJabRefText) { this.bInZoteroJabRefText = bInZoteroJabRefText; }
     
-    public boolean isInZoteroText() { return bInZoteroText; }
+    public boolean isInZoteroJabRefText() { return bInZoteroJabRefText; }
 
     public void setInFigureFloat(boolean bInFigureFloat) { this.bInFigureFloat = bInFigureFloat; }
 	
@@ -309,6 +309,7 @@ public class Context {
         newContext.setInContinuedList(bInContinuedList);
         newContext.setInSection(bInSection);
         newContext.setInCaption(bInCaption);
+        newContext.setInZoteroJabRefText(bInZoteroJabRefText);
         newContext.setInFigureFloat(bInFigureFloat);
         newContext.setInTableFloat(bInTableFloat);
         newContext.setInFrame(bInFrame);

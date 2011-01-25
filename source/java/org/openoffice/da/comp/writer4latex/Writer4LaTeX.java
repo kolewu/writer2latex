@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2010 by Henrik Just
+ *  Copyright: 2002-2011 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-10-13)
+ *  Version 1.2 (2011-01-25)
  *
  */ 
  
@@ -44,6 +44,7 @@ import com.sun.star.task.XStatusIndicator;
 import com.sun.star.task.XStatusIndicatorFactory;
 import com.sun.star.ui.dialogs.ExecutableDialogResults;
 import com.sun.star.ui.dialogs.XExecutableDialog;
+import com.sun.star.uno.AnyConverter;
 import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
 
@@ -54,6 +55,7 @@ import org.openoffice.da.comp.w2lcommon.helper.RegistryHelper;
 import org.openoffice.da.comp.w2lcommon.helper.XPropertySetHelper;
 
 import writer2latex.util.CSVList;
+import writer2latex.util.Misc;
        
 /** This class implements the ui (dispatch) commands provided by Writer4LaTeX.
  *  The actual processing is done by the three core classes <code>TeXify</code>,
@@ -202,6 +204,8 @@ public final class Writer4LaTeX extends WeakBase
         
         // First work a bit on the FilterData (get the backend and set bibliography options)
         String sBackend = "generic";
+        String sBibinputs = null;
+
         PropertyHelper mediaHelper = new PropertyHelper(mediaProps);
         Object filterData = mediaHelper.get("FilterData");
         if (filterData instanceof PropertyValue[]) {
@@ -217,14 +221,24 @@ public final class Writer4LaTeX extends WeakBase
         	try {
         		Object view = registry.getRegistryView(BibliographyDialog.REGISTRY_PATH, false);
         		XPropertySet xProps = (XPropertySet) UnoRuntime.queryInterface(XPropertySet.class,view);
+        		String sBibTeXFiles = getFileList(XPropertySetHelper.getPropertyValueAsString(xProps, "BibTeXDir"));
         		if (XPropertySetHelper.getPropertyValueAsBoolean(xProps, "ConvertZoteroCitations")) {
-        			filterHelper.put("zotero_bibtex_files", getFileList(XPropertySetHelper.getPropertyValueAsString(xProps, "ZoteroBibTeXDir")));
+        			filterHelper.put("zotero_bibtex_files", sBibTeXFiles);
+        			filterHelper.put("natbib_options", XPropertySetHelper.getPropertyValueAsString(xProps, "NatbibOptions"));
+        		}
+        		if (XPropertySetHelper.getPropertyValueAsBoolean(xProps, "ConvertJabRefCitations")) {
+        			filterHelper.put("jabref_bibtex_files", sBibTeXFiles);
         			filterHelper.put("natbib_options", XPropertySetHelper.getPropertyValueAsString(xProps, "NatbibOptions"));
         		}
         		if (XPropertySetHelper.getPropertyValueAsBoolean(xProps, "UseExternalBibTeXFiles")) {
-        			filterHelper.put("external_bibtex_files", getFileList(XPropertySetHelper.getPropertyValueAsString(xProps, "ExternalBibTeXDir")));
+        			filterHelper.put("external_bibtex_files", sBibTeXFiles);
         		}
-                mediaHelper.put("FilterData",filterHelper.toArray());
+        		String sBibTeXDir = XPropertySetHelper.getPropertyValueAsString(xProps, "BibTeXDir");
+        		if (sBibTeXDir.length()>0) {
+        			sBibinputs = sBibTeXDir+":";
+        		}
+
+        		mediaHelper.put("FilterData",filterHelper.toArray());
                 mediaProps = mediaHelper.toArray();
             	registry.disposeRegistryView(view);
         	}
@@ -255,16 +269,16 @@ public final class Writer4LaTeX extends WeakBase
 		
         try {
             if (sBackend=="pdftex") {
-                bResult = texify.process(file, TeXify.PDFTEX, true);
+                bResult = texify.process(file, sBibinputs, TeXify.PDFTEX, true);
             }
             else if (sBackend=="dvips") {
-            	bResult = texify.process(file, TeXify.DVIPS, true);
+            	bResult = texify.process(file, sBibinputs, TeXify.DVIPS, true);
             }
             else if (sBackend=="xetex") {
-            	bResult = texify.process(file, TeXify.XETEX, true);
+            	bResult = texify.process(file, sBibinputs, TeXify.XETEX, true);
             }
             else if (sBackend=="generic") {
-            	bResult = texify.process(file, TeXify.GENERIC, true);
+            	bResult = texify.process(file, sBibinputs, TeXify.GENERIC, true);
             }
         }
         catch (IOException e) {
@@ -289,11 +303,13 @@ public final class Writer4LaTeX extends WeakBase
     		File[] files = dir.listFiles();
     		for (File file : files) {
     			if (file.isFile() && file.getName().endsWith(".bib")) {
-    				filelist.addValue(file.getAbsolutePath());
+    				//filelist.addValue(file.getAbsolutePath());
+    				filelist.addValue(Misc.removeExtension(file.getName()));
     			}
     		}
     	}
-    	return filelist.toString();	
+    	String sFileList = filelist.toString();
+    	return sFileList.length()>0 ? sFileList : "dummy";
 	}
 
 	private void viewLog() {

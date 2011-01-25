@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2010 by Henrik Just
+ *  Copyright: 2002-2011 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-01-12)
+ *  Version 1.2 (2011-01-25)
  *
  */
  
@@ -32,8 +32,8 @@ package writer2latex.api;
 public class ConverterFactory {
 
     // Version information
-    private static final String VERSION = "1.1.9";
-    private static final String DATE = "2011-01-12";
+    private static final String VERSION = "1.1.6";
+    private static final String DATE = "2011-01-25";
 	
     /** Return the Writer2LaTeX version in the form
      *  (major version).(minor version).(patch level)<br/>

@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2010 by Henrik Just
+ *  Copyright: 2002-2011 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-12-15)
+ *  Version 1.2 (2011-01-23)
  *
  */
 
@@ -48,7 +48,7 @@ public class LaTeXConfig extends writer2latex.base.ConfigBase {
 	/////////////////////////////////////////////////////////////////////////
 	// I. Define items needed by ConfigBase
 	
-    protected int getOptionCount() { return 67; }
+    protected int getOptionCount() { return 68; }
     protected String getDefaultConfigPath() { return "/writer2latex/latex/config/"; } 
     
 	/////////////////////////////////////////////////////////////////////////
@@ -145,38 +145,39 @@ public class LaTeXConfig extends writer2latex.base.ConfigBase {
     private static final int BIBTEX_STYLE = 32;
     private static final int EXTERNAL_BIBTEX_FILES = 33;
     private static final int ZOTERO_BIBTEX_FILES = 34;
-    private static final int NATBIB_OPTIONS = 35;
-    private static final int FORMATTING = 36;
-    private static final int PAGE_FORMATTING = 37;
-    private static final int OTHER_STYLES = 38;
-    private static final int IMAGE_CONTENT = 39;
-	private static final int TABLE_CONTENT = 40;
-	private static final int TABLE_FIRST_HEAD_STYLE = 41;
-	private static final int TABLE_HEAD_STYLE = 42;
-	private static final int TABLE_FOOT_STYLE = 43;
-	private static final int TABLE_LAST_FOOT_STYLE = 44;
-    private static final int IGNORE_HARD_PAGE_BREAKS = 45;
-    private static final int IGNORE_HARD_LINE_BREAKS = 46;
-    private static final int IGNORE_EMPTY_PARAGRAPHS = 47;
-    private static final int IGNORE_DOUBLE_SPACES = 48;
-    private static final int ALIGN_FRAMES = 49;
-    private static final int FLOAT_FIGURES = 50; 
-    private static final int FLOAT_TABLES = 51; 
-    private static final int FLOAT_OPTIONS = 52;
-    private static final int FIGURE_SEQUENCE_NAME = 53; 
-    private static final int TABLE_SEQUENCE_NAME = 54; 
-    private static final int IMAGE_OPTIONS = 55;
-    private static final int REMOVE_GRAPHICS_EXTENSION = 56;
-    private static final int ORIGINAL_IMAGE_SIZE = 57;
-    private static final int SIMPLE_TABLE_LIMIT = 58;
-    private static final int NOTES = 59;
-    private static final int METADATA = 60;
-    private static final int TABSTOP = 61;
-    private static final int WRAP_LINES_AFTER = 62;
-    private static final int SPLIT_LINKED_SECTIONS = 63;
-    private static final int SPLIT_TOPLEVEL_SECTIONS = 64;
-    private static final int SAVE_IMAGES_IN_SUBDIR = 65;
-    private static final int DEBUG = 66;
+    private static final int JABREF_BIBTEX_FILES = 35;
+    private static final int NATBIB_OPTIONS = 36;
+    private static final int FORMATTING = 37;
+    private static final int PAGE_FORMATTING = 38;
+    private static final int OTHER_STYLES = 39;
+    private static final int IMAGE_CONTENT = 40;
+	private static final int TABLE_CONTENT = 41;
+	private static final int TABLE_FIRST_HEAD_STYLE = 42;
+	private static final int TABLE_HEAD_STYLE = 43;
+	private static final int TABLE_FOOT_STYLE = 44;
+	private static final int TABLE_LAST_FOOT_STYLE = 45;
+    private static final int IGNORE_HARD_PAGE_BREAKS = 46;
+    private static final int IGNORE_HARD_LINE_BREAKS = 47;
+    private static final int IGNORE_EMPTY_PARAGRAPHS = 48;
+    private static final int IGNORE_DOUBLE_SPACES = 49;
+    private static final int ALIGN_FRAMES = 50;
+    private static final int FLOAT_FIGURES = 51; 
+    private static final int FLOAT_TABLES = 52; 
+    private static final int FLOAT_OPTIONS = 53;
+    private static final int FIGURE_SEQUENCE_NAME = 54; 
+    private static final int TABLE_SEQUENCE_NAME = 55; 
+    private static final int IMAGE_OPTIONS = 56;
+    private static final int REMOVE_GRAPHICS_EXTENSION = 57;
+    private static final int ORIGINAL_IMAGE_SIZE = 58;
+    private static final int SIMPLE_TABLE_LIMIT = 59;
+    private static final int NOTES = 60;
+    private static final int METADATA = 61;
+    private static final int TABSTOP = 62;
+    private static final int WRAP_LINES_AFTER = 63;
+    private static final int SPLIT_LINKED_SECTIONS = 64;
+    private static final int SPLIT_TOPLEVEL_SECTIONS = 65;
+    private static final int SAVE_IMAGES_IN_SUBDIR = 66;
+    private static final int DEBUG = 67;
     
 	/////////////////////////////////////////////////////////////////////////
     // IV. Our options data
@@ -250,6 +251,7 @@ public class LaTeXConfig extends writer2latex.base.ConfigBase {
         options[BIBTEX_STYLE] = new Option("bibtex_style","plain");
         options[EXTERNAL_BIBTEX_FILES] = new Option("external_bibtex_files","");
         options[ZOTERO_BIBTEX_FILES] = new Option("zotero_bibtex_files","");
+        options[JABREF_BIBTEX_FILES] = new Option("jabref_bibtex_files","");
         options[NATBIB_OPTIONS] = new Option("natbib_options","");
         options[FORMATTING] = new IntegerOption("formatting","convert_basic") {
             public void setString(String sValue) {
@@ -661,6 +663,7 @@ public class LaTeXConfig extends writer2latex.base.ConfigBase {
     public String bibtexStyle() { return options[BIBTEX_STYLE].getString(); }
     public String externalBibtexFiles() { return options[EXTERNAL_BIBTEX_FILES].getString(); }
     public String zoteroBibtexFiles() { return options[ZOTERO_BIBTEX_FILES].getString(); }
+    public String jabrefBibtexFiles() { return options[JABREF_BIBTEX_FILES].getString(); }
     public String getNatbibOptions() { return options[NATBIB_OPTIONS].getString(); }
 	
     // Formatting options

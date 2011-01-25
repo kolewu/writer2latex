@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2010 by Henrik Just
+ *  Copyright: 2002-2011 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-04-12)
+ *  Version 1.2 (2011-01-15)
  *
  */ 
  
@@ -54,6 +54,7 @@ import writer2latex.api.Converter;
  *  All errors are silently ignored
  */
 public class FilterDataParser {
+	// TODO: Use JSON format
     
     //private static XComponentContext xComponentContext = null;
     
@@ -108,7 +109,7 @@ public class FilterDataParser {
         
         PropertyHelper props = new PropertyHelper(filterData);
         
-        // Get the special properties TemplateURL, StyleSheetURL, ConfigURL and AutoCreate
+        // Get the special properties TemplateURL, StyleSheetURL, Resources, ConfigURL and AutoCreate
         Object tpl = props.get("TemplateURL");
         String sTemplate = null;
         if (tpl!=null && AnyConverter.isString(tpl)) {
@@ -125,6 +126,18 @@ public class FilterDataParser {
         if (styles!=null && AnyConverter.isString(styles)) {
             try {
                 sStyleSheet = substituteVariables(AnyConverter.toString(styles));
+            }
+            catch (com.sun.star.lang.IllegalArgumentException e) {
+                // Failed to convert to String; should not happen - ignore   
+            }
+        }
+
+        // This property accepts a semicolon separated list of <mime type>!<file name>!<URL> (not very elegant)
+        Object resources = props.get("Resources");
+        String[] sResources = null;
+        if (resources!=null && AnyConverter.isString(resources)) {
+            try {
+                sResources = substituteVariables(AnyConverter.toString(resources)).split(";");
             }
             catch (com.sun.star.lang.IllegalArgumentException e) {
                 // Failed to convert to String; should not happen - ignore   
@@ -204,7 +217,38 @@ public class FilterDataParser {
                 // ignore
             }
         }
-
+        
+        // Load the resources from the specified URLs, if any
+        if (sfa2!=null && sResources!=null) {
+        	for (String sResource : sResources) {
+        		try {
+        			String[] sParts = sResource.split("!");
+        			if (sParts.length==3) {
+        				// Format is <mime type>!<file name>!<URL>
+        				XInputStream xIs = sfa2.openFileRead(sParts[2]);
+        				if (xIs!=null) {
+        					InputStream is = new XInputStreamToInputStreamAdapter(xIs);
+        					converter.readResource(is, sParts[1], sParts[0]);
+        					is.close();
+        					xIs.closeInput();
+        				}
+        			} // otherwise wrong format, ignore
+        		}
+        		catch (IOException e) {
+        			// ignore
+        		}
+        		catch (NotConnectedException e) {
+        			// ignore
+        		}
+        		catch (CommandAbortedException e) {
+        			// ignore
+        		}
+        		catch (com.sun.star.uno.Exception e) {
+        			// ignore
+        		}
+        	}
+        }
+        
         // Create config if required
         try {
             if (bAutoCreate && sfa2!=null && sConfig!=null && !sConfig.startsWith("*") && !sfa2.exists(sConfig)) {
@@ -271,7 +315,8 @@ public class FilterDataParser {
         Enumeration<String> keys = props.keys();
         while (keys.hasMoreElements()) {
             String sKey = keys.nextElement();
-            if (!"ConfigURL".equals(sKey) && !"TemplateURL".equals(sKey) && !"StyleSheetURL".equals(sKey) && !"AutoCreate".equals(sKey)) {
+            if (!"ConfigURL".equals(sKey) && !"TemplateURL".equals(sKey) && !"StyleSheetURL".equals(sKey)
+            		&& !"Resources".equals(sKey) && !"AutoCreate".equals(sKey)) {
                 Object value = props.get(sKey);
                 if (AnyConverter.isString(value)) {
                     try {

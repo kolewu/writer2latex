@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2010 by Henrik Just
+ *  Copyright: 2002-2011 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-10-13)
+ *  Version 1.2 (2011-01-24)
  *
  */
 
@@ -58,6 +58,9 @@ public class FieldConverter extends ConverterHelper {
 	
 	// Identify Zotero items
 	private static final String ZOTERO_ITEM = "ZOTERO_ITEM";
+	// Identify JabRef items
+	private static final String JABREF_ITEM_1 = "JR_cite_1";	
+	private static final String JABREF_ITEM_2 = "JR_cite_2";	
 	
     // Links & references
     private ExportNameCollection targets = new ExportNameCollection(true);
@@ -79,6 +82,7 @@ public class FieldConverter extends ConverterHelper {
     private boolean bUsesTitleref = false;
     private boolean bUsesOooref = false;
     private boolean bConvertZotero = false;
+    private boolean bConvertJabRef = false;
     private boolean bNeedNatbib = false;
 	
     public FieldConverter(OfficeReader ofr, LaTeXConfig config, ConverterPalette palette) {
@@ -86,6 +90,7 @@ public class FieldConverter extends ConverterHelper {
         // hyperref.sty is not compatible with titleref.sty and oooref.sty:
         bUseHyperref = config.useHyperref() && !config.useTitleref() && !config.useOooref();
         bConvertZotero = config.useBibtex() && config.zoteroBibtexFiles().length()>0;
+        bConvertJabRef = config.useBibtex() && config.jabrefBibtexFiles().length()>0;
     }
 	
     /** <p>Append declarations needed by the <code>FieldConverter</code> to
@@ -598,13 +603,34 @@ public class FieldConverter extends ConverterHelper {
     					ldp.append("}");
     				}
     				
-    				oc.setInZoteroText(true);
+    				oc.setInZoteroJabRefText(true);
     				
     				bNeedNatbib = true;
 
     				return true;
     			}
     		}
+    	}
+    	return false;
+    }
+    
+    // Try to handle this reference name as a JabRef reference, return true on success
+    private boolean handleJabRefReferenceName(String sName, LaTeXDocumentPortion ldp, Context oc) {
+    	// First parse the reference name:
+    	// A JabRef reference name has the form JR_cite_n_identifiers where
+    	//   n=1 for (Author date) and n=2 for Author (date) citations
+    	//   identifiers is a comma separated list of BibTeX keys
+    	if (sName.startsWith(JABREF_ITEM_1)) {
+    		ldp.append("\\citep{").append(sName.substring(JABREF_ITEM_1.length()+1)).append("}");
+			oc.setInZoteroJabRefText(true);			
+			bNeedNatbib = true;
+    		return true;
+    	}
+    	else if (sName.startsWith(JABREF_ITEM_2)) {
+    		ldp.append("\\citet{").append(sName.substring(JABREF_ITEM_2.length()+1)).append("}");
+			oc.setInZoteroJabRefText(true);			
+			bNeedNatbib = true;
+    		return true;
     	}
     	return false;
     }
@@ -627,8 +653,8 @@ public class FieldConverter extends ConverterHelper {
      * @param oc the current context
      */
     public void handleReferenceMarkEnd(Element node, LaTeXDocumentPortion ldp, Context oc) {
-    	// Nothing to do, except to mark that this ends any Zotero citation
-    	oc.setInZoteroText(false);
+    	// Nothing to do, except to mark that this ends any Zotero/JabRef citation
+    	oc.setInZoteroJabRefText(false);
     }
 
     /** <p>Process a reference mark (text:reference-mark or text:reference-mark-start tag)</p>
@@ -640,8 +666,9 @@ public class FieldConverter extends ConverterHelper {
     public void handleReferenceMark(Element node, LaTeXDocumentPortion ldp, Context oc) {
         if (!oc.isInSection() && !oc.isInCaption() && !oc.isVerbatim()) {
             String sName = node.getAttribute(XMLString.TEXT_NAME);
-            // Zotero (mis)uses reference marks to store citations, so check this first
-            if (sName!=null && (!bConvertZotero || !handleZoteroReferenceName(sName, ldp, oc))) {
+            // Zotero and JabRef (mis)uses reference marks to store citations, so check this first
+            if (sName!=null && (!bConvertZotero || !handleZoteroReferenceName(sName, ldp, oc))
+            				&& (!bConvertJabRef || !handleJabRefReferenceName(sName, ldp, oc))) {
             	// Plain reference mark
             	// Note: Always include \label here, even when it's not used
             	ldp.append("\\label{ref:"+refnames.getExportName(shortenRefname(sName))+"}");

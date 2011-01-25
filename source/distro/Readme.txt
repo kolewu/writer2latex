@@ -1,7 +1,7 @@
-Writer2LaTeX version 1.1.9 (beta test release)
-==============================================
+Writer2LaTeX version 1.1.6 (alpha test release)
+===============================================
 
-This is the distribution of Writer2LaTeX version 1.1.9
+This is the distribution of Writer2LaTeX version 1.1.6
 
 Latest version can be found at the web site
   http://writer2latex.sourceforge.net

@@ -402,6 +402,7 @@ public abstract class OptionsDialogBase extends DialogBase implements
                 filterData.put("ConfigURL",expander.expandMacros(XPropertySetHelper.getPropertyValueAsString(xCfgProps,"ConfigURL")));
                 filterData.put("TemplateURL",expander.expandMacros(XPropertySetHelper.getPropertyValueAsString(xCfgProps,"TargetTemplateURL")));
                 filterData.put("StyleSheetURL",expander.expandMacros(XPropertySetHelper.getPropertyValueAsString(xCfgProps,"StyleSheetURL")));
+                // TODO: Resources...
                 XPropertySetHelper.setPropertyValue(xProps,"ConfigName",sConfigNames[i]);
                 bFound = true;
             }

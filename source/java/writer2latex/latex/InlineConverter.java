@@ -195,11 +195,11 @@ public class InlineConverter extends ConverterHelper {
                 case Node.TEXT_NODE:
                     String s = childNode.getNodeValue();
                     if (s.length() > 0) {
-                    	if (oc.isInZoteroText()) { // Comment out Zotero citations
+                    	if (oc.isInZoteroJabRefText()) { // Comment out Zotero citations
                     		ldp.append("%");
                     	}
                         ldp.append(palette.getI18n().convert(s, false, oc.getLang()));
-                        if (oc.isInZoteroText()) { // End comment out
+                        if (oc.isInZoteroJabRefText()) { // End comment out
                         	ldp.nl();
                         }
                     }

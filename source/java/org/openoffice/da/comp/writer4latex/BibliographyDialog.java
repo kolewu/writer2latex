@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2010 by Henrik Just
+ *  Copyright: 2002-2011 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-10-10)
+ *  Version 1.2 (2011-01-24)
  *
  */ 
  
@@ -85,17 +85,17 @@ public final class BibliographyDialog
             if (sMethod.equals("external_event") ){
                 return handleExternalEvent(dlg, event);
             }
+            else if (sMethod.equals("BibTeXDirClick")) {
+                return bibTeXDirClick(dlg);
+            }
             else if (sMethod.equals("ConvertZoteroCitationsChange")) {
                 return convertZoteroCitationsChange(dlg);
             }
-            else if (sMethod.equals("ZoteroBibTeXDirClick")) {
-                return zoteroBibTeXDirClick(dlg);
+            else if (sMethod.equals("ConvertJabRefCitationsChange")) {
+                return convertJabRefCitationsChange(dlg);
             }
             else if (sMethod.equals("UseExternalBibTeXFilesChange")) {
                 return useExternalBibTeXFilesChange(dlg);
-            }
-            else if (sMethod.equals("ExternalBibTeXDirClick")) {
-                return externalBibTeXDirClick(dlg);
             }
         }
         catch (com.sun.star.uno.RuntimeException e) {
@@ -108,7 +108,8 @@ public final class BibliographyDialog
     }
 	
 	public String[] getSupportedMethodNames() {
-        String[] sNames = { "external_event", "ConvertZoteroCitationsChange", "ZoteroBibTeXDirClick", "UseExternalBibTeXFilesChange", "ExternalBibTeXDirClick" };
+        String[] sNames = { "external_event", "UseExternalBibTeXFilesChange", "ConvertZoteroCitationsChange",
+        		"ConvertJabRefCitationsChange", "ExternalBibTeXDirClick" };
         return sNames;
     }
     
@@ -153,16 +154,16 @@ public final class BibliographyDialog
     	try {
     		Object view = registry.getRegistryView(REGISTRY_PATH, false);
     		XPropertySet xProps = (XPropertySet) UnoRuntime.queryInterface(XPropertySet.class,view);
-    		dlg.setCheckBoxStateAsBoolean("ConvertZoteroCitations",
-    				XPropertySetHelper.getPropertyValueAsBoolean(xProps, "ConvertZoteroCitations"));
-        	dlg.setTextFieldText("ZoteroBibTeXDir",
-        			XPropertySetHelper.getPropertyValueAsString(xProps, "ZoteroBibTeXDir"));
-        	dlg.setTextFieldText("NatbibOptions",
-        			XPropertySetHelper.getPropertyValueAsString(xProps, "NatbibOptions"));
     		dlg.setCheckBoxStateAsBoolean("UseExternalBibTeXFiles",
     				XPropertySetHelper.getPropertyValueAsBoolean(xProps, "UseExternalBibTeXFiles"));
-        	dlg.setTextFieldText("ExternalBibTeXDir",
-        			XPropertySetHelper.getPropertyValueAsString(xProps, "ExternalBibTeXDir"));
+    		dlg.setCheckBoxStateAsBoolean("ConvertZoteroCitations",
+    				XPropertySetHelper.getPropertyValueAsBoolean(xProps, "ConvertZoteroCitations"));
+    		dlg.setCheckBoxStateAsBoolean("ConvertJabRefCitations",
+    				XPropertySetHelper.getPropertyValueAsBoolean(xProps, "ConvertJabRefCitations"));
+        	dlg.setTextFieldText("NatbibOptions",
+        			XPropertySetHelper.getPropertyValueAsString(xProps, "NatbibOptions"));
+        	dlg.setTextFieldText("BibTeXDir",
+        			XPropertySetHelper.getPropertyValueAsString(xProps, "BibTeXDir"));
         	registry.disposeRegistryView(view);
     	}
     	catch (Exception e) {
@@ -180,11 +181,11 @@ public final class BibliographyDialog
     	try {
     		Object view = registry.getRegistryView(REGISTRY_PATH, true);
     		XPropertySet xProps = (XPropertySet) UnoRuntime.queryInterface(XPropertySet.class,view);
-    		XPropertySetHelper.setPropertyValue(xProps, "ConvertZoteroCitations", dlg.getCheckBoxStateAsBoolean("ConvertZoteroCitations"));
-   			XPropertySetHelper.setPropertyValue(xProps, "ZoteroBibTeXDir", dlg.getTextFieldText("ZoteroBibTeXDir"));
-   			XPropertySetHelper.setPropertyValue(xProps, "NatbibOptions", dlg.getTextFieldText("NatbibOptions"));
 			XPropertySetHelper.setPropertyValue(xProps, "UseExternalBibTeXFiles", dlg.getCheckBoxStateAsBoolean("UseExternalBibTeXFiles"));
-   			XPropertySetHelper.setPropertyValue(xProps, "ExternalBibTeXDir", dlg.getTextFieldText("ExternalBibTeXDir"));
+    		XPropertySetHelper.setPropertyValue(xProps, "ConvertZoteroCitations", dlg.getCheckBoxStateAsBoolean("ConvertZoteroCitations"));
+    		XPropertySetHelper.setPropertyValue(xProps, "ConvertJabRefCitations", dlg.getCheckBoxStateAsBoolean("ConvertJabRefCitations"));
+   			XPropertySetHelper.setPropertyValue(xProps, "NatbibOptions", dlg.getTextFieldText("NatbibOptions"));
+   			XPropertySetHelper.setPropertyValue(xProps, "BibTeXDir", dlg.getTextFieldText("BibTeXDir"));
    			
             // Commit registry changes
             XChangesBatch  xUpdateContext = (XChangesBatch)
@@ -203,45 +204,44 @@ public final class BibliographyDialog
     	}		
 	}
 
-	private boolean convertZoteroCitationsChange(DialogAccess dlg) {
-		// Update dialog according to the current setting of the checkbox
-		boolean bConvert = dlg.getCheckBoxStateAsBoolean("ConvertZoteroCitations");
-		dlg.setControlEnabled("ZoteroBibTeXDirLabel", bConvert);
-		dlg.setControlEnabled("ZoteroBibTeXDir", bConvert);
-		dlg.setControlEnabled("ZoteroBibTeXDirButton", bConvert);
-		dlg.setControlEnabled("NatbibOptionsLabel", bConvert);
-		dlg.setControlEnabled("NatbibOptions", bConvert);
-		return true;
-	}
-
-	private boolean zoteroBibTeXDirClick(DialogAccess dlg) {
-		String sPath = folderPicker.getPath();
-    	if (sPath!=null) {
-    		try {
-    			dlg.setTextFieldText("ZoteroBibTeXDir", new File(new URI(sPath)).getCanonicalPath());
-			}
-    		catch (IOException e) {
-			}
-    		catch (URISyntaxException e) {
-			}
-    	}     
-		return true;
-	}
-
 	private boolean useExternalBibTeXFilesChange(DialogAccess dlg) {
-		// Update dialog according to the current setting of the checkbox
-		boolean bExternal = dlg.getCheckBoxStateAsBoolean("UseExternalBibTeXFiles");
-		dlg.setControlEnabled("ExternalBibTeXDirLabel", bExternal);
-		dlg.setControlEnabled("ExternalBibTeXDir", bExternal);
-		dlg.setControlEnabled("ExternalBibTeXDirButton", bExternal);
+		enableBibTeXDir(dlg);
 		return true;
 	}
 
-	private boolean externalBibTeXDirClick(DialogAccess dlg) {
+	private boolean convertZoteroCitationsChange(DialogAccess dlg) {
+		enableNatbibOptions(dlg);
+		enableBibTeXDir(dlg);
+		return true;
+	}
+
+	private boolean convertJabRefCitationsChange(DialogAccess dlg) {
+		enableNatbibOptions(dlg);
+		enableBibTeXDir(dlg);
+		return true;
+	}
+	
+	private void enableNatbibOptions(DialogAccess dlg) {
+		boolean bConvertZotero = dlg.getCheckBoxStateAsBoolean("ConvertZoteroCitations");
+		boolean bConvertJabRef = dlg.getCheckBoxStateAsBoolean("ConvertJabRefCitations");
+		dlg.setControlEnabled("NatbibOptionsLabel", bConvertZotero || bConvertJabRef);
+		dlg.setControlEnabled("NatbibOptions", bConvertZotero || bConvertJabRef);
+	}
+	
+	private void enableBibTeXDir(DialogAccess dlg) {
+		boolean bExternal = dlg.getCheckBoxStateAsBoolean("UseExternalBibTeXFiles");
+		boolean bConvertZotero = dlg.getCheckBoxStateAsBoolean("ConvertZoteroCitations");
+		boolean bConvertJabRef = dlg.getCheckBoxStateAsBoolean("ConvertJabRefCitations");
+		dlg.setControlEnabled("BibTeXDirLabel", bExternal || bConvertZotero || bConvertJabRef);
+		dlg.setControlEnabled("BibTeXDir", bExternal || bConvertZotero || bConvertJabRef);
+		dlg.setControlEnabled("BibTeXDirButton", bExternal|| bConvertZotero || bConvertJabRef);
+	}
+
+	private boolean bibTeXDirClick(DialogAccess dlg) {
 		String sPath = folderPicker.getPath();
     	if (sPath!=null) {
     		try {
-    			dlg.setTextFieldText("ExternalBibTeXDir", new File(new URI(sPath)).getCanonicalPath());
+    			dlg.setTextFieldText("BibTeXDir", new File(new URI(sPath)).getCanonicalPath());
 			}
     		catch (IOException e) {
 			}

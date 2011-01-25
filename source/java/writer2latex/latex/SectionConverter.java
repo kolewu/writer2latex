@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2010 by Henrik Just
+ *  Copyright: 2002-2011 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-10-06)
+ *  Version 1.2 (2011-01-24)
  *
  */
 
@@ -121,6 +121,20 @@ public class SectionConverter extends ConverterHelper {
     		return false;
     	}
     }
+    
+    // Handle a section as a JabRef bibliography
+    private boolean handleJabRefBibliography(Element node, LaTeXDocumentPortion ldp, Context oc) {
+    	String sName = node.getAttribute(XMLString.TEXT_NAME);
+    	if (config.useBibtex() && config.jabrefBibtexFiles().length()>0	&& sName.equals("JR_bib")) {
+    		// This section is a JabRef bibliography, and the user wishes to handle it as such
+        	// A JabRef bibliography is identified by the name JR_bib
+			// Use the BibTeX style and files given in the configuration
+			ldp.append("\\bibliographystyle{").append(config.bibtexStyle()).append("}").nl()
+			   .append("\\bibliography{").append(config.jabrefBibtexFiles()).append("}").nl();
+			return true;
+    	}
+    	return false;
+    }
 	
     /** <p> Process a section (text:section tag)</p>
      * @param node The element containing the section
@@ -167,8 +181,8 @@ public class SectionConverter extends ConverterHelper {
         if (sFileName!=null) {
             ldp.append("\\input{").append(sFileName).append("}").nl();
         }
-        // Zotero might have generated this section as a bibliograhy:
-        if (!handleZoteroBibliography(node,sectionLdp,ic)) {
+        // Zotero or JabRef might have generated this section as a bibliograhy:
+        if (!handleZoteroBibliography(node,sectionLdp,ic) && !handleJabRefBibliography(node,sectionLdp,ic)) {
         	palette.getBlockCv().traverseBlockText(node,sectionLdp,ic);
         }
         if (sectionLdp!=ldp) { sectionLdp.append("\\endinput").nl(); }

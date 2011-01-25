@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2010 by Henrik Just
+ *  Copyright: 2002-2011 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-10-11)
+ *  Version 1.2 (2011-01-25)
  *
  */ 
  
@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.lang.Process;
 import java.lang.ProcessBuilder;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
 
 import org.openoffice.da.comp.w2lcommon.helper.RegistryHelper;
@@ -99,11 +100,12 @@ public class ExternalApps {
      *  @param sAppName the name of the application to execute
      *  @param sFileName the file name to use
      *  @param workDir the working directory to use
+     *  @param env map of environment variables to set (or null if no variables needs to be set)
      *  @param bWaitFor true if the method should wait for the execution to finish
      *  @return error code 
      */
-    public int execute(String sAppName, String sFileName, File workDir, boolean bWaitFor) {
-    	return execute(sAppName, "", sFileName, workDir, bWaitFor);
+    public int execute(String sAppName, String sFileName, File workDir, Map<String,String> env, boolean bWaitFor) {
+    	return execute(sAppName, "", sFileName, workDir, env, bWaitFor);
     }
 	
     /** Execute an external application
@@ -111,10 +113,11 @@ public class ExternalApps {
      *  @param sCommand subcommand/option to pass to the command
      *  @param sFileName the file name to use
      *  @param workDir the working directory to use
+     *  @param env map of environment variables to set (or null if no variables needs to be set)
      *  @param bWaitFor true if the method should wait for the execution to finish
      *  @return error code 
      */
-    public int execute(String sAppName, String sCommand, String sFileName, File workDir, boolean bWaitFor) {
+    public int execute(String sAppName, String sCommand, String sFileName, File workDir, Map<String,String> env, boolean bWaitFor) {
         // Assemble the command
         String[] sApp = getApplication(sAppName);
         if (sApp==null) { return 1; }
@@ -129,6 +132,12 @@ public class ExternalApps {
 			
             ProcessBuilder pb = new ProcessBuilder(command);
             pb.directory(workDir);
+            if (env!=null) {
+            	pb.environment().putAll(env);
+            	if (env.containsKey("BIBINPUTS")) {
+            		System.out.println("Running "+sApp[0]+" with BIBINPUTS="+env.get("BIBINPUTS"));
+            	}
+            }
             Process proc = pb.start();        
         
             // Gobble the error stream of the application

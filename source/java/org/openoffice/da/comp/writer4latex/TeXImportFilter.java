@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2009 by Henrik Just
+ *  Copyright: 2002-2010 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2009-06-19)
+ *  Version 1.2 (2011-01-25)
  *
  */ 
  
@@ -291,7 +291,7 @@ public class TeXImportFilter extends WeakBase implements XInitialization, XNamed
     	
     	System.out.println("Executing tex4ht with command "+sCommand+" on file "+file.getName());
     	
-    	externalApps.execute(ExternalApps.MK4HT, sCommand, file.getName(), file.getParentFile(), true);
+    	externalApps.execute(ExternalApps.MK4HT, sCommand, file.getName(), file.getParentFile(), null, true);
 		
     	if (xStatus!=null) { nStep+=5; xStatus.setValue(nStep); }
 
