@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-01-25)
+ *  Version 1.2 (2011-01-28)
  *
  */ 
  
@@ -36,15 +36,18 @@ import com.sun.star.beans.XPropertyAccess;
 import com.sun.star.beans.XPropertySet;
 import com.sun.star.container.XNameAccess;
 import com.sun.star.frame.XController;
+import com.sun.star.frame.XDesktop;
 import com.sun.star.frame.XFrame;
 import com.sun.star.frame.XModel;
 import com.sun.star.frame.XStorable;
+import com.sun.star.lang.XComponent;
+import com.sun.star.lang.XServiceInfo;
 import com.sun.star.lib.uno.helper.WeakBase;
 import com.sun.star.task.XStatusIndicator;
 import com.sun.star.task.XStatusIndicatorFactory;
 import com.sun.star.ui.dialogs.ExecutableDialogResults;
 import com.sun.star.ui.dialogs.XExecutableDialog;
-import com.sun.star.uno.AnyConverter;
+import com.sun.star.uno.Exception;
 import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
 
@@ -221,22 +224,24 @@ public final class Writer4LaTeX extends WeakBase
         	try {
         		Object view = registry.getRegistryView(BibliographyDialog.REGISTRY_PATH, false);
         		XPropertySet xProps = (XPropertySet) UnoRuntime.queryInterface(XPropertySet.class,view);
-        		String sBibTeXFiles = getFileList(XPropertySetHelper.getPropertyValueAsString(xProps, "BibTeXDir"));
+        		String sBibTeXFiles = getFileList(XPropertySetHelper.getPropertyValueAsShort(xProps, "BibTeXLocation"),
+        				XPropertySetHelper.getPropertyValueAsString(xProps, "BibTeXDir"));
         		if (XPropertySetHelper.getPropertyValueAsBoolean(xProps, "ConvertZoteroCitations")) {
         			filterHelper.put("zotero_bibtex_files", sBibTeXFiles);
-        			filterHelper.put("natbib_options", XPropertySetHelper.getPropertyValueAsString(xProps, "NatbibOptions"));
         		}
         		if (XPropertySetHelper.getPropertyValueAsBoolean(xProps, "ConvertJabRefCitations")) {
         			filterHelper.put("jabref_bibtex_files", sBibTeXFiles);
-        			filterHelper.put("natbib_options", XPropertySetHelper.getPropertyValueAsString(xProps, "NatbibOptions"));
         		}
         		if (XPropertySetHelper.getPropertyValueAsBoolean(xProps, "UseExternalBibTeXFiles")) {
         			filterHelper.put("external_bibtex_files", sBibTeXFiles);
         		}
         		String sBibTeXDir = XPropertySetHelper.getPropertyValueAsString(xProps, "BibTeXDir");
         		if (sBibTeXDir.length()>0) {
-        			sBibinputs = sBibTeXDir+":";
+        			// The separator character in BIBINPUTS is OS specific
+        			sBibinputs = sBibTeXDir+File.pathSeparatorChar;
         		}
+    			filterHelper.put("use_natbib", Boolean.toString(XPropertySetHelper.getPropertyValueAsBoolean(xProps, "UseNatbib")));
+    			filterHelper.put("natbib_options", XPropertySetHelper.getPropertyValueAsString(xProps, "NatbibOptions"));
 
         		mediaHelper.put("FilterData",filterHelper.toArray());
                 mediaProps = mediaHelper.toArray();
@@ -295,9 +300,20 @@ public final class Writer4LaTeX extends WeakBase
         
         xStatus.end();
     }
-	
-    private String getFileList(String sDirectory) {
-    	File dir = new File(sDirectory);
+    
+    private String getFileList(short nType, String sDirectory) {
+    	File dir;
+    	switch (nType) {
+    	case 0: // absolute path
+        	dir = new File(sDirectory);
+        	break;
+    	case 1: // relative path
+    		dir = new File(urlToFile(sBasePath),sDirectory);
+    		break;
+    	default: // document directory
+    		dir = urlToFile(sBasePath);
+    	}
+    	
     	CSVList filelist = new CSVList(",");
     	if (dir.isDirectory()) {
     		File[] files = dir.listFiles();

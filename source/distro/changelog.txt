@@ -2,8 +2,11 @@ Changelog for Writer2LaTeX version 1.0 -> 1.2
 
 ---------- version 1.1.6 ----------
 
+[w2l] New option use_natbib (default false) to use natbib.sty. This implies that natbib.sty is no longer loaded automatically
+  if Zotero or JabRef support is enabled
+
 [w4l] Bibliography options page has been reworked to include JabRef support and unify BibTeX directory (which is now allowed
-  to contain special characters like spaces)
+  to contain special characters like spaces and can be relative to the the document directory)
 
 [w2l] Added support for JabRef reference marks: A new option jabref_bibtex_files has been added to give the names of
   the BibTeX files from JabRef

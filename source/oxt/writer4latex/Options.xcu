@@ -96,8 +96,14 @@
         <prop oor:name="ConvertJabRefCitations" oor:type="xs:boolean">
             <value>false</value>
         </prop>
+        <prop oor:name="UseNatbib" oor:type="xs:boolean">
+            <value>false</value>
+        </prop>
         <prop oor:name="NatbibOptions" oor:type="xs:string">
             <value></value>
+        </prop>
+        <prop oor:name="BibTeXLocation" oor:type="xs:short">
+            <value>2</value><!-- document directory -->
         </prop>
         <prop oor:name="BibTeXDir" oor:type="xs:string">
             <value></value>

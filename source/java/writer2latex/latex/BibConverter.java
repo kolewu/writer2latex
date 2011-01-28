@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2010 by Henrik Just
+ *  Copyright: 2002-2011 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-03-28)
+ *  Version 1.2 (2011-01-27)
  *
  */
 
@@ -79,7 +79,14 @@ public class BibConverter extends ConverterHelper {
      * other declarations should be added.
      */
     public void appendDeclarations(LaTeXDocumentPortion pack, LaTeXDocumentPortion decl) {
-        // Currently nothing; may add support for eg. natbib later
+        // Use natbib
+        if (config.useBibtex() && config.useNatbib()) {
+        	pack.append("\\usepackage");
+        	if (config.getNatbibOptions().length()>0) {
+        		pack.append("[").append(config.getNatbibOptions()).append("]");
+        	}
+        	pack.append("{natbib}").nl();
+        }
     }
 
     /** Process a bibliography (text:bibliography tag)

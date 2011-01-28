@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-01-24)
+ *  Version 1.2 (2011-01-28)
  *
  */ 
  
@@ -35,8 +35,12 @@ import com.sun.star.awt.XContainerWindowEventHandler;
 import com.sun.star.awt.XDialog;
 import com.sun.star.awt.XWindow;
 import com.sun.star.beans.XPropertySet;
+import com.sun.star.frame.XDesktop;
+import com.sun.star.frame.XModel;
+import com.sun.star.lang.XComponent;
 import com.sun.star.lang.XServiceInfo;
 import com.sun.star.uno.AnyConverter;
+import com.sun.star.uno.Exception;
 import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
 import com.sun.star.util.XChangesBatch;
@@ -45,8 +49,12 @@ import com.sun.star.lib.uno.helper.WeakBase;
 
 import org.openoffice.da.comp.w2lcommon.helper.DialogAccess;
 import org.openoffice.da.comp.w2lcommon.helper.FolderPicker;
+import org.openoffice.da.comp.w2lcommon.helper.MessageBox;
 import org.openoffice.da.comp.w2lcommon.helper.RegistryHelper;
 import org.openoffice.da.comp.w2lcommon.helper.XPropertySetHelper;
+
+import writer2latex.util.CSVList;
+import writer2latex.util.Misc;
 
 /** This class provides a uno component which implements the configuration
  *  of the bibliography in Writer4LaTeX.
@@ -85,9 +93,6 @@ public final class BibliographyDialog
             if (sMethod.equals("external_event") ){
                 return handleExternalEvent(dlg, event);
             }
-            else if (sMethod.equals("BibTeXDirClick")) {
-                return bibTeXDirClick(dlg);
-            }
             else if (sMethod.equals("ConvertZoteroCitationsChange")) {
                 return convertZoteroCitationsChange(dlg);
             }
@@ -96,6 +101,15 @@ public final class BibliographyDialog
             }
             else if (sMethod.equals("UseExternalBibTeXFilesChange")) {
                 return useExternalBibTeXFilesChange(dlg);
+            }
+            else if (sMethod.equals("UseNatbibChange")) {
+                return useNatbibChange(dlg);
+            }
+            else if (sMethod.equals("BibTeXLocationChange")) {
+                return bibTeXLocationChange(dlg);
+            }
+            else if (sMethod.equals("BibTeXDirClick")) {
+                return bibTeXDirClick(dlg);
             }
         }
         catch (com.sun.star.uno.RuntimeException e) {
@@ -109,7 +123,7 @@ public final class BibliographyDialog
 	
 	public String[] getSupportedMethodNames() {
         String[] sNames = { "external_event", "UseExternalBibTeXFilesChange", "ConvertZoteroCitationsChange",
-        		"ConvertJabRefCitationsChange", "ExternalBibTeXDirClick" };
+        		"ConvertJabRefCitationsChange", "UseNatbibChange", "BibTeXLocationChange", "ExternalBibTeXDirClick" };
         return sNames;
     }
     
@@ -138,6 +152,8 @@ public final class BibliographyDialog
                 return true;
             } else if (sMethod.equals("back") || sMethod.equals("initialize")) {
                 loadConfiguration(dlg);
+                enableBibTeXSettings(dlg);
+                useNatbibChange(dlg);
                 return true;
             }
         }
@@ -160,8 +176,12 @@ public final class BibliographyDialog
     				XPropertySetHelper.getPropertyValueAsBoolean(xProps, "ConvertZoteroCitations"));
     		dlg.setCheckBoxStateAsBoolean("ConvertJabRefCitations",
     				XPropertySetHelper.getPropertyValueAsBoolean(xProps, "ConvertJabRefCitations"));
-        	dlg.setTextFieldText("NatbibOptions",
+    		dlg.setCheckBoxStateAsBoolean("UseNatbib",
+    				XPropertySetHelper.getPropertyValueAsBoolean(xProps, "UseNatbib"));
+    		dlg.setTextFieldText("NatbibOptions",
         			XPropertySetHelper.getPropertyValueAsString(xProps, "NatbibOptions"));
+        	dlg.setListBoxSelectedItem("BibTeXLocation",
+        			XPropertySetHelper.getPropertyValueAsShort(xProps, "BibTeXLocation"));
         	dlg.setTextFieldText("BibTeXDir",
         			XPropertySetHelper.getPropertyValueAsString(xProps, "BibTeXDir"));
         	registry.disposeRegistryView(view);
@@ -184,7 +204,9 @@ public final class BibliographyDialog
 			XPropertySetHelper.setPropertyValue(xProps, "UseExternalBibTeXFiles", dlg.getCheckBoxStateAsBoolean("UseExternalBibTeXFiles"));
     		XPropertySetHelper.setPropertyValue(xProps, "ConvertZoteroCitations", dlg.getCheckBoxStateAsBoolean("ConvertZoteroCitations"));
     		XPropertySetHelper.setPropertyValue(xProps, "ConvertJabRefCitations", dlg.getCheckBoxStateAsBoolean("ConvertJabRefCitations"));
+    		XPropertySetHelper.setPropertyValue(xProps, "UseNatbib", dlg.getCheckBoxStateAsBoolean("UseNatbib"));
    			XPropertySetHelper.setPropertyValue(xProps, "NatbibOptions", dlg.getTextFieldText("NatbibOptions"));
+   			XPropertySetHelper.setPropertyValue(xProps, "BibTeXLocation", dlg.getListBoxSelectedItem("BibTeXLocation"));
    			XPropertySetHelper.setPropertyValue(xProps, "BibTeXDir", dlg.getTextFieldText("BibTeXDir"));
    			
             // Commit registry changes
@@ -205,43 +227,114 @@ public final class BibliographyDialog
 	}
 
 	private boolean useExternalBibTeXFilesChange(DialogAccess dlg) {
-		enableBibTeXDir(dlg);
+		enableBibTeXSettings(dlg);
 		return true;
 	}
 
 	private boolean convertZoteroCitationsChange(DialogAccess dlg) {
-		enableNatbibOptions(dlg);
-		enableBibTeXDir(dlg);
+		enableBibTeXSettings(dlg);
 		return true;
 	}
 
 	private boolean convertJabRefCitationsChange(DialogAccess dlg) {
-		enableNatbibOptions(dlg);
-		enableBibTeXDir(dlg);
+		enableBibTeXSettings(dlg);
 		return true;
 	}
 	
-	private void enableNatbibOptions(DialogAccess dlg) {
-		boolean bConvertZotero = dlg.getCheckBoxStateAsBoolean("ConvertZoteroCitations");
-		boolean bConvertJabRef = dlg.getCheckBoxStateAsBoolean("ConvertJabRefCitations");
-		dlg.setControlEnabled("NatbibOptionsLabel", bConvertZotero || bConvertJabRef);
-		dlg.setControlEnabled("NatbibOptions", bConvertZotero || bConvertJabRef);
+	private boolean useNatbibChange(DialogAccess dlg) {
+		boolean bUseNatbib = dlg.getCheckBoxStateAsBoolean("UseNatbib");
+		dlg.setControlEnabled("NatbibOptionsLabel", bUseNatbib);
+		dlg.setControlEnabled("NatbibOptions", bUseNatbib);
+		return true;
 	}
-	
-	private void enableBibTeXDir(DialogAccess dlg) {
-		boolean bExternal = dlg.getCheckBoxStateAsBoolean("UseExternalBibTeXFiles");
-		boolean bConvertZotero = dlg.getCheckBoxStateAsBoolean("ConvertZoteroCitations");
-		boolean bConvertJabRef = dlg.getCheckBoxStateAsBoolean("ConvertJabRefCitations");
-		dlg.setControlEnabled("BibTeXDirLabel", bExternal || bConvertZotero || bConvertJabRef);
-		dlg.setControlEnabled("BibTeXDir", bExternal || bConvertZotero || bConvertJabRef);
-		dlg.setControlEnabled("BibTeXDirButton", bExternal|| bConvertZotero || bConvertJabRef);
+		
+	private boolean bibTeXLocationChange(DialogAccess dlg) {
+		enableBibTeXSettings(dlg);
+		return true;
 	}
 
+	private void enableBibTeXSettings(DialogAccess dlg) {
+		boolean bEnableLocation = dlg.getCheckBoxStateAsBoolean("UseExternalBibTeXFiles")
+			|| dlg.getCheckBoxStateAsBoolean("ConvertZoteroCitations")
+			|| dlg.getCheckBoxStateAsBoolean("ConvertJabRefCitations");
+		boolean bEnableDir = dlg.getListBoxSelectedItem("BibTeXLocation")<2;
+		dlg.setControlEnabled("BibTeXLocationLabel", bEnableLocation);
+		dlg.setControlEnabled("BibTeXLocation", bEnableLocation);
+		dlg.setControlEnabled("BibTeXDirLabel", bEnableLocation && bEnableDir);
+		dlg.setControlEnabled("BibTeXDir",  bEnableLocation && bEnableDir);
+		dlg.setControlEnabled("BibTeXDirButton",  bEnableLocation && bEnableDir);
+	}
+	
+	private String getDocumentDirURL() {
+		// Get the desktop from the service manager
+		Object desktop=null;
+		try {
+			desktop = xContext.getServiceManager().createInstanceWithContext("com.sun.star.frame.Desktop", xContext);
+		} catch (Exception e) {
+			// Failed to get the desktop service
+			return "";
+		}
+		XDesktop xDesktop = (XDesktop) UnoRuntime.queryInterface(XDesktop.class, desktop);
+		
+		// Get the current component and verify that it really is a text document		
+		if (xDesktop!=null) {
+			XComponent xComponent = xDesktop.getCurrentComponent();
+			XServiceInfo xInfo = (XServiceInfo)UnoRuntime.queryInterface(XServiceInfo.class, xComponent);
+			if (xInfo!=null && xInfo.supportsService("com.sun.star.text.TextDocument")) {
+				// Get the model, which provides the URL
+				XModel xModel = (XModel) UnoRuntime.queryInterface(XModel.class, xComponent);
+				if (xModel!=null) {
+					String sURL = xModel.getURL();
+					int nSlash = sURL.lastIndexOf('/');
+					return nSlash>-1 ? sURL.substring(0, nSlash) : "";
+				}
+			}
+		}
+		
+		return "";
+	}
+	
+	private boolean hasBibTeXFiles(File dir) {
+		if (dir.isDirectory()) {
+			File[] files = dir.listFiles();
+			for (File file : files) {
+				if (file.isFile() && file.getName().endsWith(".bib")) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
 	private boolean bibTeXDirClick(DialogAccess dlg) {
 		String sPath = folderPicker.getPath();
     	if (sPath!=null) {
     		try {
-    			dlg.setTextFieldText("BibTeXDir", new File(new URI(sPath)).getCanonicalPath());
+    			File bibDir = new File(new URI(sPath));
+    			String sBibPath = bibDir.getCanonicalPath();
+    			if (dlg.getListBoxSelectedItem("BibTeXLocation")==1) {
+    				// Path relative to document directory, remove the document directory part
+    				String sDocumentDirURL = getDocumentDirURL();
+    				if (sDocumentDirURL.length()>0) {
+    					String sDocumentDirPath = new File(new URI(sDocumentDirURL)).getCanonicalPath();
+    					if (sBibPath.startsWith(sDocumentDirPath)) {
+    						if (sBibPath.length()>sDocumentDirPath.length()) {
+    							sBibPath = sBibPath.substring(sDocumentDirPath.length()+1);
+    						}
+    						else { // Same as document directory
+    							sBibPath = "";
+    						}
+    					}
+    					else { // not a subdirectory
+    						sBibPath = "";
+    					}
+    				}
+    			}
+    			dlg.setTextFieldText("BibTeXDir", sBibPath);
+    			if (!hasBibTeXFiles(bibDir)) {
+    				MessageBox msgBox = new MessageBox(xContext);
+    				msgBox.showMessage("Writer4LaTeX warning", "The selected directory does not contain any BibTeX files");    				
+    			}
 			}
     		catch (IOException e) {
 			}

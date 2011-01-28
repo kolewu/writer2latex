@@ -2,22 +2,35 @@
 <!DOCTYPE dlg:window PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "dialog.dtd">
 <dlg:window xmlns:dlg="http://openoffice.org/2000/dialog" xmlns:script="http://openoffice.org/2000/script" dlg:id="Bibliography" dlg:left="139" dlg:top="84" dlg:width="260" dlg:height="185" dlg:help-url="org.openoffice.da.writer4latex.oxt:BibliographyDialog" dlg:closeable="true" dlg:moveable="true" dlg:title="Writer4LaTeX Bibliography Configuration" dlg:withtitlebar="false">
  <dlg:bulletinboard>
-  <dlg:checkbox dlg:id="ConvertZoteroCitations" dlg:tab-index="2" dlg:left="10" dlg:top="32" dlg:width="240" dlg:height="12" dlg:help-url="org.openoffice.da.writer4latex.oxt:BibliographyConvertZoteroCitations" dlg:value="Convert Zotero citations (requires natbib.sty)" dlg:checked="false">
+  <dlg:checkbox dlg:id="ConvertZoteroCitations" dlg:tab-index="2" dlg:left="10" dlg:top="32" dlg:width="240" dlg:height="12" dlg:help-url="org.openoffice.da.writer4latex.oxt:BibliographyConvertZoteroCitations" dlg:value="Convert Zotero citations" dlg:checked="false">
    <script:event script:event-name="on-itemstatechange" script:macro-name="vnd.sun.star.UNO:ConvertZoteroCitationsChange" script:language="UNO"/>
   </dlg:checkbox>
-  <dlg:text dlg:id="NatbibOptionsLabel" dlg:tab-index="7" dlg:left="10" dlg:top="60" dlg:width="55" dlg:height="12" dlg:value="Natbib options"/>
-  <dlg:textfield dlg:id="NatbibOptions" dlg:tab-index="4" dlg:left="70" dlg:top="58" dlg:width="180" dlg:height="12" dlg:help-url="org.openoffice.da.writer4latex.oxt:BibliographyNatbibOptions"/>
-  <dlg:checkbox dlg:id="UseExternalBibTeXFiles" dlg:tab-index="1" dlg:left="10" dlg:top="18" dlg:width="240" dlg:height="12" dlg:help-url="org.openoffice.da.writer4latex.oxt:BibliographyUseExternalBibTeXFiles" dlg:value="Use external BibTeX files for normal citations" dlg:checked="false">
+  <dlg:text dlg:id="NatbibOptionsLabel" dlg:tab-index="9" dlg:left="19" dlg:top="116" dlg:width="45" dlg:height="12" dlg:value="Options"/>
+  <dlg:textfield dlg:id="NatbibOptions" dlg:tab-index="8" dlg:left="70" dlg:top="114" dlg:width="180" dlg:height="12" dlg:help-url="org.openoffice.da.writer4latex.oxt:BibliographyNatbibOptions"/>
+  <dlg:checkbox dlg:id="UseExternalBibTeXFiles" dlg:tab-index="1" dlg:left="10" dlg:top="18" dlg:width="240" dlg:height="12" dlg:help-url="org.openoffice.da.writer4latex.oxt:BibliographyUseExternalBibTeXFiles" dlg:value="Use external BibTeX files for ordinary citations" dlg:checked="false">
    <script:event script:event-name="on-itemstatechange" script:macro-name="vnd.sun.star.UNO:UseExternalBibTeXFilesChange" script:language="UNO"/>
   </dlg:checkbox>
-  <dlg:text dlg:id="BibTeXDirLabel" dlg:tab-index="8" dlg:left="10" dlg:top="74" dlg:width="55" dlg:height="12" dlg:value="BibTeX folder"/>
+  <dlg:text dlg:id="BibTeXDirLabel" dlg:tab-index="10" dlg:left="10" dlg:top="74" dlg:width="55" dlg:height="12" dlg:value="BibTeX folder"/>
   <dlg:textfield dlg:id="BibTeXDir" dlg:tab-index="5" dlg:left="70" dlg:top="72" dlg:width="130" dlg:height="12" dlg:help-url="org.openoffice.da.writer4latex.oxt:BibliographyBibTeXDir"/>
   <dlg:button dlg:id="BibTeXDirButton" dlg:tab-index="6" dlg:left="210" dlg:top="72" dlg:width="40" dlg:height="12" dlg:help-url="org.openoffice.da.writer4latex.oxt:BibliographyBibTeXDirButton" dlg:value="Browse...">
    <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.UNO:BibTeXDirClick" script:language="UNO"/>
   </dlg:button>
-  <dlg:text dlg:id="BibliographyLabel" dlg:tab-index="0" dlg:left="6" dlg:top="4" dlg:width="244" dlg:height="12" dlg:value="Bibliography and BibTeX"/>
-  <dlg:checkbox dlg:id="ConvertJabRefCitations" dlg:tab-index="3" dlg:left="10" dlg:top="46" dlg:width="240" dlg:height="12" dlg:value="Convert JabRef citations (requires natbib.sty)" dlg:help-url="org.openoffice.da.writer4latex.oxt:BibliographyConvertJabRefCitations" dlg:checked="false">
+  <dlg:text dlg:id="BibliographyLabel" dlg:tab-index="0" dlg:left="6" dlg:top="4" dlg:width="244" dlg:height="12" dlg:value="Citations and BibTeX files"/>
+  <dlg:checkbox dlg:id="ConvertJabRefCitations" dlg:tab-index="3" dlg:left="10" dlg:top="46" dlg:width="240" dlg:height="12" dlg:help-url="org.openoffice.da.writer4latex.oxt:BibliographyConvertJabRefCitations" dlg:value="Convert JabRef citations" dlg:checked="false">
    <script:event script:event-name="on-itemstatechange" script:macro-name="vnd.sun.star.UNO:ConvertJabRefCitationsChange" script:language="UNO"/>
   </dlg:checkbox>
+  <dlg:checkbox dlg:id="UseNatbib" dlg:tab-index="7" dlg:left="10" dlg:top="102" dlg:width="240" dlg:height="12" dlg:help-url="org.openoffice.da.writer4latex.oxt:BibliographyUseNatbib" dlg:value="Use natbib.sty" dlg:checked="false">
+   <script:event script:event-name="on-itemstatechange" script:macro-name="vnd.sun.star.UNO:UseNatbibChange" script:language="UNO"/>
+  </dlg:checkbox>
+  <dlg:menulist dlg:id="BibTeXLocation" dlg:tab-index="4" dlg:left="70" dlg:top="58" dlg:width="180" dlg:height="13" dlg:help-url="org.openoffice.da.writer4latex.oxt:BibliographyBibTeXLocation" dlg:spin="true" dlg:linecount="3">
+   <dlg:menupopup>
+    <dlg:menuitem dlg:value="In central folder"/>
+    <dlg:menuitem dlg:value="In subfolder of document folder"/>
+    <dlg:menuitem dlg:value="In document folder"/>
+   </dlg:menupopup>
+   <script:event script:event-name="on-itemstatechange" script:macro-name="vnd.sun.star.UNO:BibTeXLocationChange" script:language="UNO"/>
+  </dlg:menulist>
+  <dlg:text dlg:id="BibTeXLocationLabel" dlg:tab-index="11" dlg:left="10" dlg:top="60" dlg:width="55" dlg:height="12" dlg:value="BibTeX location"/>
+  <dlg:text dlg:id="NatbibLabel" dlg:tab-index="12" dlg:left="6" dlg:top="88" dlg:width="244" dlg:height="11" dlg:value="Natbib"/>
  </dlg:bulletinboard>
 </dlg:window>
