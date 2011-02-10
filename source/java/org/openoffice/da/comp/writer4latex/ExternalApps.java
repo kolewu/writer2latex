@@ -88,7 +88,7 @@ public class ExternalApps {
 	
     /** Get the definition for an external application
      *  @param sAppName the name of the application to get
-     *  @return a String array containg the system dependent path to the
+     *  @return a String array containing the system dependent path to the
      *  executable file as entry 0, and the parameters as entry 1
      *  returns null if the application is unknown
      */
@@ -134,9 +134,6 @@ public class ExternalApps {
             pb.directory(workDir);
             if (env!=null) {
             	pb.environment().putAll(env);
-            	if (env.containsKey("BIBINPUTS")) {
-            		System.out.println("Running "+sApp[0]+" with BIBINPUTS="+env.get("BIBINPUTS"));
-            	}
             }
             Process proc = pb.start();        
         
@@ -144,7 +141,7 @@ public class ExternalApps {
             StreamGobbler errorGobbler = new 
                 StreamGobbler(proc.getErrorStream(), "ERROR");            
             
-            // Gooble the output stream of the application
+            // Gobble the output stream of the application
             StreamGobbler outputGobbler = new 
                 StreamGobbler(proc.getInputStream(), "OUTPUT");
                 
@@ -174,7 +171,6 @@ public class ExternalApps {
     	}
         catch (com.sun.star.uno.Exception e) {
             // Give up...
-            //setApplication(LATEX,"Error!",e.getMessage());
             return;
         }
 

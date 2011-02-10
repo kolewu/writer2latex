@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-01-28)
+ *  Version 1.2 (2011-02-01)
  *
  */ 
  
@@ -36,12 +36,9 @@ import com.sun.star.beans.XPropertyAccess;
 import com.sun.star.beans.XPropertySet;
 import com.sun.star.container.XNameAccess;
 import com.sun.star.frame.XController;
-import com.sun.star.frame.XDesktop;
 import com.sun.star.frame.XFrame;
 import com.sun.star.frame.XModel;
 import com.sun.star.frame.XStorable;
-import com.sun.star.lang.XComponent;
-import com.sun.star.lang.XServiceInfo;
 import com.sun.star.lib.uno.helper.WeakBase;
 import com.sun.star.task.XStatusIndicator;
 import com.sun.star.task.XStatusIndicatorFactory;
@@ -235,6 +232,8 @@ public final class Writer4LaTeX extends WeakBase
         		if (XPropertySetHelper.getPropertyValueAsBoolean(xProps, "UseExternalBibTeXFiles")) {
         			filterHelper.put("external_bibtex_files", sBibTeXFiles);
         		}
+    			filterHelper.put("include_original_citations",
+    					Boolean.toString(XPropertySetHelper.getPropertyValueAsBoolean(xProps, "IncludeOriginalCitations")));
         		String sBibTeXDir = XPropertySetHelper.getPropertyValueAsString(xProps, "BibTeXDir");
         		if (sBibTeXDir.length()>0) {
         			// The separator character in BIBINPUTS is OS specific

@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2010 by Henrik Just
+ *  Copyright: 2002-2011 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-10-30)
+ *  Version 1.2 (2011-02-01)
  *
  */
 
@@ -43,11 +43,13 @@ import writer2latex.latex.util.HeadingMap;
  */
 public class InlineConverter extends ConverterHelper {
 
+	private boolean bIncludeOriginalCitations = false;
     private String sTabstop = "\\ \\ ";
     private boolean bHasPdfannotation = false;
 	
     public InlineConverter(OfficeReader ofr, LaTeXConfig config, ConverterPalette palette) {
         super(ofr,config,palette);
+        bIncludeOriginalCitations = config.includeOriginalCitations();
         // Get custom code for tab stops
         if (config.getTabstop().length()>0) {
             sTabstop = config.getTabstop();
@@ -195,13 +197,16 @@ public class InlineConverter extends ConverterHelper {
                 case Node.TEXT_NODE:
                     String s = childNode.getNodeValue();
                     if (s.length() > 0) {
-                    	if (oc.isInZoteroJabRefText()) { // Comment out Zotero citations
-                    		ldp.append("%");
+                    	if (oc.isInZoteroJabRefText()) {
+                    		if (bIncludeOriginalCitations) { //	Include original citation as a comment
+                    			ldp.append("%")
+                    			   .append(palette.getI18n().convert(s, false, oc.getLang()))
+                    			   .nl();
+                    		}
                     	}
-                        ldp.append(palette.getI18n().convert(s, false, oc.getLang()));
-                        if (oc.isInZoteroJabRefText()) { // End comment out
-                        	ldp.nl();
-                        }
+                    	else { // Normal text
+             			   ldp.append(palette.getI18n().convert(s, false, oc.getLang()));
+                    	}
                     }
                     break;
                         

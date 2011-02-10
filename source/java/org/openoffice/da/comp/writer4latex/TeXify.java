@@ -144,7 +144,6 @@ public final class TeXify {
         	}
             int nReturnCode = externalApps.execute(
                 sAppList[i], file.getName(), file.getParentFile(), env, true);
-            System.out.println("Return code from "+sAppList[i]+": "+nReturnCode);
             if (i==0 && nReturnCode>0) {
             	return false;
                 //throw new IOException("Error executing "+sAppList[i]);

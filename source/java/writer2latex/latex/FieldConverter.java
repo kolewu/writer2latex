@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-01-28)
+ *  Version 1.2 (2011-02-01)
  *
  */
 
@@ -82,6 +82,7 @@ public class FieldConverter extends ConverterHelper {
     private boolean bUsesOooref = false;
     private boolean bConvertZotero = false;
     private boolean bConvertJabRef = false;
+    private boolean bIncludeOriginalCitations = false;
     private boolean bUseNatbib = false;
 	
     public FieldConverter(OfficeReader ofr, LaTeXConfig config, ConverterPalette palette) {
@@ -90,6 +91,7 @@ public class FieldConverter extends ConverterHelper {
         bUseHyperref = config.useHyperref() && !config.useTitleref() && !config.useOooref();
         bConvertZotero = config.useBibtex() && config.zoteroBibtexFiles().length()>0;
         bConvertJabRef = config.useBibtex() && config.jabrefBibtexFiles().length()>0;
+        bIncludeOriginalCitations = config.includeOriginalCitations();
         bUseNatbib = config.useBibtex() && config.useNatbib();
     }
 	
@@ -695,6 +697,9 @@ public class FieldConverter extends ConverterHelper {
     public void handleReferenceMarkEnd(Element node, LaTeXDocumentPortion ldp, Context oc) {
     	// Nothing to do, except to mark that this ends any Zotero/JabRef citation
     	oc.setInZoteroJabRefText(false);
+    	if (bIncludeOriginalCitations) { // Protect space after comment
+    		ldp.append("{}");
+    	}
     }
 
     /** <p>Process a reference mark (text:reference-mark or text:reference-mark-start tag)</p>

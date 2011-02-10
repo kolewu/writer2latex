@@ -2,6 +2,11 @@ Changelog for Writer2LaTeX version 1.0 -> 1.2
 
 ---------- version 1.1.6 ----------
 
+[w2l] Clarified that BibTeX-Writer2LaTeX.js uses GPLv3 license
+
+[w2l] New option include_original_citations (default false). If set to true the original Zotero or JabRef citation text will be
+  included as a comment if these citations are converted to LaTeX citations
+
 [w2l] New option use_natbib (default false) to use natbib.sty. This implies that natbib.sty is no longer loaded automatically
   if Zotero or JabRef support is enabled
 
@@ -23,8 +28,6 @@ Changelog for Writer2LaTeX version 1.0 -> 1.2
   If the former is true, relative font sizes are used, scaled by the percentage given by the latter
 
 [w2x] EPUB export now has its own export dialog and own help content
-
-[all] *API change: Added the method readResource to the Converter interface (only used by EPUB export currently)
 
 [w2x] EPUB export now uses user-defined meta data to support meta data features that are not defined in ODF
 

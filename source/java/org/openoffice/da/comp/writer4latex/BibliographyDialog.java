@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-01-28)
+ *  Version 1.2 (2011-01-31)
  *
  */ 
  
@@ -52,9 +52,6 @@ import org.openoffice.da.comp.w2lcommon.helper.FolderPicker;
 import org.openoffice.da.comp.w2lcommon.helper.MessageBox;
 import org.openoffice.da.comp.w2lcommon.helper.RegistryHelper;
 import org.openoffice.da.comp.w2lcommon.helper.XPropertySetHelper;
-
-import writer2latex.util.CSVList;
-import writer2latex.util.Misc;
 
 /** This class provides a uno component which implements the configuration
  *  of the bibliography in Writer4LaTeX.
@@ -176,14 +173,16 @@ public final class BibliographyDialog
     				XPropertySetHelper.getPropertyValueAsBoolean(xProps, "ConvertZoteroCitations"));
     		dlg.setCheckBoxStateAsBoolean("ConvertJabRefCitations",
     				XPropertySetHelper.getPropertyValueAsBoolean(xProps, "ConvertJabRefCitations"));
-    		dlg.setCheckBoxStateAsBoolean("UseNatbib",
-    				XPropertySetHelper.getPropertyValueAsBoolean(xProps, "UseNatbib"));
-    		dlg.setTextFieldText("NatbibOptions",
-        			XPropertySetHelper.getPropertyValueAsString(xProps, "NatbibOptions"));
+    		dlg.setCheckBoxStateAsBoolean("IncludeOriginalCitations",
+    				XPropertySetHelper.getPropertyValueAsBoolean(xProps, "IncludeOriginalCitations"));
         	dlg.setListBoxSelectedItem("BibTeXLocation",
         			XPropertySetHelper.getPropertyValueAsShort(xProps, "BibTeXLocation"));
         	dlg.setTextFieldText("BibTeXDir",
         			XPropertySetHelper.getPropertyValueAsString(xProps, "BibTeXDir"));
+    		dlg.setCheckBoxStateAsBoolean("UseNatbib",
+    				XPropertySetHelper.getPropertyValueAsBoolean(xProps, "UseNatbib"));
+    		dlg.setTextFieldText("NatbibOptions",
+        			XPropertySetHelper.getPropertyValueAsString(xProps, "NatbibOptions"));
         	registry.disposeRegistryView(view);
     	}
     	catch (Exception e) {
@@ -204,10 +203,11 @@ public final class BibliographyDialog
 			XPropertySetHelper.setPropertyValue(xProps, "UseExternalBibTeXFiles", dlg.getCheckBoxStateAsBoolean("UseExternalBibTeXFiles"));
     		XPropertySetHelper.setPropertyValue(xProps, "ConvertZoteroCitations", dlg.getCheckBoxStateAsBoolean("ConvertZoteroCitations"));
     		XPropertySetHelper.setPropertyValue(xProps, "ConvertJabRefCitations", dlg.getCheckBoxStateAsBoolean("ConvertJabRefCitations"));
-    		XPropertySetHelper.setPropertyValue(xProps, "UseNatbib", dlg.getCheckBoxStateAsBoolean("UseNatbib"));
-   			XPropertySetHelper.setPropertyValue(xProps, "NatbibOptions", dlg.getTextFieldText("NatbibOptions"));
+    		XPropertySetHelper.setPropertyValue(xProps, "IncludeOriginalCitations", dlg.getCheckBoxStateAsBoolean("IncludeOriginalCitations"));
    			XPropertySetHelper.setPropertyValue(xProps, "BibTeXLocation", dlg.getListBoxSelectedItem("BibTeXLocation"));
    			XPropertySetHelper.setPropertyValue(xProps, "BibTeXDir", dlg.getTextFieldText("BibTeXDir"));
+    		XPropertySetHelper.setPropertyValue(xProps, "UseNatbib", dlg.getCheckBoxStateAsBoolean("UseNatbib"));
+   			XPropertySetHelper.setPropertyValue(xProps, "NatbibOptions", dlg.getTextFieldText("NatbibOptions"));
    			
             // Commit registry changes
             XChangesBatch  xUpdateContext = (XChangesBatch)
@@ -254,10 +254,11 @@ public final class BibliographyDialog
 	}
 
 	private void enableBibTeXSettings(DialogAccess dlg) {
-		boolean bEnableLocation = dlg.getCheckBoxStateAsBoolean("UseExternalBibTeXFiles")
-			|| dlg.getCheckBoxStateAsBoolean("ConvertZoteroCitations")
+		boolean bConvertZoteroJabRef = dlg.getCheckBoxStateAsBoolean("ConvertZoteroCitations")
 			|| dlg.getCheckBoxStateAsBoolean("ConvertJabRefCitations");
+		boolean bEnableLocation = dlg.getCheckBoxStateAsBoolean("UseExternalBibTeXFiles") || bConvertZoteroJabRef;
 		boolean bEnableDir = dlg.getListBoxSelectedItem("BibTeXLocation")<2;
+		dlg.setControlEnabled("IncludeOriginalCitations", bConvertZoteroJabRef);
 		dlg.setControlEnabled("BibTeXLocationLabel", bEnableLocation);
 		dlg.setControlEnabled("BibTeXLocation", bEnableLocation);
 		dlg.setControlEnabled("BibTeXDirLabel", bEnableLocation && bEnableDir);
