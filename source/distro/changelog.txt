@@ -2,6 +2,8 @@ Changelog for Writer2LaTeX version 1.0 -> 1.2
 
 ---------- version 1.1.6 ----------
 
+[all] Changed w2l.bat to use  %~dp0 as suggested by Dave Jarvis (this leaves out any (probably none) win 9x users)
+
 [w2l] Clarified that BibTeX-Writer2LaTeX.js uses GPLv3 license
 
 [w2l] New option include_original_citations (default false). If set to true the original Zotero or JabRef citation text will be
