@@ -37,7 +37,7 @@ import com.sun.star.uno.XComponentContext;
  *  the result.
  */
 public final class TeXify {
-
+	
     /** Backend format generic (dvi) */
     public static final short GENERIC = 1;
 
@@ -138,7 +138,7 @@ public final class TeXify {
         for (int i=0; i<sAppList.length; i++) {
             // Execute external application
         	Map<String,String> env =null;
-        	if (ExternalApps.BIBTEX.equals(sAppList[i])) {
+        	if (ExternalApps.BIBTEX.equals(sAppList[i]) && sBibinputs!=null) {
         		env = new HashMap<String,String>();
         		env.put("BIBINPUTS", sBibinputs);
         	}
@@ -147,8 +147,9 @@ public final class TeXify {
             if (i==0 && nReturnCode>0) {
             	return false;
                 //throw new IOException("Error executing "+sAppList[i]);
-            } 
+            }
         }
+                
         return true;
     }
 
