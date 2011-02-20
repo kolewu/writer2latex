@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2010 by Henrik Just
+ *  Copyright: 2002-2011 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-04-12)
+ *  Version 1.2 (2011-02-17)
  *
  */
  
@@ -81,6 +81,10 @@ public class CssDocument implements OutputFile {
 			buf.append(sLine).append('\n');
 		}
 		sContent = buf.toString();
+	}
+	
+	public void read(String s) {
+		sContent = s;
 	}
     
     

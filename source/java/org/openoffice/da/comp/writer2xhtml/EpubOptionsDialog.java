@@ -16,24 +16,29 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2010 by Henrik Just
+ *  Copyright: 2002-2011 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-12-29)
+ *  Version 1.2 (2011-02-20)
  *
  */
 
-// TODO: Add to doc:
-// New options relative_font_size, font_scaling, use_default_font, default_font_name, split_after, page_break_split, include_toc
-// Also add to list of possible locked options external_toc_depth, display_hidden_text
- 
 package org.openoffice.da.comp.writer2xhtml;
 
 import java.awt.GraphicsEnvironment;
 
 import com.sun.star.awt.XDialog;
+import com.sun.star.beans.PropertyValue;
 import com.sun.star.beans.XPropertySet;
+import com.sun.star.frame.XDesktop;
+import com.sun.star.frame.XDispatchHelper;
+import com.sun.star.frame.XDispatchProvider;
+import com.sun.star.frame.XFrame;
+import com.sun.star.lang.XMultiComponentFactory;
+import com.sun.star.lang.XMultiServiceFactory;
+import com.sun.star.uno.Exception;
+import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
 
 import org.openoffice.da.comp.w2lcommon.helper.PropertyHelper;
@@ -88,16 +93,17 @@ public class EpubOptionsDialog extends OptionsDialogBase {
         setListBoxStringItemList("DefaultFontName", 
         		GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames());
         
-        // Special content
-        loadCheckBoxOption(xProps, "DisplayHiddenText");
-        loadCheckBoxOption(xProps, "Notes");
-        loadCheckBoxOption(xProps, "UseDublinCore");
-			
         // AutoCorrect
         loadCheckBoxOption(xProps, "IgnoreHardLineBreaks");
         loadCheckBoxOption(xProps, "IgnoreEmptyParagraphs");
         loadCheckBoxOption(xProps, "IgnoreDoubleSpaces");
 
+        // Special content
+        loadCheckBoxOption(xProps, "DisplayHiddenText");
+        loadCheckBoxOption(xProps, "Notes");
+        loadCheckBoxOption(xProps, "UseDublinCore");
+        loadCheckBoxOption(xProps, "UseCustomMetadata");
+			
         // Document division
         loadCheckBoxOption(xProps, "Split");
         loadListBoxOption(xProps, "SplitLevel");
@@ -135,16 +141,17 @@ public class EpubOptionsDialog extends OptionsDialogBase {
         saveCheckBoxOption(xProps, helper, "ConvertToPx", "convert_to_px");
         saveCheckBoxOption(xProps, helper, "OriginalImageSize", "original_image_size");
 
-        // Special content
-        saveCheckBoxOption(xProps, helper, "DisplayHiddenText", "display_hidden_text");
-        saveCheckBoxOption(xProps, helper, "Notes", "notes");
-        saveCheckBoxOption(xProps, helper, "UseDublinCore", "use_dublin_core");
-  		
         // AutoCorrect
         saveCheckBoxOption(xProps, helper, "IgnoreHardLineBreaks", "ignore_hard_line_breaks");
         saveCheckBoxOption(xProps, helper, "IgnoreEmptyParagraphs", "ignore_empty_paragraphs");
         saveCheckBoxOption(xProps, helper, "IgnoreDoubleSpaces", "ignore_double_spaces");
 
+        // Special content
+        saveCheckBoxOption(xProps, helper, "DisplayHiddenText", "display_hidden_text");
+        saveCheckBoxOption(xProps, helper, "Notes", "notes");
+        saveCheckBoxOption(xProps, helper, "UseDublinCore", "use_dublin_core");
+        saveCheckBoxOption(xProps, helper, "UseCustomMetadata", "use_custom_metadata");
+  		
         // Document division
         boolean bSplit = saveCheckBoxOption(xProps, "Split");
         short nSplitLevel = saveListBoxOption(xProps, "SplitLevel");
@@ -202,6 +209,12 @@ public class EpubOptionsDialog extends OptionsDialogBase {
         else if (sMethod.equals("UseDefaultFontChange")) {
         	useDefaultFontChange();
         }
+        else if (sMethod.equals("EditMetadataClick")) {
+            editMetadataClick();
+        }
+        else if (sMethod.equals("EditCustomMetadataClick")) {
+            editCustomMetadataClick();
+        }
         else if (sMethod.equals("SplitChange")) {
             splitChange();
         }
@@ -216,6 +229,7 @@ public class EpubOptionsDialog extends OptionsDialogBase {
 
     @Override public String[] getSupportedMethodNames() {
         String[] sNames = { "ConfigChange", "RelativeFontSizeChange", "UseDefaultFontChange",
+        		"EditMetadataClick", "EditCustomMetadataClick",
         		"SplitChange", "UsePageBreakSplitChange", "UseSplitAfterChange" };
         return sNames;
     }
@@ -242,15 +256,16 @@ public class EpubOptionsDialog extends OptionsDialogBase {
 		setControlEnabled("ConvertToPx",!isLocked("convert_to_px"));
         setControlEnabled("OriginalImageSize",!isLocked("original_image_size"));
 
-        // Special content
-        setControlEnabled("Notes",!isLocked("notes"));
-        setControlEnabled("UseDublinCore",!isLocked("use_dublin_core"));
-			
         // AutoCorrect
         setControlEnabled("IgnoreHardLineBreaks",!isLocked("ignore_hard_line_breaks"));
         setControlEnabled("IgnoreEmptyParagraphs",!isLocked("ignore_empty_paragraphs"));
         setControlEnabled("IgnoreDoubleSpaces",!isLocked("ignore_double_spaces"));
 
+        // Special content
+        setControlEnabled("Notes",!isLocked("notes"));
+        setControlEnabled("UseDublinCore",!isLocked("use_dublin_core"));
+        setControlEnabled("UseCustomMetadata",!isLocked("use_custom_metadata"));
+			
         // Document division
         boolean bSplit = getCheckBoxStateAsBoolean("Split");
         setControlEnabled("Split",!isLocked("split_level"));
@@ -288,6 +303,43 @@ public class EpubOptionsDialog extends OptionsDialogBase {
     		setControlEnabled("DefaultFontNameLabel", bState);
     		setControlEnabled("DefaultFontName", bState);
     	}    	
+    }
+    
+    private void editMetadataClick() {
+    	// Get the DispatchHelper service
+    	XMultiComponentFactory xMCF = xContext.getServiceManager();
+    	XMultiServiceFactory xFactory = (XMultiServiceFactory) UnoRuntime.queryInterface(XMultiServiceFactory.class, xMCF);
+    	Object dispatchHelper;
+		try {
+			dispatchHelper = xFactory.createInstance("com.sun.star.frame.DispatchHelper");
+		} catch (Exception e) {
+			// Failed to get dispatch helper, cannot execute dispatch
+			System.out.println("Failed to get dispatch helper");
+			return;
+		}
+    	XDispatchHelper helper = (XDispatchHelper) UnoRuntime.queryInterface(XDispatchHelper.class, dispatchHelper);
+    	
+    	// Get the current frame
+    	Object desktop;
+		try {
+			desktop = xMCF.createInstanceWithContext("com.sun.star.frame.Desktop", xContext);
+		} catch (Exception e) {
+			// Failed to get desktop
+			System.out.println("Failed to get desktop");
+			return;
+		} 
+    	XDesktop xDesktop = (XDesktop) UnoRuntime.queryInterface(com.sun.star.frame.XDesktop.class, desktop);
+    	XFrame xFrame =xDesktop.getCurrentFrame();
+    	
+    	// Get the DispatchProvider for the current frame
+    	XDispatchProvider xDispatchProvider = (XDispatchProvider)UnoRuntime.queryInterface(XDispatchProvider.class, xFrame);
+    	PropertyValue[] props = new PropertyValue[0];
+    	helper.executeDispatch(xDispatchProvider, ".uno:SetDocumentProperties","", 0, props); 
+    }
+    
+    private void editCustomMetadataClick() {
+    	// Stub, TODO
+    	System.out.println("Edit custom metadata");
     }
 	
     private void splitChange() {

@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2010 by Henrik Just
+ *  Copyright: 2002-2011 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-11-21) 
+ *  Version 1.2 (2011-02-19) 
  *
  */
 
@@ -124,9 +124,11 @@ public final class ConverterPalette extends ConverterBase {
     // fill out inner converter method
     public void convertInner() throws IOException {
         sTargetFileName = Misc.trimDocumentName(sTargetFileName,".tex");
-        imageLoader.setOutFileName(new ExportNameCollection(true).getExportName(sTargetFileName));
-        
-        imageLoader.setUseSubdir(config.saveImagesInSubdir());
+        String sSafeTargetFileName = new ExportNameCollection(true).getExportName(sTargetFileName);
+        imageLoader.setBaseFileName(sSafeTargetFileName+"-img");
+        if (config.saveImagesInSubdir()) {
+        	imageLoader.setUseSubdir(sSafeTargetFileName+"-img");
+        }
 		
         // Set graphics formats depending on backend
         if (config.getBackend()==LaTeXConfig.PDFTEX || config.getBackend()==LaTeXConfig.XETEX) {

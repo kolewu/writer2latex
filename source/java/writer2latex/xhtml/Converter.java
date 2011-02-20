@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2010 by Henrik Just
+ *  Copyright: 2002-2011 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-12-21)
+ *  Version 1.2 (2011-02-19)
  *
  */
 
@@ -60,7 +60,7 @@ import writer2latex.util.ExportNameCollection;
 import writer2latex.util.Misc;
 
 /**
- * <p>This class converts an OpenDocument file to an XHTML(+MathML) document.</p>
+ * <p>This class converts an OpenDocument file to an XHTML(+MathML) or EPUB document.</p>
  *
  */
 public class Converter extends ConverterBase {
@@ -87,7 +87,7 @@ public class Converter extends ConverterBase {
     // The included style sheet and associated resources
     private CssDocument styleSheet = null;
     private Set<ResourceDocument> resources = new HashSet<ResourceDocument>();
-
+    
     // The xhtml output file(s)
     protected int nType = XhtmlDocument.XHTML10; // the doctype
     private boolean bOPS = false; // Do we need to be OPS conforming?
@@ -124,7 +124,7 @@ public class Converter extends ConverterBase {
 
     @Override public void readStyleSheet(InputStream is) throws IOException {
     	if (styleSheet==null) {
-    		styleSheet = new CssDocument("styles.css");
+    		styleSheet = new CssDocument("styles/styles.css");
     	}
     	styleSheet.read(is);
     }
@@ -201,7 +201,16 @@ public class Converter extends ConverterBase {
 
         l10n = new L10n();
         
-        imageLoader.setUseSubdir(config.saveImagesInSubdir());
+        if (isOPS()) {
+        	imageLoader.setBaseFileName("image");
+        	imageLoader.setUseSubdir("images");
+        }
+        else { 
+        	imageLoader.setBaseFileName(sTargetFileName+"-img");
+        	if (config.saveImagesInSubdir()) {
+        		imageLoader.setUseSubdir(sTargetFileName+"-img");        	
+        	}
+        }
 
         imageLoader.setDefaultFormat(MIMETypes.PNG);
         imageLoader.addAcceptedFormat(MIMETypes.JPEG);
@@ -272,13 +281,15 @@ public class Converter extends ConverterBase {
         	}
         }
         
-        // Export styles (temp.)
-        for (int i=0; i<=nOutFileIndex; i++) {
-        	Element head = outFiles.get(i).getHeadNode();
-        	if (head!=null) {
-        		Node styles = styleCv.exportStyles(outFiles.get(i).getContentDOM());
-        		if (styles!=null) {
-        			head.appendChild(styles);
+        // Export styles (XHTML)
+        if (!isOPS()) {
+        	for (int i=0; i<=nOutFileIndex; i++) {
+        		Element head = outFiles.get(i).getHeadNode();
+        		if (head!=null) {
+        			Node styles = styleCv.exportStyles(outFiles.get(i).getContentDOM());
+        			if (styles!=null) {
+        				head.appendChild(styles);
+        			}
         		}
         	}
         }
@@ -407,6 +418,12 @@ public class Converter extends ConverterBase {
             }
         }
         
+        // Export styles (EPUB)
+        if (isOPS()) {
+        	CssDocument cssDoc = new CssDocument("styles/styles1.css");
+        	cssDoc.read(styleCv.exportStyles(false));
+        	converterResult.addDocument(cssDoc);
+        }
     }
 	
     private void addNavigationLink(Document dom, Node node, String s, int nIndex) {
@@ -617,7 +634,7 @@ public class Converter extends ConverterBase {
         		}
         	}
 
-        	// Add link to stylesheet, if producing nomral XHTML
+        	// Add link to custom stylesheet, if producing normal XHTML
         	if (!bOPS && config.xhtmlCustomStylesheet().length()>0) {
         		Element htmlStyle = htmlDOM.createElement("link");
         		htmlStyle.setAttribute("rel","stylesheet");
@@ -626,26 +643,28 @@ public class Converter extends ConverterBase {
         		htmlStyle.setAttribute("href",config.xhtmlCustomStylesheet());
         		head.appendChild(htmlStyle);
         	}
-        	/* later....
-        if (nSplit>0 && !config.xhtmlIgnoreStyles()) {
-            Element htmlStyle = htmlDOM.createElement("link");
-            htmlStyle.setAttribute("rel","stylesheet");
-            htmlStyle.setAttribute("type","text/css");
-            htmlStyle.setAttribute("media","all");
-            htmlStyle.setAttribute("href",oooDoc.getName()+"-styles.css");
-            htmlHead.appendChild(htmlStyle);
-        }*/
-        	// Note: For single output file, styles are exported to the doc at the end.
-
+        	
         	// Add link to included style sheet if producing OPS content
         	if (bOPS && styleSheet!=null) {
         		Element sty = htmlDOM.createElement("link");
         		sty.setAttribute("rel", "stylesheet");
         		sty.setAttribute("type", "text/css");
         		sty.setAttribute("media", "all");
-        		sty.setAttribute("href", styleSheet.getFileName());
+        		sty.setAttribute("href", "stylesheet/"+styleSheet.getFileName());
         		head.appendChild(sty);
         	}
+
+        	// Add link to generated stylesheet if producing OPS content
+        	if (isOPS() && config.xhtmlFormatting()>XhtmlConfig.IGNORE_STYLES) {
+        		Element htmlStyle = htmlDOM.createElement("link");
+        		htmlStyle.setAttribute("rel","stylesheet");
+        		htmlStyle.setAttribute("type","text/css");
+        		htmlStyle.setAttribute("media","all");
+        		htmlStyle.setAttribute("href","styles/styles1.css");
+        		head.appendChild(htmlStyle);
+        	}
+        	// Note: For XHTML, generated styles are exported to the doc at the end.
+
         }
         
         // Recreate nested sections, if any

@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2010 by Henrik Just
+ *  Copyright: 2002-2011 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-12-29)
+ *  Version 1.2 (2011-02-17)
  *
  */
 
@@ -121,11 +121,10 @@ class StyleConverter extends ConverterHelper {
             applyStyle(info,node);
         }
     }
-	
-    // Export used styles to CSS
-    public Node exportStyles(Document htmlDOM) {
-        String sIndent = config.prettyPrint() ? "      " : "";
-		
+    
+    public String exportStyles(boolean bIndent) {
+    	String sIndent = bIndent ? "      " : "";
+    	
         StringBuffer buf = new StringBuffer();
         
         // Export default style
@@ -163,21 +162,26 @@ class StyleConverter extends ConverterHelper {
         buf.append(getFrameSc().getStyleDeclarations(sIndent));
         buf.append(getPresentationSc().getStyleDeclarations(sIndent));
         buf.append(getPageSc().getStyleDeclarations(sIndent));
+        return buf.toString();
+    }
+	
+    // Export used styles to CSS
+    public Node exportStyles(Document htmlDOM) {
+        String sStyles = exportStyles(config.prettyPrint());
 		
         // Create node
-        if (buf.length()>0) {
+        if (sStyles.length()>0) {
             Element htmlStyle = htmlDOM.createElement("style");
             htmlStyle.setAttribute("media","all");
             htmlStyle.setAttribute("type","text/css");
             htmlStyle.appendChild(htmlDOM.createTextNode(config.prettyPrint() ? "\n" : " "));
-            htmlStyle.appendChild(htmlDOM.createTextNode(buf.toString()));
+            htmlStyle.appendChild(htmlDOM.createTextNode(sStyles));
             if (config.prettyPrint()) { htmlStyle.appendChild(htmlDOM.createTextNode("    ")); }
             return htmlStyle;
         }
         else {
             return null;
         }
-
     }
 		
 }

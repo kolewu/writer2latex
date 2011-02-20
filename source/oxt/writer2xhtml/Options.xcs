@@ -62,14 +62,15 @@
             <prop oor:name="DefaultFontName" oor:type="xs:string" />
             <prop oor:name="ConvertToPx" oor:type="xs:boolean" />
             <prop oor:name="OriginalImageSize" oor:type="xs:boolean"/>
-            <!-- Special content -->
-            <prop oor:name="DisplayHiddenText" oor:type="xs:boolean" />
-            <prop oor:name="Notes" oor:type="xs:boolean" />
-            <prop oor:name="UseDublinCore" oor:type="xs:boolean" />
             <!-- AutoCorrect -->
             <prop oor:name="IgnoreEmptyParagraphs" oor:type="xs:boolean" />
             <prop oor:name="IgnoreHardLineBreaks" oor:type="xs:boolean" />
             <prop oor:name="IgnoreDoubleSpaces" oor:type="xs:boolean" />
+            <!-- Special content -->
+            <prop oor:name="DisplayHiddenText" oor:type="xs:boolean" />
+            <prop oor:name="Notes" oor:type="xs:boolean" />
+            <prop oor:name="UseDublinCore" oor:type="xs:boolean" />
+            <prop oor:name="UseCustomMetadata" oor:type="xs:boolean" />
             <!-- Files -->
             <prop oor:name="Split" oor:type="xs:boolean" />
             <prop oor:name="SplitLevel" oor:type="xs:short" />

@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2009 by Henrik Just
+ *  Copyright: 2002-2011 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2009-12-07)
+ *  Version 1.2 (2011-02-19)
  *
  */
 
@@ -55,8 +55,8 @@ public final class ImageLoader {
     private OfficeDocument oooDoc;
 	
     // Data for file name generation
-    private String sOutFileName;
-    private boolean bUseSubdir = false;
+    private String sBaseFileName = "";
+    private String sSubDirName = "";
     private int nImageCount = 0;
     private NumberFormat formatter;
 	
@@ -70,17 +70,16 @@ public final class ImageLoader {
     private String sDefaultVectorFormat = null;
     private HashSet<String> acceptedFormats = new HashSet<String>();
 
-    public ImageLoader(OfficeDocument oooDoc, String sOutFileName, boolean bExtractEPS) {
+    public ImageLoader(OfficeDocument oooDoc, boolean bExtractEPS) {
         this.oooDoc = oooDoc;
-        this.sOutFileName = sOutFileName;
         this.bExtractEPS = bExtractEPS;
         this.formatter = new DecimalFormat("000");
     }
 	
-    public void setOutFileName(String sOutFileName) { this.sOutFileName = sOutFileName; }
+    public void setBaseFileName(String sBaseFileName) { this.sBaseFileName = sBaseFileName; }
     
-    public void setUseSubdir(boolean bUseSubdir) { this.bUseSubdir = bUseSubdir; }
-	
+    public void setUseSubdir(String sSubDirName) { this.sSubDirName = sSubDirName+"/"; }
+    
     public void setAcceptOtherFormats(boolean b) { bAcceptOtherFormats = b; }
 	
     public void setDefaultFormat(String sMime) {
@@ -146,8 +145,7 @@ public final class ImageLoader {
         if (blob==null) { return null; }
 
         // Assign a name (without extension) 
-        String sName = sOutFileName+"-img"+formatter.format(++nImageCount);
-        if (bUseSubdir) { sName = sOutFileName + "-img/" + sName; }
+        String sName = sSubDirName+sBaseFileName+formatter.format(++nImageCount);
      
         BinaryGraphicsDocument bgd = null;
 

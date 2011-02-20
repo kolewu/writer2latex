@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2010 by Henrik Just
+ *  Copyright: 2002-2011 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-12-21)
+ *  Version 1.2 (2011-02-19)
  *
  */
 
@@ -97,7 +97,7 @@ public abstract class ConverterBase implements Converter {
         odDoc.read(is);
         ofr = new OfficeReader(odDoc,false);
         metaData = new MetaData(odDoc);
-        imageLoader = new ImageLoader(odDoc,sTargetFileName,true);
+        imageLoader = new ImageLoader(odDoc,true);
         imageLoader.setGraphicConverter(graphicConverter);
 
         // Prepare output

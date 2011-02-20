@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2001-2010 by Henrik Just
+ *  Copyright: 2001-2011 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  version 1.2 (2010-12-20)
+ *  version 1.2 (2011-02-17)
  *
  */
 
@@ -51,7 +51,7 @@ import writer2latex.xmerge.NewDOMDocument;
 public class OPFWriter extends NewDOMDocument {
 	private String sUID=null;
 
-	public OPFWriter(ConverterResult cr, boolean bUseDublinCore) {
+	public OPFWriter(ConverterResult cr, boolean bUseDublinCore, boolean bUseCustomMetadata) {
 		super("book", "opf");
 		
         // create DOM
@@ -108,84 +108,86 @@ public class OPFWriter extends NewDOMDocument {
         boolean bHasIdentifier = false;
         boolean bHasCreator = false;
         boolean bHasDate = false;
-        // First rearrange the user-defined meta data
-        Map<String,String> userDefinedMetaData = cr.getMetaData().getUserDefinedMetaData();
-        Map<String,String[]> dc = new HashMap<String,String[]>();
-        for (String sKey : userDefinedMetaData.keySet()) {
-        	if (sKey.length()>0) {
-        		String[] sValue = new String[2];
-    			sValue[0] = userDefinedMetaData.get(sKey);
-    			String sNewKey;
-        		int nDot = sKey.indexOf(".");
-        		if (nDot>0) {
-        			sNewKey = sKey.substring(0, nDot).toLowerCase();
-        			sValue[1] = sKey.substring(nDot+1);
-        		}
-        		else {
-        			sNewKey = sKey.toLowerCase();
-        			sValue[1] = null;
-        		}
-        		dc.put(sNewKey, sValue);
-        	}
-        }
-        // Then export it
-        String[] sKeys = Misc.sortStringSet(dc.keySet());
-        for (String sKey : sKeys) {
-        	String sValue = dc.get(sKey)[0];
-        	String sAttributeValue = dc.get(sKey)[1];
-        	if (sKey.startsWith("identifier")) {
-        		Element identifier = appendElement(contentDOM, metadata, "dc:identifier", sValue);
-        		if (!bHasIdentifier) { // The first identifier is the unique ID
-        			identifier.setAttribute("id", "BookId");
-        			sUID = sValue;
-        		}
-        		if (sAttributeValue!=null) {
-        			identifier.setAttribute("opf:scheme", sAttributeValue);
-        		}
-        		bHasIdentifier = true;
-        	}
-        	else if (sKey.startsWith("creator")) {
-        		Element creator = appendElement(contentDOM, metadata, "dc:creator", sValue);
-        		if (sAttributeValue!=null) {
-        			creator.setAttribute("opf:role", sAttributeValue);
-        		}
-        		bHasCreator = true;
-        	}
-        	else if (sKey.startsWith("contributor")) {
-        		Element contributor = appendElement(contentDOM, metadata, "dc:contributor", sValue);
-        		if (sAttributeValue!=null) {
-        			contributor.setAttribute("opf:role", sAttributeValue);
+        if (bUseCustomMetadata) {
+        	// First rearrange the user-defined meta data
+        	Map<String,String> userDefinedMetaData = cr.getMetaData().getUserDefinedMetaData();
+        	Map<String,String[]> dc = new HashMap<String,String[]>();
+        	for (String sKey : userDefinedMetaData.keySet()) {
+        		if (sKey.length()>0) {
+        			String[] sValue = new String[2];
+        			sValue[0] = userDefinedMetaData.get(sKey);
+        			String sNewKey;
+        			int nDot = sKey.indexOf(".");
+        			if (nDot>0) {
+        				sNewKey = sKey.substring(0, nDot).toLowerCase();
+        				sValue[1] = sKey.substring(nDot+1);
+        			}
+        			else {
+        				sNewKey = sKey.toLowerCase();
+        				sValue[1] = null;
+        			}
+        			dc.put(sNewKey, sValue);
         		}
         	}
-        	else if (sKey.startsWith("date")) {
-        		Element date = appendElement(contentDOM, metadata, "dc:date", sValue);
-        		if (sAttributeValue!=null) {
-        			date.setAttribute("opf:event", sAttributeValue);
+        	// Then export it
+        	String[] sKeys = Misc.sortStringSet(dc.keySet());
+        	for (String sKey : sKeys) {
+        		String sValue = dc.get(sKey)[0];
+        		String sAttributeValue = dc.get(sKey)[1];
+        		if (sKey.startsWith("identifier")) {
+        			Element identifier = appendElement(contentDOM, metadata, "dc:identifier", sValue);
+        			if (!bHasIdentifier) { // The first identifier is the unique ID
+        				identifier.setAttribute("id", "BookId");
+        				sUID = sValue;
+        			}
+        			if (sAttributeValue!=null) {
+        				identifier.setAttribute("opf:scheme", sAttributeValue);
+        			}
+        			bHasIdentifier = true;
         		}
-        		bHasDate = true;
-        	}
-        	// Remaining properties must be unique and has not attributes, hence
-        	else if (sAttributeValue==null) {
-        		if ("publisher".equals(sKey)) {
-        			appendElement(contentDOM, metadata, "dc:publisher", sValue);
+        		else if (sKey.startsWith("creator")) {
+        			Element creator = appendElement(contentDOM, metadata, "dc:creator", sValue);
+        			if (sAttributeValue!=null) {
+        				creator.setAttribute("opf:role", sAttributeValue);
+        			}
+        			bHasCreator = true;
         		}
-        		else if ("type".equals(sKey)) {
-        			appendElement(contentDOM, metadata, "dc:type", sValue);
+        		else if (sKey.startsWith("contributor")) {
+        			Element contributor = appendElement(contentDOM, metadata, "dc:contributor", sValue);
+        			if (sAttributeValue!=null) {
+        				contributor.setAttribute("opf:role", sAttributeValue);
+        			}
         		}
-        		else if ("format".equals(sKey)) {
-        			appendElement(contentDOM, metadata, "dc:format", sValue);
+        		else if (sKey.startsWith("date")) {
+        			Element date = appendElement(contentDOM, metadata, "dc:date", sValue);
+        			if (sAttributeValue!=null) {
+        				date.setAttribute("opf:event", sAttributeValue);
+        			}
+        			bHasDate = true;
         		}
-        		else if ("source".equals(sKey)) {
-        			appendElement(contentDOM, metadata, "dc:source", sValue);
-        		}
-        		else if ("relation".equals(sKey)) {
-        			appendElement(contentDOM, metadata, "dc:relation", sValue);
-        		}
-        		else if ("coverage".equals(sKey)) {
-        			appendElement(contentDOM, metadata, "dc:coverage", sValue);
-        		}
-        		else if ("rights".equals(sKey)) {
-        			appendElement(contentDOM, metadata, "dc:rights", sValue);
+        		// Remaining properties must be unique and has not attributes, hence
+        		else if (sAttributeValue==null) {
+        			if ("publisher".equals(sKey)) {
+        				appendElement(contentDOM, metadata, "dc:publisher", sValue);
+        			}
+        			else if ("type".equals(sKey)) {
+        				appendElement(contentDOM, metadata, "dc:type", sValue);
+        			}
+        			else if ("format".equals(sKey)) {
+        				appendElement(contentDOM, metadata, "dc:format", sValue);
+        			}
+        			else if ("source".equals(sKey)) {
+        				appendElement(contentDOM, metadata, "dc:source", sValue);
+        			}
+        			else if ("relation".equals(sKey)) {
+        				appendElement(contentDOM, metadata, "dc:relation", sValue);
+        			}
+        			else if ("coverage".equals(sKey)) {
+        				appendElement(contentDOM, metadata, "dc:coverage", sValue);
+        			}
+        			else if ("rights".equals(sKey)) {
+        				appendElement(contentDOM, metadata, "dc:rights", sValue);
+        			}
         		}
         	}
         }

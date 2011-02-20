@@ -45,7 +45,7 @@ public final class EPUBConverter extends Xhtml11Converter {
 	
     @Override public ConverterResult convert(InputStream is, String sTargetFileName) throws IOException {
     	setOPS(true);
-    	ConverterResult xhtmlResult = super.convert(is, sTargetFileName);
+    	ConverterResult xhtmlResult = super.convert(is, "chapter");
     	
     	ConverterResultImpl epubResult = new ConverterResultImpl();
     	epubResult.addDocument(new EPUBWriter(xhtmlResult,sTargetFileName,getXhtmlConfig()));

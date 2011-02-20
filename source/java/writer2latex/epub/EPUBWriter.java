@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2001-2010 by Henrik Just
+ *  Copyright: 2001-2011 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  version 1.2 (2010-12-20)
+ *  version 1.2 (2011-02-17)
  *
  */
 
@@ -89,7 +89,7 @@ public class EPUBWriter implements OutputFile {
 		zos.closeEntry();
 		
 		// Then manifest
-		OPFWriter manifest = new OPFWriter(xhtmlResult, config.xhtmlUseDublinCore());
+		OPFWriter manifest = new OPFWriter(xhtmlResult, config.xhtmlUseDublinCore(), config.useCustomMetadata());
 		ZipEntry manifestEntry = new ZipEntry("OEBPS/book.opf");
 		zos.putNextEntry(manifestEntry);
 		writeZipEntry(manifest,zos);

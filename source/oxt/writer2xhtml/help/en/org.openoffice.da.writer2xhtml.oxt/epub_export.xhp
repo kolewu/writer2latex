@@ -85,6 +85,23 @@
 		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2xhtml.oxt:EpubOptionsOriginalImageSize" visibility="hidden">Check this to use the natural size of images rather than the size defined in the document</ahelp></paragraph>
 		<embed href="org.openoffice.da.writer2xhtml.oxt/export.xhp#originalimagesize"/>
         
+        <paragraph role="heading" level="2" xml-lang="en-US">AutoCorrect</paragraph>
+
+    	<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:EpubOptionsIgnoreHardLineBreaks" id="bm_options_ignorehardlinebreaks"/>
+        <paragraph role="heading" level="3" xml-lang="en-US">Ignore hard line breaks</paragraph>
+   		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2xhtml.oxt:EpubOptionsIgnoreHardLineBreaks" visibility="hidden">Check this if you don't want to export hard (manual) line breaks</ahelp></paragraph>
+        <paragraph role="paragraph" xml-lang="en-US">Sometimes hard (or manual) line breaks are used in Writer to optimize
+        the placement of the line breaks. Since line breaking in an EPUB reader is completely different, you may want to ignore
+        all hard line breaks by selecting this option.</paragraph>
+
+    	<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:EpubOptionsIgnoreEmptyParagraphs" id="bm_options_ignoreemptyparagraphs"/>
+		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2xhtml.oxt:EpubOptionsIgnoreEmptyParagraphs" visibility="hidden">Check this if you don't want to export empty paragraphs</ahelp></paragraph>
+		<embed href="org.openoffice.da.writer2xhtml.oxt/export.xhp#ignoreemptyparagraphs"/>
+
+    	<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:EpubOptionsIgnoreDoubleSpaces" id="bm_options_ignoredoublespaces"/>
+		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2xhtml.oxt:EpubOptionsIgnoreDoubleSpaces" visibility="hidden">Check this to treat several spaces as a single space in the export</ahelp></paragraph>
+        <embed href="org.openoffice.da.writer2xhtml.oxt/export.xhp#ignoredoublespaces"/>
+
 		<embed href="org.openoffice.da.writer2xhtml.oxt/export.xhp#special"/>
 
    		<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:EpubOptionsDisplayHiddenText" id="bm_options_displayhiddentext"/>
@@ -105,26 +122,15 @@
        	<paragraph role="heading" level="3" xml-lang="en-US">Export optional document properties</paragraph>
    	    <paragraph role="paragraph" xml-lang="en-US">If you select this option, all the document properties (File – Properties)
        	are exported, otherwise only the title is exported.</paragraph>
-		<paragraph role="paragraph" xml-lang="en-US">The EPUB format supports a number of additional meta data elements.
-		You can define these using <link href="#custommetadata" name="EPUB">user-defined properties</link>.
-		</paragraph>
+       	<paragraph role="paragraph" xml-lang="en-US">Click <emph>Edit</emph> to open the dialog to edit the document properties.</paragraph>
 
-        <paragraph role="heading" level="2" xml-lang="en-US">AutoCorrect</paragraph>
-
-    	<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:EpubOptionsIgnoreHardLineBreaks" id="bm_options_ignorehardlinebreaks"/>
-        <paragraph role="heading" level="3" xml-lang="en-US">Ignore hard line breaks</paragraph>
-   		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2xhtml.oxt:EpubOptionsIgnoreHardLineBreaks" visibility="hidden">Check this if you don't want to export hard (manual) line breaks</ahelp></paragraph>
-        <paragraph role="paragraph" xml-lang="en-US">Sometimes hard (or manual) line breaks are used in Writer to optimize
-        the placement of the line breaks. Since line breaking in an EPUB reader is completely different, you may want to ignore
-        all hard line breaks by selecting this option.</paragraph>
-
-    	<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:EpubOptionsIgnoreEmptyParagraphs" id="bm_options_ignoreemptyparagraphs"/>
-		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2xhtml.oxt:EpubOptionsIgnoreEmptyParagraphs" visibility="hidden">Check this if you don't want to export empty paragraphs</ahelp></paragraph>
-		<embed href="org.openoffice.da.writer2xhtml.oxt/export.xhp#ignoreemptyparagraphs"/>
-
-    	<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:EpubOptionsIgnoreDoubleSpaces" id="bm_options_ignoredoublespaces"/>
-		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2xhtml.oxt:EpubOptionsIgnoreDoubleSpaces" visibility="hidden">Check this to treat several spaces as a single space in the export</ahelp></paragraph>
-        <embed href="org.openoffice.da.writer2xhtml.oxt/export.xhp#ignoredoublespaces"/>
+    	<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:EpubOptionsUseCustomMetadata" id="bm_options_usecustommetadata"/>
+   		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2xhtml.oxt:EpubOptionsUseCustomMetadata" visibility="hidden">Check this if you want to export custom document properties</ahelp></paragraph>
+       	<paragraph role="heading" level="3" xml-lang="en-US">Export custom document properties</paragraph>
+		<paragraph role="paragraph" xml-lang="en-US">The EPUB format supports a number of additional document properties, which can be
+		defined using custom document properties in %PRODUCTNAME Writer.</paragraph>
+   	    <paragraph role="paragraph" xml-lang="en-US">If you select this option, these properties will be exported.</paragraph>
+       	<paragraph role="paragraph" xml-lang="en-US">Click <emph>Edit</emph> to edit the custom document properties.</paragraph>
 
       	<paragraph role="heading" level="2" xml-lang="en-US">Document division</paragraph>
    		<paragraph role="paragraph" xml-lang="en-US">Technically an EPUB document consists of several document parts in XHTML format.

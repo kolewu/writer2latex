@@ -1,5 +1,21 @@
 Changelog for Writer2LaTeX version 1.0 -> 1.2
 
+---------- version 1.1.7 ----------
+
+[w2x] Standard meta data as well as custom meta data can now be edited directly from the EPUB export dialog
+
+[w2x] New option use_custom_metadata (default true) making the inclusion of custom meta data in EPUB export optional
+
+[w2x] Revised the internal structure of EPUB files: Text files are named chapter<n>.xhtml, images are placed in the
+  subdirectory images and name image<n>, styles are placed in the subdirectory styles and names styles.css (custom
+  style sheet) and styles1.css (generated style sheet)
+
+[w2x] Use relative font size is now selected per default in EPUB export dialog
+
+[w2x] Default value of the option formulas changed to image+starmath
+
+[w2x] Default value of the option use_default_font changed to false (was true by mistake)
+
 ---------- version 1.1.6 ----------
 
 [all] Changed w2l.bat to use  %~dp0 as suggested by Dave Jarvis (this leaves out any (probably none) win 9x users)

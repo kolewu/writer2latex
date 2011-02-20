@@ -74,7 +74,7 @@
             <value>false</value>
         </prop>
         <prop oor:name="RelativeFontSize" oor:type="xs:boolean">
-            <value>false</value>
+            <value>true</value>
         </prop>
         <prop oor:name="FontScaling" oor:type="xs:int">
             <value>100</value>
@@ -85,6 +85,15 @@
         <prop oor:name="DefaultFontName" oor:type="xs:string">
             <value></value>
         </prop>
+        <prop oor:name="IgnoreEmptyParagraphs" oor:type="xs:boolean">
+            <value>false</value>
+        </prop>
+        <prop oor:name="IgnoreHardLineBreaks" oor:type="xs:boolean">
+            <value>false</value>
+        </prop>
+        <prop oor:name="IgnoreDoubleSpaces" oor:type="xs:boolean">
+            <value>false</value>
+        </prop>
         <prop oor:name="DisplayHiddenText" oor:type="xs:boolean">
             <value>false</value>
         </prop>
@@ -94,14 +103,8 @@
         <prop oor:name="UseDublinCore" oor:type="xs:boolean">
             <value>true</value>
         </prop>
-        <prop oor:name="IgnoreEmptyParagraphs" oor:type="xs:boolean">
-            <value>false</value>
-        </prop>
-        <prop oor:name="IgnoreHardLineBreaks" oor:type="xs:boolean">
-            <value>false</value>
-        </prop>
-        <prop oor:name="IgnoreDoubleSpaces" oor:type="xs:boolean">
-            <value>false</value>
+        <prop oor:name="UseCustomMetadata" oor:type="xs:boolean">
+            <value>true</value>
         </prop>
         <prop oor:name="Split" oor:type="xs:boolean">
             <value>false</value>
