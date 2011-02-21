@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-02-19)
+ *  Version 1.2 (2011-02-21)
  *
  */
 
@@ -64,6 +64,9 @@ import writer2latex.util.Misc;
  *
  */
 public class Converter extends ConverterBase {
+	private static final String EPUB_STYLESHEET = "styles/styles1.css";
+	private static final String EPUB_CUSTOM_STYLESHEET = "styles/styles.css";
+	
     // Config
     private XhtmlConfig config;
 	
@@ -124,7 +127,7 @@ public class Converter extends ConverterBase {
 
     @Override public void readStyleSheet(InputStream is) throws IOException {
     	if (styleSheet==null) {
-    		styleSheet = new CssDocument("styles/styles.css");
+    		styleSheet = new CssDocument(EPUB_CUSTOM_STYLESHEET);
     	}
     	styleSheet.read(is);
     }
@@ -419,8 +422,8 @@ public class Converter extends ConverterBase {
         }
         
         // Export styles (EPUB)
-        if (isOPS()) {
-        	CssDocument cssDoc = new CssDocument("styles/styles1.css");
+        if (isOPS() && config.xhtmlFormatting()>XhtmlConfig.IGNORE_STYLES) {
+        	CssDocument cssDoc = new CssDocument(EPUB_STYLESHEET);
         	cssDoc.read(styleCv.exportStyles(false));
         	converterResult.addDocument(cssDoc);
         }
@@ -650,7 +653,7 @@ public class Converter extends ConverterBase {
         		sty.setAttribute("rel", "stylesheet");
         		sty.setAttribute("type", "text/css");
         		sty.setAttribute("media", "all");
-        		sty.setAttribute("href", "stylesheet/"+styleSheet.getFileName());
+        		sty.setAttribute("href", EPUB_CUSTOM_STYLESHEET);
         		head.appendChild(sty);
         	}
 
@@ -660,7 +663,7 @@ public class Converter extends ConverterBase {
         		htmlStyle.setAttribute("rel","stylesheet");
         		htmlStyle.setAttribute("type","text/css");
         		htmlStyle.setAttribute("media","all");
-        		htmlStyle.setAttribute("href","styles/styles1.css");
+        		htmlStyle.setAttribute("href",EPUB_STYLESHEET);
         		head.appendChild(htmlStyle);
         	}
         	// Note: For XHTML, generated styles are exported to the doc at the end.
