@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-02-20)
+ *  Version 1.2 (2011-02-22)
  *
  */
 
@@ -37,6 +37,7 @@ import com.sun.star.frame.XDispatchProvider;
 import com.sun.star.frame.XFrame;
 import com.sun.star.lang.XMultiComponentFactory;
 import com.sun.star.lang.XMultiServiceFactory;
+import com.sun.star.ui.dialogs.XExecutableDialog;
 import com.sun.star.uno.Exception;
 import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
@@ -320,15 +321,16 @@ public class EpubOptionsDialog extends OptionsDialogBase {
     	XDispatchHelper helper = (XDispatchHelper) UnoRuntime.queryInterface(XDispatchHelper.class, dispatchHelper);
     	
     	// Get the current frame
+    	XDesktop xDesktop;
     	Object desktop;
 		try {
-			desktop = xMCF.createInstanceWithContext("com.sun.star.frame.Desktop", xContext);
+			desktop = xContext.getServiceManager().createInstanceWithContext("com.sun.star.frame.Desktop", xContext);
 		} catch (Exception e) {
 			// Failed to get desktop
 			System.out.println("Failed to get desktop");
 			return;
-		} 
-    	XDesktop xDesktop = (XDesktop) UnoRuntime.queryInterface(com.sun.star.frame.XDesktop.class, desktop);
+		}
+    	xDesktop = (XDesktop) UnoRuntime.queryInterface(com.sun.star.frame.XDesktop.class, desktop);
     	XFrame xFrame =xDesktop.getCurrentFrame();
     	
     	// Get the DispatchProvider for the current frame
@@ -338,8 +340,14 @@ public class EpubOptionsDialog extends OptionsDialogBase {
     }
     
     private void editCustomMetadataClick() {
-    	// Stub, TODO
-    	System.out.println("Edit custom metadata");
+        Object dialog;
+		try {
+			dialog = xContext.getServiceManager().createInstanceWithContext("org.openoffice.da.writer2xhtml.EpubMetadataDialog", xContext);
+	        XExecutableDialog xDialog = (XExecutableDialog) UnoRuntime.queryInterface(XExecutableDialog.class, dialog);
+	        xDialog.execute();
+		} catch (Exception e) {
+			// Failed to get dialog
+		}
     }
 	
     private void splitChange() {

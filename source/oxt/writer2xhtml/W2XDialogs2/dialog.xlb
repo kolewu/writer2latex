@@ -13,4 +13,5 @@
  <library:element library:name="DeleteDialog"/>
  <library:element library:name="LoadDefaults"/>
  <library:element library:name="EpubOptions"/>
+ <library:element library:name="EpubMetadata"/>
 </library:library>

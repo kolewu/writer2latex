@@ -50,6 +50,7 @@ import com.sun.star.uno.XComponentContext;
 
 /** This class provides an abstract uno component which implements a dialog
  *  from an xml description (using the DialogProvider2 service)
+ *  TODO: Use DialogAccess.java
  */
 public abstract class DialogBase implements
         XTypeProvider, XServiceInfo, XServiceName, // Uno component

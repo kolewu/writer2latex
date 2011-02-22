@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2010 by Henrik Just
+ *  Copyright: 2002-2011 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-12-28) 
+ *  Version 1.2 (2011-02-21) 
  *
  */ 
  
@@ -96,6 +96,12 @@ public class W2XRegistration {
             multiFactory,						    
             regKey);
         }
+        else if (implName.equals(EpubMetadataDialog.__implementationName)) {
+            xSingleServiceFactory = FactoryHelper.getServiceFactory(EpubMetadataDialog.class,
+            EpubMetadataDialog.__serviceName,
+            multiFactory,						    
+            regKey);
+        }
         else if (implName.equals(ConfigurationDialog.__implementationName)) {
             xSingleServiceFactory = FactoryHelper.getServiceFactory(ConfigurationDialog.class,
             ConfigurationDialog.__serviceName,
@@ -128,6 +134,8 @@ public class W2XRegistration {
                 XhtmlOptionsDialogCalc.__serviceName, regKey) & 
             FactoryHelper.writeRegistryServiceInfo(EpubOptionsDialog.__implementationName,
                         EpubOptionsDialog.__serviceName, regKey) &
+            FactoryHelper.writeRegistryServiceInfo(EpubMetadataDialog.__implementationName,
+                        EpubMetadataDialog.__serviceName, regKey) &
             FactoryHelper.writeRegistryServiceInfo(ConfigurationDialog.__implementationName,
                 ConfigurationDialog.__serviceName, regKey);
     }
