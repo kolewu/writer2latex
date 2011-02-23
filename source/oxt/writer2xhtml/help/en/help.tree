@@ -5,6 +5,7 @@
       <topic id="writer2xhtml/org.openoffice.da.writer2xhtml.oxt/export.xhp">XHTML Export (Writer)</topic>
       <topic id="writer2xhtml/org.openoffice.da.writer2xhtml.oxt/export_calc.xhp">XHTML Export (Calc)</topic>
       <topic id="writer2xhtml/org.openoffice.da.writer2xhtml.oxt/epub_export.xhp">EPUB Export (Writer)</topic>
+      <topic id="writer2xhtml/org.openoffice.da.writer2xhtml.oxt/epub_metadata.xhp">EPUB document properties (Writer)</topic>
       <node id="w2l0x_configuration" title="Custom style">
       	<topic id="writer2latex/org.openoffice.da.writer2xhtml.oxt/Configuration/Introduction.xhp">Introduction</topic>
       	<topic id="writer2latex/org.openoffice.da.writer2xhtml.oxt/Configuration/General.xhp">General</topic>

@@ -62,7 +62,7 @@
   <dlg:textfield dlg:id="Rights" dlg:tab-index="28" dlg:left="245" dlg:top="166" dlg:width="105" dlg:height="12"/>
   <dlg:button dlg:id="OKButton" dlg:tab-index="36" dlg:left="10" dlg:top="195" dlg:width="50" dlg:height="12" dlg:value="OK" dlg:button-type="ok"/>
   <dlg:button dlg:id="CancelButton" dlg:tab-index="37" dlg:left="65" dlg:top="195" dlg:width="50" dlg:height="12" dlg:value="Cancel" dlg:button-type="cancel"/>
-  <dlg:button dlg:id="HelpButton" dlg:tab-index="38" dlg:left="300" dlg:top="195" dlg:width="50" dlg:height="12" dlg:value="Help"/>
+  <dlg:button dlg:id="HelpButton" dlg:tab-index="38" dlg:left="300" dlg:top="195" dlg:width="50" dlg:height="12" dlg:help-url="org.openoffice.da.writer2xhtml.oxt:EpubMetadata" dlg:value="Help" dlg:button-type="help"/>
   <dlg:fixedline dlg:id="FixedLine1" dlg:tab-index="39" dlg:left="180" dlg:top="9" dlg:width="1" dlg:height="170" dlg:align="vertical"/>
   <dlg:text dlg:id="TitleLabel" dlg:tab-index="40" dlg:left="190" dlg:top="8" dlg:width="50" dlg:height="12" dlg:value="Title"/>
   <dlg:textfield dlg:id="Title" dlg:tab-index="18" dlg:left="245" dlg:top="6" dlg:width="105" dlg:height="12"/>
