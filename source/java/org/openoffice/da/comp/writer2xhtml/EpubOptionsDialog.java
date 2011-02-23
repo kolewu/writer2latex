@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-02-22)
+ *  Version 1.2 (2011-02-23)
  *
  */
 
@@ -29,14 +29,8 @@ package org.openoffice.da.comp.writer2xhtml;
 import java.awt.GraphicsEnvironment;
 
 import com.sun.star.awt.XDialog;
-import com.sun.star.beans.PropertyValue;
 import com.sun.star.beans.XPropertySet;
-import com.sun.star.frame.XDesktop;
-import com.sun.star.frame.XDispatchHelper;
-import com.sun.star.frame.XDispatchProvider;
-import com.sun.star.frame.XFrame;
-import com.sun.star.lang.XMultiComponentFactory;
-import com.sun.star.lang.XMultiServiceFactory;
+import com.sun.star.lang.XComponent;
 import com.sun.star.ui.dialogs.XExecutableDialog;
 import com.sun.star.uno.Exception;
 import com.sun.star.uno.UnoRuntime;
@@ -103,7 +97,6 @@ public class EpubOptionsDialog extends OptionsDialogBase {
         loadCheckBoxOption(xProps, "DisplayHiddenText");
         loadCheckBoxOption(xProps, "Notes");
         loadCheckBoxOption(xProps, "UseDublinCore");
-        loadCheckBoxOption(xProps, "UseCustomMetadata");
 			
         // Document division
         loadCheckBoxOption(xProps, "Split");
@@ -151,7 +144,6 @@ public class EpubOptionsDialog extends OptionsDialogBase {
         saveCheckBoxOption(xProps, helper, "DisplayHiddenText", "display_hidden_text");
         saveCheckBoxOption(xProps, helper, "Notes", "notes");
         saveCheckBoxOption(xProps, helper, "UseDublinCore", "use_dublin_core");
-        saveCheckBoxOption(xProps, helper, "UseCustomMetadata", "use_custom_metadata");
   		
         // Document division
         boolean bSplit = saveCheckBoxOption(xProps, "Split");
@@ -213,9 +205,6 @@ public class EpubOptionsDialog extends OptionsDialogBase {
         else if (sMethod.equals("EditMetadataClick")) {
             editMetadataClick();
         }
-        else if (sMethod.equals("EditCustomMetadataClick")) {
-            editCustomMetadataClick();
-        }
         else if (sMethod.equals("SplitChange")) {
             splitChange();
         }
@@ -229,8 +218,7 @@ public class EpubOptionsDialog extends OptionsDialogBase {
     }
 
     @Override public String[] getSupportedMethodNames() {
-        String[] sNames = { "ConfigChange", "RelativeFontSizeChange", "UseDefaultFontChange",
-        		"EditMetadataClick", "EditCustomMetadataClick",
+        String[] sNames = { "ConfigChange", "RelativeFontSizeChange", "UseDefaultFontChange", "EditMetadataClick",
         		"SplitChange", "UsePageBreakSplitChange", "UseSplitAfterChange" };
         return sNames;
     }
@@ -265,7 +253,6 @@ public class EpubOptionsDialog extends OptionsDialogBase {
         // Special content
         setControlEnabled("Notes",!isLocked("notes"));
         setControlEnabled("UseDublinCore",!isLocked("use_dublin_core"));
-        setControlEnabled("UseCustomMetadata",!isLocked("use_custom_metadata"));
 			
         // Document division
         boolean bSplit = getCheckBoxStateAsBoolean("Split");
@@ -307,49 +294,22 @@ public class EpubOptionsDialog extends OptionsDialogBase {
     }
     
     private void editMetadataClick() {
-    	// Get the DispatchHelper service
-    	XMultiComponentFactory xMCF = xContext.getServiceManager();
-    	XMultiServiceFactory xFactory = (XMultiServiceFactory) UnoRuntime.queryInterface(XMultiServiceFactory.class, xMCF);
-    	Object dispatchHelper;
-		try {
-			dispatchHelper = xFactory.createInstance("com.sun.star.frame.DispatchHelper");
-		} catch (Exception e) {
-			// Failed to get dispatch helper, cannot execute dispatch
-			System.out.println("Failed to get dispatch helper");
-			return;
-		}
-    	XDispatchHelper helper = (XDispatchHelper) UnoRuntime.queryInterface(XDispatchHelper.class, dispatchHelper);
-    	
-    	// Get the current frame
-    	XDesktop xDesktop;
-    	Object desktop;
-		try {
-			desktop = xContext.getServiceManager().createInstanceWithContext("com.sun.star.frame.Desktop", xContext);
-		} catch (Exception e) {
-			// Failed to get desktop
-			System.out.println("Failed to get desktop");
-			return;
-		}
-    	xDesktop = (XDesktop) UnoRuntime.queryInterface(com.sun.star.frame.XDesktop.class, desktop);
-    	XFrame xFrame =xDesktop.getCurrentFrame();
-    	
-    	// Get the DispatchProvider for the current frame
-    	XDispatchProvider xDispatchProvider = (XDispatchProvider)UnoRuntime.queryInterface(XDispatchProvider.class, xFrame);
-    	PropertyValue[] props = new PropertyValue[0];
-    	helper.executeDispatch(xDispatchProvider, ".uno:SetDocumentProperties","", 0, props); 
-    }
-    
-    private void editCustomMetadataClick() {
         Object dialog;
 		try {
 			dialog = xContext.getServiceManager().createInstanceWithContext("org.openoffice.da.writer2xhtml.EpubMetadataDialog", xContext);
 	        XExecutableDialog xDialog = (XExecutableDialog) UnoRuntime.queryInterface(XExecutableDialog.class, dialog);
 	        xDialog.execute();
+	        // Dispose the dialog after execution (to free up the memory)
+	        XComponent xComponent = (XComponent) UnoRuntime.queryInterface(XComponent.class, dialog);
+	        if (xComponent!=null) {
+	        	System.out.println("Disposing the dialog!");
+	        	xComponent.dispose();
+	        }
 		} catch (Exception e) {
 			// Failed to get dialog
 		}
     }
-	
+    
     private void splitChange() {
         if (!isLocked("split_level")) {
             boolean bState = getCheckBoxStateAsBoolean("Split");

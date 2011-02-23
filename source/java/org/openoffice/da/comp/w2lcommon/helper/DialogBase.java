@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2008 by Henrik Just
+ *  Copyright: 2002-2011 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.0 (2008-09-11)
+ *  Version 1.2 (2011-02-23)
  *
  */ 
  
@@ -87,10 +87,10 @@ public abstract class DialogBase implements
      */
     protected abstract void initialize();
 	
-    /** Finalize the dialog after execution (eg. save settings to the registry)
+    /** End the dialog after execution (eg. save settings to the registry)
      *  The subclass must implement this
      */
-    protected abstract void finalize();
+    protected abstract void endDialog();
 	
     //////////////////////////////////////////////////////////////////////////
     // Some constants
@@ -195,15 +195,12 @@ public abstract class DialogBase implements
 
             if (nResult == ExecutableDialogResults.OK) {
                 // Finalize after execution of dialog using method from subclass
-                finalize();
+                endDialog();
             }
             xDialog.endExecute();
             return nResult;
         }
         catch (Exception e) {
-MessageBox msgBox = new MessageBox(xContext);
-msgBox.showMessage("Error",e.toString()+" "+e.getStackTrace()[0].toString());
-
             // continue as if the dialog was executed OK
             return ExecutableDialogResults.OK; 
         }

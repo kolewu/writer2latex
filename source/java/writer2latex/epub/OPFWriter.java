@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  version 1.2 (2011-02-17)
+ *  version 1.2 (2011-02-23)
  *
  */
 
@@ -51,7 +51,7 @@ import writer2latex.xmerge.NewDOMDocument;
 public class OPFWriter extends NewDOMDocument {
 	private String sUID=null;
 
-	public OPFWriter(ConverterResult cr, boolean bUseDublinCore, boolean bUseCustomMetadata) {
+	public OPFWriter(ConverterResult cr, boolean bUseDublinCore) {
 		super("book", "opf");
 		
         // create DOM
@@ -108,7 +108,7 @@ public class OPFWriter extends NewDOMDocument {
         boolean bHasIdentifier = false;
         boolean bHasCreator = false;
         boolean bHasDate = false;
-        if (bUseCustomMetadata) {
+        if (bUseDublinCore) {
         	// First rearrange the user-defined meta data
         	Map<String,String> userDefinedMetaData = cr.getMetaData().getUserDefinedMetaData();
         	Map<String,String[]> dc = new HashMap<String,String[]>();

@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2010 by Henrik Just
+ *  Copyright: 2002-2011 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-04-12)
+ *  Version 1.2 (2011-02-23)
  *
  */ 
  
@@ -115,7 +115,7 @@ public abstract class OptionsDialogBase extends DialogBase implements
 	
     /** Finalize the dialog after execution (eg. save settings to the registry)
      */
-    public void finalize() {
+    public void endDialog() {
         try {
             // Prepare registry view
             Object rwview = getRegistryView(true);

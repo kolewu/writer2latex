@@ -70,7 +70,6 @@
             <prop oor:name="DisplayHiddenText" oor:type="xs:boolean" />
             <prop oor:name="Notes" oor:type="xs:boolean" />
             <prop oor:name="UseDublinCore" oor:type="xs:boolean" />
-            <prop oor:name="UseCustomMetadata" oor:type="xs:boolean" />
             <!-- Files -->
             <prop oor:name="Split" oor:type="xs:boolean" />
             <prop oor:name="SplitLevel" oor:type="xs:short" />

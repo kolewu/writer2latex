@@ -124,14 +124,6 @@
        	are exported, otherwise only the title is exported.</paragraph>
        	<paragraph role="paragraph" xml-lang="en-US">Click <emph>Edit</emph> to open the dialog to edit the document properties.</paragraph>
 
-    	<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:EpubOptionsUseCustomMetadata" id="bm_options_usecustommetadata"/>
-   		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2xhtml.oxt:EpubOptionsUseCustomMetadata" visibility="hidden">Check this if you want to export custom document properties</ahelp></paragraph>
-       	<paragraph role="heading" level="3" xml-lang="en-US">Export custom document properties</paragraph>
-		<paragraph role="paragraph" xml-lang="en-US">The EPUB format supports a number of additional document properties, which can be
-		defined using custom document properties in %PRODUCTNAME Writer.</paragraph>
-   	    <paragraph role="paragraph" xml-lang="en-US">If you select this option, these properties will be exported.</paragraph>
-       	<paragraph role="paragraph" xml-lang="en-US">Click <emph>Edit</emph> to edit the custom document properties.</paragraph>
-
       	<paragraph role="heading" level="2" xml-lang="en-US">Document division</paragraph>
    		<paragraph role="paragraph" xml-lang="en-US">Technically an EPUB document consists of several document parts in XHTML format.
    		In principle you can have only one part, but this is not recommended. For performance reasons and because some EPUB readers have
