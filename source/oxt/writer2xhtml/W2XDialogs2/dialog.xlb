@@ -14,4 +14,6 @@
  <library:element library:name="LoadDefaults"/>
  <library:element library:name="EpubOptions"/>
  <library:element library:name="EpubMetadata"/>
+ <library:element library:name="AuthorDialog"/>
+ <library:element library:name="DateDialog"/>
 </library:library>

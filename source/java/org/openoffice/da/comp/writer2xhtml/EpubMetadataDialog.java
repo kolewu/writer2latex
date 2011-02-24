@@ -20,17 +20,21 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-02-23)
+ *  Version 1.2 (2011-02-24)
  *
  */
 
 package org.openoffice.da.comp.writer2xhtml;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Vector;
 
 import org.openoffice.da.comp.w2lcommon.helper.DialogBase;
+import org.openoffice.da.comp.w2lcommon.helper.SimpleDialog;
 
 import writer2latex.util.CSVList;
+import writer2latex.util.Misc;
 
 import com.sun.star.awt.XDialog;
 import com.sun.star.beans.IllegalTypeException;
@@ -47,6 +51,7 @@ import com.sun.star.frame.XDesktop;
 import com.sun.star.lang.IllegalArgumentException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.lang.XComponent;
+import com.sun.star.ui.dialogs.ExecutableDialogResults;
 import com.sun.star.uno.AnyConverter;
 import com.sun.star.uno.Exception;
 import com.sun.star.uno.UnoRuntime;
@@ -55,6 +60,13 @@ import com.sun.star.uno.XComponentContext;
 /** This class provides a UNO component which implements a custom metadata editor UI for the EPUB export
  */
 public class EpubMetadataDialog extends DialogBase {
+	// Author data
+	private class AuthorInfo {
+		String sName = "";
+		boolean isCreator = true;
+		String sRole = "";
+	}
+	
 	// All the user defined properties we handle
 	private static final String IDENTIFIER="Identifier";
 	private static final String CREATOR="Creator";
@@ -67,11 +79,25 @@ public class EpubMetadataDialog extends DialogBase {
 	private static final String RELATION="Relation";
 	private static final String COVERAGE="Coverage";
 	private static final String RIGHTS="Rights";
-
+	
+	private static final String[] sRoles = {"", "adp", "ann", "arr", "art", "asn", "aut", "aqt", "aft", "aui", "ant", "bkp",
+		"clb", "cmm", "dsr", "edt", "ill", "lyr", "mdc", "mus", "nrt", "oth", "pht", "prt", "red", "rev", "spn", "ths", "trc", "trl"};
+	private static HashMap<String,Short> backRoles;
+	static {
+		backRoles = new HashMap<String,Short>();
+		int nCount = sRoles.length;
+		for (short i=0; i<nCount; i++) {
+			backRoles.put(sRoles[i], i);
+		}
+	}
+	
 	// Access to the document properties
 	private XDocumentProperties xDocumentProperties=null;
 	private XPropertyContainer xUserProperties=null;
 	private XPropertySet xUserPropertySet=null;
+	
+	// Author and date bookkeeping
+	private Vector<AuthorInfo> authors = new Vector<AuthorInfo>();
     
     public EpubMetadataDialog(XComponentContext xContext) {
 		super(xContext);
@@ -145,27 +171,78 @@ public class EpubMetadataDialog extends DialogBase {
     }
     
     private boolean authorAddclick() {
-    	System.out.println("AuthorAddClick");
+    	SimpleDialog dialog = new SimpleDialog(xContext,"W2XDialogs2.AuthorDialog");
+    	if (dialog.getDialog()!=null) {
+    		dialog.getControls().setListBoxSelectedItem("Type", (short) 0);
+    		dialog.getControls().setListBoxSelectedItem("Role", (short) 0); 		
+    		if (dialog.getDialog().execute()==ExecutableDialogResults.OK) {
+    			AuthorInfo author = new AuthorInfo();
+    			author.sName = dialog.getControls().getTextFieldText("Author");
+    			author.sRole = sRoles[dialog.getControls().getListBoxSelectedItem("Role")];
+    			author.isCreator = dialog.getControls().getListBoxSelectedItem("Type")==0;
+    			authors.add(author);
+    			updateAuthorList((short) (authors.size()-1));
+    		}
+    		dialog.getDialog().endExecute();
+    	}
     	return true;
     }
     
     private boolean authorModifyclick() {
-    	System.out.println("AuthorModifyClick");    	
+    	short nIndex = getListBoxSelectedItem("Authors");
+    	AuthorInfo author = authors.get(nIndex);
+    	SimpleDialog dialog = new SimpleDialog(xContext,"W2XDialogs2.AuthorDialog");
+    	if (dialog.getDialog()!=null) {
+    		dialog.getControls().setTextFieldText("Author", author.sName);
+    		dialog.getControls().setListBoxSelectedItem("Type", author.isCreator ? (short)0 : (short) 1);
+    		dialog.getControls().setListBoxSelectedItem("Role", backRoles.containsKey(author.sRole)? backRoles.get(author.sRole) : (short)0); 		
+    		if (dialog.getDialog().execute()==ExecutableDialogResults.OK) {
+    			author.sName = dialog.getControls().getTextFieldText("Author");
+    			author.sRole = sRoles[dialog.getControls().getListBoxSelectedItem("Role")];
+    			author.isCreator = dialog.getControls().getListBoxSelectedItem("Type")==0;
+    			updateAuthorList(nIndex);
+    		}
+    		dialog.getDialog().endExecute();
+    	}    	    	
     	return true;
     }
     
     private boolean authorDeleteclick() {
-    	System.out.println("AuthorDeleteClick");	
+    	if (authors.size()>0) {
+    		SimpleDialog dialog = new SimpleDialog(xContext,"W2XDialogs2.DeleteDialog");
+    		if (dialog.getDialog()!=null) {
+    			short nIndex = getListBoxSelectedItem("Authors");
+    			String sLabel = dialog.getControls().getLabelText("DeleteLabel");
+    			sLabel = sLabel.replaceAll("%s", authors.get(nIndex).sName);
+    			dialog.getControls().setLabelText("DeleteLabel", sLabel);
+    			if (dialog.getDialog().execute()==ExecutableDialogResults.OK) {
+    				authors.remove(nIndex);
+    				updateAuthorList(nIndex<authors.size() ? (short) nIndex : (short) (nIndex-1));
+    			}
+    		}
+    	}
     	return true;
     }
     
     private boolean authorUpclick() {
-    	System.out.println("AuthorUpClick");	
+		short nIndex = getListBoxSelectedItem("Authors");
+		if (nIndex>0) {
+			AuthorInfo author = authors.get(nIndex);
+			authors.set(nIndex, authors.get(nIndex-1));
+			authors.set(nIndex-1, author);
+			updateAuthorList((short) (nIndex-1));
+		}
     	return true;
     }
     
     private boolean authorDownclick() {
-    	System.out.println("AuthorDownClick");	
+		short nIndex = getListBoxSelectedItem("Authors");
+		if (nIndex+1<authors.size()) {
+			AuthorInfo author = authors.get(nIndex);
+			authors.set(nIndex, authors.get(nIndex+1));
+			authors.set(nIndex+1, author);
+			updateAuthorList((short) (nIndex+1));
+		}
     	return true;
     }
     
@@ -212,9 +289,31 @@ public class EpubMetadataDialog extends DialogBase {
 		useCustomIdentifierChange();
 		if (sIdentifiers.length>0) { // Use the first if we have several...
 			setTextFieldText("Identifier",getValue(sIdentifiers[0]));
-			int nDot = sIdentifiers[0].indexOf(".");
-			setTextFieldText("IdentifierType",nDot>-1 ? sIdentifiers[0].substring(nDot+1) : "");
+			setTextFieldText("IdentifierType",getSuffix(sIdentifiers[0]));
 		}
+		
+		// Get the authors and set the list box
+		String[] sCreators = getProperties(CREATOR,false);
+		for (String sCreator : sCreators) {
+			AuthorInfo creator = new AuthorInfo();
+			creator.sName = getValue(sCreator);
+			creator.sRole = getSuffix(sCreator);
+			creator.isCreator = true;
+			authors.add(creator);
+		}
+		String[] sContributors = getProperties(CONTRIBUTOR,false);
+		for (String sContributor : sContributors) {
+			AuthorInfo contributor = new AuthorInfo();
+			contributor.sName = getValue(sContributor);
+			contributor.sRole = getSuffix(sContributor);
+			contributor.isCreator = false;
+			authors.add(contributor);
+		}
+		updateAuthorList((short) 0);
+		
+		// Get the dates and set the list box
+		// TODO
+		updateDateList((short) 0);
 		
 		// Get the standard properties and set the text fields
 		setTextFieldText("Title",xDocumentProperties.getTitle());
@@ -253,12 +352,34 @@ public class EpubMetadataDialog extends DialogBase {
 			setValue(sName,getTextFieldText("Identifier"));
 		}
 		
+		// Set the authors from the list box
+		String[] sCreators = getProperties(CREATOR,false);
+		for (String sCreator : sCreators) { // remove old creators
+			removeProperty(sCreator);
+		}
+		String[] sContributors = getProperties(CONTRIBUTOR,false); 
+		for (String sContributor : sContributors) { // remove old contributors
+			removeProperty(sContributor);
+		}
+		int i=0;
+		for (AuthorInfo author : authors) {
+			String sName = (author.isCreator ? CREATOR : CONTRIBUTOR)+(++i);
+			if (author.sRole.length()>0) {
+				sName+="."+author.sRole;
+			}
+			addProperty(sName);
+			setValue(sName,author.sName);
+		}
+		
+		// Set the dates from the list box
+		// TODO
+		
 		// Set the standard properties from the text fields
 		xDocumentProperties.setTitle(getTextFieldText("Title"));
 		xDocumentProperties.setSubject(getTextFieldText("Subject"));
 		String[] sKeywords = getTextFieldText("Keywords").split(",");
-		for (int i=0; i<sKeywords.length; i++) {
-			sKeywords[i] = sKeywords[i].trim();
+		for (int j=0; j<sKeywords.length; j++) {
+			sKeywords[j] = sKeywords[j].trim();
 		}
 		xDocumentProperties.setKeywords(sKeywords);
 		xDocumentProperties.setDescription(getTextFieldText("Description"));
@@ -271,6 +392,12 @@ public class EpubMetadataDialog extends DialogBase {
 		writeSimpleProperty(RELATION);
 		writeSimpleProperty(COVERAGE);
 		writeSimpleProperty(RIGHTS);
+	}
+	
+	// Get the suffix of a user defined property (portion after fist ., if any)
+	private String getSuffix(String sPropertyName) {
+		int nDot = sPropertyName.indexOf(".");
+		return nDot>-1 ? sPropertyName.substring(nDot+1) : "";
 	}
 
 	// Get all currently defined user properties with a specific name or prefix
@@ -285,7 +412,7 @@ public class EpubMetadataDialog extends DialogBase {
 				names.add(sName);
 			}
 		}
-		return names.toArray(new String[names.size()]);
+		return Misc.sortStringSet(names);
 	}
 	
 	// Add a user property
@@ -293,14 +420,8 @@ public class EpubMetadataDialog extends DialogBase {
 		try {
 			xUserProperties.addProperty(sName, (short) 128, ""); // 128 means removeable, last parameter is default value
 		} catch (PropertyExistException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (IllegalTypeException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 	}
 	
@@ -309,11 +430,7 @@ public class EpubMetadataDialog extends DialogBase {
 		try {
 			xUserProperties.removeProperty(sName);
 		} catch (UnknownPropertyException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (NotRemoveableException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 	}
 	
@@ -347,6 +464,31 @@ public class EpubMetadataDialog extends DialogBase {
 			}
 		}
 		return null;
+	}
+	
+	private void updateAuthorList(short nItem) {
+		int nCount = authors.size();
+		String[] sAuthors = new String[nCount];
+		for (int i=0; i<nCount; i++) {
+			AuthorInfo author = authors.get(i);
+			sAuthors[i] = author.sName
+				+" ("
+				+(author.isCreator ? "creator":"contributor")
+				+(author.sRole.length()>0 ? ", "+author.sRole : "")
+				+")";
+		}
+		setListBoxStringItemList("Authors", sAuthors);
+		setListBoxSelectedItem("Authors",nItem);
+		setControlEnabled("ModifyAuthorButton",nCount>0);
+		setControlEnabled("DeleteAuthorButton",nCount>0);
+		setControlEnabled("AuthorUpButton",nCount>1);
+		setControlEnabled("AuthorDownButton",nCount>1);
+	}
+	
+	private void updateDateList(short nItem) {
+		setControlEnabled("AddDateButton",false);
+		setControlEnabled("ModifyDateButton",false);
+		setControlEnabled("DeleteDateButton",false);
 	}
 	
 	private void readSimpleProperty(String sName) {

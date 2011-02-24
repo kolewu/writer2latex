@@ -2,7 +2,9 @@ Changelog for Writer2LaTeX version 1.0 -> 1.2
 
 ---------- version 1.1.7 ----------
 
-[w2x] Standard meta data as well as custom meta data can now be edited directly from the EPUB export dialog
+[w2x] Added opf:file-as attribute to EPUB metadata (creators and contributors)
+
+[w2x] EPUB meta data can now be edited directly from the export dialog
 
 [w2x] Revised the internal structure of EPUB files: Text files are named chapter<n>.xhtml, images are placed in the
   subdirectory images and name image<n>, styles are placed in the subdirectory styles and names styles.css (custom

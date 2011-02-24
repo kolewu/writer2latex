@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  version 1.2 (2011-02-23)
+ *  version 1.2 (2011-02-24)
  *
  */
 
@@ -147,6 +147,7 @@ public class OPFWriter extends NewDOMDocument {
         		}
         		else if (sKey.startsWith("creator")) {
         			Element creator = appendElement(contentDOM, metadata, "dc:creator", sValue);
+    				creator.setAttribute("opf:file-as", fileAs(sValue));
         			if (sAttributeValue!=null) {
         				creator.setAttribute("opf:role", sAttributeValue);
         			}
@@ -154,6 +155,7 @@ public class OPFWriter extends NewDOMDocument {
         		}
         		else if (sKey.startsWith("contributor")) {
         			Element contributor = appendElement(contentDOM, metadata, "dc:contributor", sValue);
+    				contributor.setAttribute("opf:file-as", fileAs(sValue));
         			if (sAttributeValue!=null) {
         				contributor.setAttribute("opf:role", sAttributeValue);
         			}
@@ -268,6 +270,16 @@ public class OPFWriter extends NewDOMDocument {
 	 */
 	public String getUid() {
 		return sUID;
+	}
+	
+	private String fileAs(String sName) {
+		int nSpace = sName.lastIndexOf(' ');
+		if (nSpace>-1) {
+			return sName.substring(nSpace+1).trim()+", "+sName.substring(0, nSpace).trim();
+		}
+		else {
+			return sName.trim();
+		}
 	}
 	
 	private Element appendElement(Document contentDOM, Element node, String sTagName, String sContent) {
