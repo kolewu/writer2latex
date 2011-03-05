@@ -21,7 +21,6 @@
   <dlg:checkbox dlg:id="OriginalImageSize" dlg:tab-index="13" dlg:left="10" dlg:top="134" dlg:width="155" dlg:height="12" dlg:help-url="org.openoffice.da.writer2xhtml.oxt:EpubOptionsOriginalImageSize" dlg:value="Use original image size" dlg:checked="false"/>
   <dlg:text dlg:id="SpecialContentLabel" dlg:tab-index="30" dlg:left="185" dlg:top="8" dlg:width="160" dlg:height="12" dlg:value="Special content"/>
   <dlg:checkbox dlg:id="Notes" dlg:tab-index="18" dlg:left="190" dlg:top="36" dlg:width="155" dlg:height="12" dlg:help-url="org.openoffice.da.writer2xhtml.oxt:EpubOptionsNotes" dlg:value="Export notes" dlg:checked="true"/>
-  <dlg:checkbox dlg:id="UseDublinCore" dlg:tab-index="19" dlg:left="190" dlg:top="50" dlg:width="110" dlg:height="12" dlg:help-url="org.openoffice.da.writer2xhtml.oxt:EpubOptionsUseDublinCore" dlg:value="Export optional document properties" dlg:checked="true"/>
   <dlg:text dlg:id="AutoCorrectLabel" dlg:tab-index="31" dlg:left="5" dlg:top="148" dlg:width="160" dlg:height="12" dlg:value="AutoCorrect"/>
   <dlg:checkbox dlg:id="IgnoreHardLineBreaks" dlg:tab-index="14" dlg:left="10" dlg:top="162" dlg:width="155" dlg:height="12" dlg:help-url="org.openoffice.da.writer2xhtml.oxt:EpubOptionsIgnoreHardLineBreaks" dlg:value="Ignore hard line breaks" dlg:checked="false"/>
   <dlg:checkbox dlg:id="IgnoreEmptyParagraphs" dlg:tab-index="15" dlg:left="10" dlg:top="176" dlg:width="155" dlg:height="12" dlg:help-url="org.openoffice.da.writer2xhtml.oxt:EpubOptionsIgnoreEmptyParagraphs" dlg:value="Ignore empty paragraphs" dlg:checked="false"/>
@@ -90,7 +89,7 @@
   </dlg:menulist>
   <dlg:text dlg:id="TocLabel" dlg:tab-index="44" dlg:left="185" dlg:top="162" dlg:width="160" dlg:height="12" dlg:value="Navigation table"/>
   <dlg:text dlg:id="DocumentDivisionLabel" dlg:tab-index="32" dlg:left="185" dlg:top="64" dlg:width="160" dlg:height="12" dlg:value="Document division"/>
-  <dlg:button dlg:id="EditMetadata" dlg:tab-index="20" dlg:left="305" dlg:top="48" dlg:width="40" dlg:height="12" dlg:help-url="org.openoffice.da.writer2xhtml.oxt:EpubOptionsUseCustomMetadata" dlg:value="Edit">
+  <dlg:button dlg:id="EditMetadata" dlg:tab-index="20" dlg:left="190" dlg:top="48" dlg:width="100" dlg:height="12" dlg:help-url="org.openoffice.da.writer2xhtml.oxt:EpubOptionsUseCustomMetadata" dlg:value="Edit document properties">
    <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.UNO:EditMetadataClick" script:language="UNO"/>
   </dlg:button>
  </dlg:bulletinboard>

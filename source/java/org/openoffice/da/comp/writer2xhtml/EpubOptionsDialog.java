@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-02-23)
+ *  Version 1.2 (2011-03-04)
  *
  */
 
@@ -96,7 +96,6 @@ public class EpubOptionsDialog extends OptionsDialogBase {
         // Special content
         loadCheckBoxOption(xProps, "DisplayHiddenText");
         loadCheckBoxOption(xProps, "Notes");
-        loadCheckBoxOption(xProps, "UseDublinCore");
 			
         // Document division
         loadCheckBoxOption(xProps, "Split");
@@ -143,7 +142,6 @@ public class EpubOptionsDialog extends OptionsDialogBase {
         // Special content
         saveCheckBoxOption(xProps, helper, "DisplayHiddenText", "display_hidden_text");
         saveCheckBoxOption(xProps, helper, "Notes", "notes");
-        saveCheckBoxOption(xProps, helper, "UseDublinCore", "use_dublin_core");
   		
         // Document division
         boolean bSplit = saveCheckBoxOption(xProps, "Split");
@@ -241,7 +239,6 @@ public class EpubOptionsDialog extends OptionsDialogBase {
 		setControlEnabled("DefaultFontNameLabel",!isLocked("default_font_name") && bUseDefaultFont);
 		setControlEnabled("DefaultFontName",!isLocked("default_font_name") && bUseDefaultFont);
         
-        setControlEnabled("DisplayHiddenText",!isLocked("display_hidden_text"));
 		setControlEnabled("ConvertToPx",!isLocked("convert_to_px"));
         setControlEnabled("OriginalImageSize",!isLocked("original_image_size"));
 
@@ -251,8 +248,8 @@ public class EpubOptionsDialog extends OptionsDialogBase {
         setControlEnabled("IgnoreDoubleSpaces",!isLocked("ignore_double_spaces"));
 
         // Special content
+        setControlEnabled("DisplayHiddenText",!isLocked("display_hidden_text"));
         setControlEnabled("Notes",!isLocked("notes"));
-        setControlEnabled("UseDublinCore",!isLocked("use_dublin_core"));
 			
         // Document division
         boolean bSplit = getCheckBoxStateAsBoolean("Split");

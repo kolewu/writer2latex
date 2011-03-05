@@ -20,15 +20,19 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-02-24)
+ *  Version 1.2 (2011-03-05)
  *
  */
 
 package org.openoffice.da.comp.writer2xhtml;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.openoffice.da.comp.w2lcommon.helper.DialogBase;
 import org.openoffice.da.comp.w2lcommon.helper.SimpleDialog;
@@ -56,6 +60,9 @@ import com.sun.star.uno.AnyConverter;
 import com.sun.star.uno.Exception;
 import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
+import com.sun.star.util.DateTime;
+
+// TODO: Create the UNO helper class DocumentPropertiesAccess
 
 /** This class provides a UNO component which implements a custom metadata editor UI for the EPUB export
  */
@@ -65,6 +72,12 @@ public class EpubMetadataDialog extends DialogBase {
 		String sName = "";
 		boolean isCreator = true;
 		String sRole = "";
+	}
+	
+	// Date data
+	private class DateInfo {
+		int nDate = 0;
+		String sEvent = "";
 	}
 	
 	// All the user defined properties we handle
@@ -98,6 +111,13 @@ public class EpubMetadataDialog extends DialogBase {
 	
 	// Author and date bookkeeping
 	private Vector<AuthorInfo> authors = new Vector<AuthorInfo>();
+	private Vector<DateInfo> dates = new Vector<DateInfo>();
+	
+	// Number formatter
+    private NumberFormat formatter = new  DecimalFormat("00");
+    
+    // Pattern matcher for dates
+	Pattern datePattern = Pattern.compile("(\\d{4})-(\\d{2})-(\\d{2})");
     
     public EpubMetadataDialog(XComponentContext xContext) {
 		super(xContext);
@@ -151,13 +171,19 @@ public class EpubMetadataDialog extends DialogBase {
         else if (sMethod.equals("DateDeleteClick")) {
         	return dateDeleteClick();
         }
+        else if (sMethod.equals("DateUpClick")) {
+        	return dateUpClick();
+        }
+        else if (sMethod.equals("DateDownClick")) {
+        	return dateDownClick();
+        }
         return false;
     }
 	
     @Override public String[] getSupportedMethodNames() {
         String[] sNames = { "UseCustomIdentifierChange",
         		"AuthorAddClick", "AuthorModifyClick", "AuthorDeleteClick", "AuthorUpClick", "AuthorDownClick",
-        		"DataAddClick", "DateModifyClick", "DateDeleteClick"};
+        		"DataAddClick", "DateModifyClick", "DateDeleteClick", "DateUpClick", "DateDownClick"};
         return sNames;
     }
     
@@ -247,17 +273,74 @@ public class EpubMetadataDialog extends DialogBase {
     }
     
     private boolean dateAddClick() {
-    	System.out.println("DateAddClick");	
+    	SimpleDialog dialog = new SimpleDialog(xContext,"W2XDialogs2.DateDialog");
+    	if (dialog.getDialog()!=null) {
+    		dialog.getControls().setDateFieldValue("Date", datetime2int(xDocumentProperties.getModificationDate()));
+    		if (dialog.getDialog().execute()==ExecutableDialogResults.OK) {
+    			DateInfo date = new DateInfo();
+    			date.nDate = dialog.getControls().getDateFieldValue("Date");
+    			date.sEvent = dialog.getControls().getTextFieldText("Event").trim();
+    			dates.add(date);
+    			updateDateList((short) (dates.size()-1));
+    		}
+    		dialog.getDialog().endExecute();
+    	}
     	return true;
     }
     
     private boolean dateModifyClick() {
-    	System.out.println("DateModifyClick");
+    	short nIndex = getListBoxSelectedItem("Dates");
+    	DateInfo date = dates.get(nIndex);
+    	SimpleDialog dialog = new SimpleDialog(xContext,"W2XDialogs2.DateDialog");
+    	if (dialog.getDialog()!=null) {
+    		dialog.getControls().setDateFieldValue("Date", date.nDate);
+    		dialog.getControls().setTextFieldText("Event", date.sEvent);
+    		if (dialog.getDialog().execute()==ExecutableDialogResults.OK) {
+    			date.nDate = dialog.getControls().getDateFieldValue("Date");
+    			date.sEvent = dialog.getControls().getTextFieldText("Event").trim();
+    			updateDateList(nIndex);
+    		}
+    		dialog.getDialog().endExecute();
+    	}    	    	
     	return true;
     }
     
     private boolean dateDeleteClick() {
-    	System.out.println("DateDeleteClick");
+    	if (dates.size()>0) {
+    		SimpleDialog dialog = new SimpleDialog(xContext,"W2XDialogs2.DeleteDialog");
+    		if (dialog.getDialog()!=null) {
+    			short nIndex = getListBoxSelectedItem("Dates");
+    			String sLabel = dialog.getControls().getLabelText("DeleteLabel");
+    			sLabel = sLabel.replaceAll("%s", formatDate(dates.get(nIndex).nDate));
+    			dialog.getControls().setLabelText("DeleteLabel", sLabel);
+    			if (dialog.getDialog().execute()==ExecutableDialogResults.OK) {
+    				dates.remove(nIndex);
+    				updateDateList(nIndex<dates.size() ? (short) nIndex : (short) (nIndex-1));
+    			}
+    		}
+    	}
+    	return true;
+    }
+    
+    private boolean dateUpClick() {
+		short nIndex = getListBoxSelectedItem("Dates");
+		if (nIndex>0) {
+			DateInfo date = dates.get(nIndex);
+			dates.set(nIndex, dates.get(nIndex-1));
+			dates.set(nIndex-1, date);
+			updateDateList((short) (nIndex-1));
+		}
+    	return true;
+    }
+    
+    private boolean dateDownClick() {
+		short nIndex = getListBoxSelectedItem("Dates");
+		if (nIndex+1<dates.size()) {
+			DateInfo date = dates.get(nIndex);
+			dates.set(nIndex, dates.get(nIndex+1));
+			dates.set(nIndex+1, date);
+			updateDateList((short) (nIndex+1));
+		}
     	return true;
     }
     
@@ -288,7 +371,7 @@ public class EpubMetadataDialog extends DialogBase {
 		setCheckBoxStateAsBoolean("UseCustomIdentifier",sIdentifiers.length>0);
 		useCustomIdentifierChange();
 		if (sIdentifiers.length>0) { // Use the first if we have several...
-			setTextFieldText("Identifier",getValue(sIdentifiers[0]));
+			setTextFieldText("Identifier",getStringValue(sIdentifiers[0]));
 			setTextFieldText("IdentifierType",getSuffix(sIdentifiers[0]));
 		}
 		
@@ -296,7 +379,7 @@ public class EpubMetadataDialog extends DialogBase {
 		String[] sCreators = getProperties(CREATOR,false);
 		for (String sCreator : sCreators) {
 			AuthorInfo creator = new AuthorInfo();
-			creator.sName = getValue(sCreator);
+			creator.sName = getStringValue(sCreator);
 			creator.sRole = getSuffix(sCreator);
 			creator.isCreator = true;
 			authors.add(creator);
@@ -304,7 +387,7 @@ public class EpubMetadataDialog extends DialogBase {
 		String[] sContributors = getProperties(CONTRIBUTOR,false);
 		for (String sContributor : sContributors) {
 			AuthorInfo contributor = new AuthorInfo();
-			contributor.sName = getValue(sContributor);
+			contributor.sName = getStringValue(sContributor);
 			contributor.sRole = getSuffix(sContributor);
 			contributor.isCreator = false;
 			authors.add(contributor);
@@ -312,7 +395,19 @@ public class EpubMetadataDialog extends DialogBase {
 		updateAuthorList((short) 0);
 		
 		// Get the dates and set the list box
-		// TODO
+		String[] sDates = getProperties(DATE,false);
+		for (String sDate : sDates) {
+			DateInfo date = new DateInfo();
+			DateTime dt = getDateValue(sDate);
+			if (dt!=null) { // We accept either a date
+				date.nDate = datetime2int(dt);
+			}
+			else { // Or a string in the form yyyy-mm-dd
+				date.nDate = parseDate(getStringValue(sDate));
+			}
+			date.sEvent = getSuffix(sDate);
+			dates.add(date);
+		}
 		updateDateList((short) 0);
 		
 		// Get the standard properties and set the text fields
@@ -363,7 +458,7 @@ public class EpubMetadataDialog extends DialogBase {
 		}
 		int i=0;
 		for (AuthorInfo author : authors) {
-			String sName = (author.isCreator ? CREATOR : CONTRIBUTOR)+(++i);
+			String sName = (author.isCreator ? CREATOR : CONTRIBUTOR)+formatter.format(++i);
 			if (author.sRole.length()>0) {
 				sName+="."+author.sRole;
 			}
@@ -372,7 +467,21 @@ public class EpubMetadataDialog extends DialogBase {
 		}
 		
 		// Set the dates from the list box
-		// TODO
+		String[] sDates = getProperties(DATE,false); 
+		for (String sDate : sDates) { // remove old dates
+			removeProperty(sDate);
+		}
+		i=0;
+		for (DateInfo date : dates) {
+			String sName = DATE+formatter.format(++i);
+			if (date.sEvent.length()>0) {
+				sName+="."+date.sEvent;
+			}
+			addProperty(sName);
+			setValue(sName,formatDate(date.nDate));
+			// Doesn't work (why not?)
+			//setValue(sName,int2datetime(date.nDate));
+		}
 		
 		// Set the standard properties from the text fields
 		xDocumentProperties.setTitle(getTextFieldText("Title"));
@@ -435,9 +544,9 @@ public class EpubMetadataDialog extends DialogBase {
 	}
 	
 	// Set the value of a user property (failing silently if the property does not exist)
-	private void setValue(String sName, String sValue) {
+	private void setValue(String sName, Object value) {
 		try {
-			xUserPropertySet.setPropertyValue(sName, sValue);
+			xUserPropertySet.setPropertyValue(sName, value);
 		} catch (UnknownPropertyException e) {
 		} catch (PropertyVetoException e) {
 		} catch (IllegalArgumentException e) {
@@ -445,18 +554,11 @@ public class EpubMetadataDialog extends DialogBase {
 		}
 	}
 	
-	// Get the value of a user property (returning null if the property does not exist)
-	private String getValue(String sName) {
-		Object value;
-		try {
-			value = xUserPropertySet.getPropertyValue(sName);
-		} catch (UnknownPropertyException e) {
-			return null;
-		} catch (WrappedTargetException e) {
-			return null;
-		}
-
-		if (AnyConverter.isString(value)) {
+	// Get the string value of a user property (returning null if the property does not exist)
+	private String getStringValue(String sName) {
+		Object value = getValue(sName);
+		
+		if (value!=null && AnyConverter.isString(value)) {
 			try {
 				return AnyConverter.toString(value);
 			} catch (IllegalArgumentException e) {
@@ -466,19 +568,48 @@ public class EpubMetadataDialog extends DialogBase {
 		return null;
 	}
 	
+	private DateTime getDateValue(String sName) {
+		Object value = getValue(sName);
+		
+		if (value!=null && value instanceof DateTime) {
+			return (DateTime) value;
+		}
+		return null;
+	}
+	
+	// Get the value of a user property (returning null if the property does not exist)
+	private Object getValue(String sName) {
+		try {
+			return xUserPropertySet.getPropertyValue(sName);
+		} catch (UnknownPropertyException e) {
+			return null;
+		} catch (WrappedTargetException e) {
+			return null;
+		}
+	}
+	
 	private void updateAuthorList(short nItem) {
 		int nCount = authors.size();
-		String[] sAuthors = new String[nCount];
-		for (int i=0; i<nCount; i++) {
-			AuthorInfo author = authors.get(i);
-			sAuthors[i] = author.sName
+		if (nCount>0) {
+			String[] sAuthors = new String[nCount];
+			for (int i=0; i<nCount; i++) {
+				AuthorInfo author = authors.get(i);
+				sAuthors[i] = author.sName
 				+" ("
 				+(author.isCreator ? "creator":"contributor")
 				+(author.sRole.length()>0 ? ", "+author.sRole : "")
 				+")";
+			}
+			setListBoxStringItemList("Authors", sAuthors);
+			setListBoxSelectedItem("Authors",nItem);
+			setControlEnabled("Authors", true);
 		}
-		setListBoxStringItemList("Authors", sAuthors);
-		setListBoxSelectedItem("Authors",nItem);
+		else { // Display the fall-back author
+			String[] sAuthors = new String[1];
+			sAuthors[0] = xDocumentProperties.getAuthor()+" (default creator)";
+			setListBoxStringItemList("Authors", sAuthors);
+			setControlEnabled("Authors", false);
+		}
 		setControlEnabled("ModifyAuthorButton",nCount>0);
 		setControlEnabled("DeleteAuthorButton",nCount>0);
 		setControlEnabled("AuthorUpButton",nCount>1);
@@ -486,15 +617,36 @@ public class EpubMetadataDialog extends DialogBase {
 	}
 	
 	private void updateDateList(short nItem) {
-		setControlEnabled("AddDateButton",false);
-		setControlEnabled("ModifyDateButton",false);
-		setControlEnabled("DeleteDateButton",false);
+		int nCount = dates.size();
+		if (nCount>0) {
+			String[] sDates = new String[nCount];
+			for (int i=0; i<nCount; i++) {
+				DateInfo date = dates.get(i);
+				sDates[i] = formatDate(date.nDate);
+				if (date.sEvent.length()>0) {
+					sDates[i]+=" (" + date.sEvent + ")";
+				}
+			}
+			setListBoxStringItemList("Dates", sDates);
+			setListBoxSelectedItem("Dates",nItem);
+			setControlEnabled("Dates", true);
+		}
+		else { // Display the fall-back date
+			String[] sDates = new String[1];
+			sDates[0] = formatDate(datetime2int(xDocumentProperties.getModificationDate()))+" (default date)";
+			setListBoxStringItemList("Dates", sDates);
+			setControlEnabled("Dates", false);
+		}
+		setControlEnabled("ModifyDateButton",nCount>0);
+		setControlEnabled("DeleteDateButton",nCount>0);
+		setControlEnabled("DateUpButton",nCount>1);
+		setControlEnabled("DateDownButton",nCount>1);
 	}
 	
 	private void readSimpleProperty(String sName) {
 		String[] sNames = getProperties(sName,true);
 		if (sNames.length>0) {
-			String sValue = getValue(sNames[0]);
+			String sValue = getStringValue(sNames[0]);
 			if (sValue!=null) {
 				setTextFieldText(sName, sValue);
 			}
@@ -513,5 +665,44 @@ public class EpubMetadataDialog extends DialogBase {
 		}
 	}
 	
+	// Date fields uses integers for dates (format yyyymmdd)
+	// Document properties uses com.sun.star.util.DateTime
+	// Also dates should be formatted as yyyy-mm-dd as strings
+	// Thus we need a few conversion methods
+
+	// Format a integer date as yyyy-mm-dd
+	private String formatDate(int nDate) {
+		String sDate = Integer.toString(nDate);
+		if (sDate.length()==8) {
+			return sDate.substring(0,4)+"-"+sDate.substring(4, 6)+"-"+sDate.substring(6);
+		}
+		else {
+			return "???";
+		}
+	}
+	
+	// Parse a string as a date in the format yyyy-mm-dd (returning 0 on failure)
+	private int parseDate(String sDate) {
+		Matcher matcher = datePattern.matcher(sDate);
+		if (matcher.matches()) {
+			return Misc.getPosInteger(matcher.group(1)+matcher.group(2)+matcher.group(3),0);
+		}
+		return 0;
+	}
+	
+	// Convert an integer to com.sun.star.util.DateTime
+	/*private DateTime int2datetime(int nDate) {
+		DateTime date = new DateTime();
+		date.Year = (short) (nDate/10000);
+		date.Month = (short) ((nDate%10000)/100);
+		date.Day = (short) (nDate%100);
+		System.out.println(date.Year+"-"+date.Month+"-"+date.Day);
+		return date;
+	}*/
+	
+	// Convert a com.sun.star.util.DateTime to integer
+	private int datetime2int(DateTime date) {
+		return 10000*date.Year+100*date.Month+date.Day;				
+	}
     
 }

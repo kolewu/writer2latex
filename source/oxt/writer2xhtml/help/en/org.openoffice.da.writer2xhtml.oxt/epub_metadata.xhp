@@ -13,14 +13,15 @@
         <section id="howtoget" xml-lang="en-US">
         	Choose <emph>File - Export - EPUB, Click Edit in the dialog</emph>
         </section>
+
     
         <paragraph role="paragraph" xml-lang="en-US">The EPUB standard specifies a large number of document properties.
         Not all of these are supported by the OpenDocument standard.
         Writer2xhtml supports the additional properties using user defined document properties.
         This dialog provides a convenient interface to edit all EPUB document properties, but you can also access all properties
         using the standard interface in %PRODUCTNAME Writer, that is <emph>File - Properties</emph>.
-        Properties that are not required can be left blank. In this case they will not be included in the EPUB document (except the
-        title which is always included).</paragraph>
+        Writer2xhtml will always include the identifier, author(s), date(s) and the title.
+        Other fields are optional and can be left blank. In this case they will not be included in the EPUB document.</paragraph>
 
 
         <paragraph role="heading" level="2" xml-lang="en-US">Custom identifier</paragraph>
@@ -45,9 +46,11 @@
 		An author can be either a <emph>creator</emph>, that is a primary author of the publication, or a <emph>contributor</emph>,
 		that is a party whose contribution to the publication is secondary to the creator(s).
 		Furthermore an author may have a special role, e.g. <emph>illustrator</emph>. Both properties are specified when you add
-		a new authort to the list.</paragraph>
+		a new author to the list.</paragraph>
 		<paragraph role="paragraph" xml-lang="en-US">Note that some EPUB readers may only present the first creator, hence
-		the order may be important</paragraph>
+		you should make sure that the primary creator is at the top of the list.</paragraph>
+		<paragraph role="paragraph" xml-lang="en-US">If you do not add any authors, Writer2xhtml will display and use a default value
+		for the author.</paragraph>
         
         <paragraph role="heading" level="3" xml-lang="en-US">Add...</paragraph>
    		<paragraph role="paragraph" xml-lang="en-US">Click this to add new author to the list.</paragraph>
@@ -68,6 +71,10 @@
         <paragraph role="heading" level="2" xml-lang="en-US">Dates</paragraph>
         <paragraph role="paragraph" xml-lang="en-US">An EPUB document can specify one or more dates relating to the publication.
         Each date can be associated with a special event such as creation, publication or modification.</paragraph>
+		<paragraph role="paragraph" xml-lang="en-US">Note that some EPUB readers may only present the first date, hence
+		you should make sure that the primary date is at the top of the list.</paragraph>
+		<paragraph role="paragraph" xml-lang="en-US">If you do not add any dates, Writer2xhtml will display and use a default value
+		for the date (date of last modification).</paragraph>
         
         <paragraph role="heading" level="3" xml-lang="en-US">Add...</paragraph>
    		<paragraph role="paragraph" xml-lang="en-US">Click this to add new date to the list.</paragraph>
@@ -78,9 +85,16 @@
         <paragraph role="heading" level="3" xml-lang="en-US">Delete...</paragraph>
    		<paragraph role="paragraph" xml-lang="en-US">Click this to delete the currently selected date from the list.</paragraph>
         
+        <paragraph role="heading" level="3" xml-lang="en-US">Up</paragraph>
+   		<paragraph role="paragraph" xml-lang="en-US">Click this to move the currently selected date up one position in the list.</paragraph>
+
+        <paragraph role="heading" level="3" xml-lang="en-US">Down</paragraph>
+   		<paragraph role="paragraph" xml-lang="en-US">Click this to move the currently selected date down one position in the list.</paragraph>
+
+
         <paragraph role="heading" level="2" xml-lang="en-US">Title</paragraph>
-        <paragraph role="paragraph" xml-lang="en-US">The title of the document. This will always be included in the EPUB document,
-        even if you have not selected <emph>Export optional document properties.</emph></paragraph>
+        <paragraph role="paragraph" xml-lang="en-US">The title of the document. This will always be included in the EPUB
+        document.</paragraph>
         
         <paragraph role="heading" level="2" xml-lang="en-US">Subject</paragraph>
         <paragraph role="paragraph" xml-lang="en-US">The subject of the document</paragraph>

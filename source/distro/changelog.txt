@@ -1,6 +1,10 @@
 Changelog for Writer2LaTeX version 1.0 -> 1.2
 
+
 ---------- version 1.1.7 ----------
+
+[w2x] The option use_dublin_core no longer has effect on EPUB export (instead identifier, author, date and title are always
+  exported, and other properties are exported if they exist and are non-empty)
 
 [w2x] Added opf:file-as attribute to EPUB metadata (creators and contributors)
 

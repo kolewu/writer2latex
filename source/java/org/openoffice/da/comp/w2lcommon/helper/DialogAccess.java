@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2009 by Henrik Just
+ *  Copyright: 2002-2011 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2009-11-08)
+ *  Version 1.2 (2011-03-03)
  *
  */ 
 
@@ -273,6 +273,27 @@ public class DialogAccess {
         }
         catch (Exception e) {
             // Will fail if the control does not exist or is not a formatted field
+        }
+    }
+    
+    public int getDateFieldValue(String sControlName) {
+        XPropertySet xPropertySet = getControlProperties(sControlName);
+        try {
+        	return ((Integer) xPropertySet.getPropertyValue("Date")).intValue();
+        }
+        catch (Exception e) {
+            // Will fail if the control does not exist or is not a date field
+            return 0;
+        }
+    }
+	
+    public void setDateFieldValue(String sControlName, int nValue) {
+        XPropertySet xPropertySet = getControlProperties(sControlName);
+        try {
+        	xPropertySet.setPropertyValue("Date", nValue);
+        }
+        catch (Exception e) {
+            // Will fail if the control does not exist or is not a date field
         }
     }
 	

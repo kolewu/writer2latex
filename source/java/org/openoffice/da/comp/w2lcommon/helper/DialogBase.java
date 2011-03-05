@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-02-23)
+ *  Version 1.2 (2011-02-25)
  *
  */ 
  
@@ -391,7 +391,7 @@ public abstract class DialogBase implements
             // Will fail if the control does not exist or is not a text field
         }
     }
-	
+    
     protected String getFormattedFieldText(String sControlName) {
         XPropertySet xPropertySet = getControlProperties(sControlName);
         try {
