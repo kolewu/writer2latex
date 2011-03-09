@@ -3,6 +3,12 @@ Changelog for Writer2LaTeX version 1.0 -> 1.2
 
 ---------- version 1.1.7 ----------
 
+[w2x] Bugfix: Do not add space to empty labels (e.g. heading numbering)
+
+[w2x] Export line breaks as spaces in annotations and EPUB table of content
+
+[w2x] Bugfix: Do not export cell widths for tables with relative width
+
 [w2x] Export suffix and prefix on footnotes and endnotes
 
 [w2x] Export footnotes as endnotes (if text:footnotes-position="document"). A new option footnotes_heading is added:

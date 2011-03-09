@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2010 by Henrik Just
+ *  Copyright: 2002-2011 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-05-13)
+ *  Version 1.2 (2011-03-09)
  *
  */
 
@@ -124,7 +124,7 @@ public class ListCounter {
     		// TODO: Lettersync
     		sLabel+=formatNumber(nCounter[nLevel],sNumFormat[nLevel],true);
     		if (sSuffix!=null) { sLabel+=sSuffix; }
-    		if (sSpace!=null) { sLabel+=sSpace; }
+    		if (sLabel.length()>0 && sSpace!=null) { sLabel+=sSpace; }
     		return sLabel;
     	}
     	else if (style.isBullet(nLevel)) {

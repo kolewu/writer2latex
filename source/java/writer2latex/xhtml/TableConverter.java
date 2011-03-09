@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2008 by Henrik Just
+ *  Copyright: 2002-2011 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.0 (2008-12-15)
+ *  Version 1.2 (2011-03-09)
  *
  */
 
@@ -285,7 +285,7 @@ public class TableConverter extends ConverterHelper {
                     String sValueType = ofr.isOpenDocument() ?
                         Misc.getAttribute(cell,XMLString.OFFICE_VALUE_TYPE) :
                         Misc.getAttribute(cell,XMLString.TABLE_VALUE_TYPE);
-                    applyCellStyle(view.getCellStyleName(nRow,nCol), sTotalWidth, sValueType, td, subTable!=null);
+                    applyCellStyle(view.getCellStyleName(nRow,nCol), view.getRelTableWidth()!=null, sTotalWidth, sValueType, td, subTable!=null);
                 }
                 else if (XMLString.TABLE_COVERED_TABLE_CELL.equals(cell.getNodeName())) {
                     // covered table cells are not part of xhtml table model
@@ -367,13 +367,13 @@ public class TableConverter extends ConverterHelper {
         applyStyle(info,row);
     }
 	
-    private void applyCellStyle(String sStyleName, String sTotalWidth, String sValueType, Element cell, boolean bIsSubTable) {
+    private void applyCellStyle(String sStyleName, boolean bIsRelative, String sTotalWidth, String sValueType, Element cell, boolean bIsSubTable) {
         StyleInfo info = new StyleInfo();
         getCellSc().applyStyle(sStyleName,info);
 
         StyleWithProperties style = ofr.getCellStyle(sStyleName);
         if (style!=null) {
-            if (!config.xhtmlIgnoreTableDimensions()) {
+            if (!config.xhtmlIgnoreTableDimensions() && !bIsRelative) {
                 String sEdge = "0";
     
                 // Set the cell width. This is calculated as

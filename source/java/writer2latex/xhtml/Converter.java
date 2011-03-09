@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-03-08)
+ *  Version 1.2 (2011-03-09)
  *
  */
 
@@ -472,7 +472,7 @@ public class Converter extends ConverterBase {
                     if (sName.equals(XMLString.TEXT_S)) {
                            buf.append(" ");
                     }
-                    else if (sName.equals(XMLString.TEXT_TAB_STOP) || sName.equals(XMLString.TEXT_TAB)) { // text:tab in oasis
+                    else if (sName.equals(XMLString.TEXT_LINE_BREAK) || sName.equals(XMLString.TEXT_TAB_STOP) || sName.equals(XMLString.TEXT_TAB)) { // text:tab in oasis
                         buf.append(" ");
                     }
                     else if (OfficeReader.isNoteElement(child)) {

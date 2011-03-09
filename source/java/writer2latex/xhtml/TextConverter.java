@@ -1,6 +1,5 @@
 /************************************************************************
  *
- *  TextConverter.java
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -20,7 +19,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-03-08)
+ *  Version 1.2 (2011-03-09)
  *
  */
 
@@ -691,7 +690,7 @@ public class TextConverter extends ConverterHelper {
                 // Add in external content. For single file output we include all level 1 headings + their target
                 // Targets are added only when the toc level is deeper than the split level 
                 if (nLevel<=nExternalTocDepth) {
-                	converter.addContentEntry(sLabel+(sLabel.length()>0 ? " " : "")+converter.getPlainInlineText(onode), nLevel,
+                	converter.addContentEntry(sLabel+converter.getPlainInlineText(onode), nLevel,
                 			nLevel>nSplit ? sTarget : null);
                 }
 
