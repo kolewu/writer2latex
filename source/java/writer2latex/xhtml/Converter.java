@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-02-21)
+ *  Version 1.2 (2011-03-08)
  *
  */
 
@@ -237,10 +237,6 @@ public class Converter extends ConverterBase {
         else if (ofr.isPresentation()) { drawCv.convertDrawContent(body); }
         else { textCv.convertTextContent(body); }
 		
-        // Add footnotes and endnotes
-        textCv.insertFootnotes(htmlDoc.getContentNode());
-        textCv.insertEndnotes(htmlDoc.getContentNode());
-        
         // Set the title page and text page entries
         if (converterResult.getContent().isEmpty()) {
         	// No headings in the document: There is no title page and the text page is the first page
@@ -555,7 +551,6 @@ public class Converter extends ConverterBase {
 	
     // Prepare next output file
     public Element nextOutFile() {
-        if (nOutFileIndex>=0) { textCv.insertFootnotes(htmlDoc.getContentNode()); }
         htmlDoc = new XhtmlDocument(getOutFileName(++nOutFileIndex,false),nType);
         htmlDoc.setConfig(config);
         if (template!=null) { htmlDoc.readFromTemplate(template); }
@@ -574,10 +569,10 @@ public class Converter extends ConverterBase {
              ". See http://writer2latex.sourceforge.net for more info."),
              rootElement.getFirstChild());
 		
-        // Apply page formatting (using first master page)
-        if (ofr.getFirstMasterPage()!=null && !ofr.isPresentation()) {
+        // Apply default writing direction
+        if (!ofr.isPresentation()) {
             StyleInfo pageInfo = new StyleInfo();
-            styleCv.getPageSc().applyStyle(ofr.getFirstMasterPage().getName(),pageInfo);
+            styleCv.getPageSc().applyDefaultWritingDirection(pageInfo);
             styleCv.getPageSc().applyStyle(pageInfo,htmlDoc.getContentNode());
         }
 

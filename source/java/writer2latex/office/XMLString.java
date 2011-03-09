@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2010 by Henrik Just
+ *  Copyright: 2002-2011 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-12-15)
+ *  Version 1.2 (2011-03-08)
  *
  */
 
@@ -355,6 +355,7 @@ public class XMLString {
     public static final String TEXT_REFERENCE_FORMAT="text:reference-format";
     public static final String TEXT_REF_NAME="text:ref-name";
     public static final String TEXT_FORMULA="text:formula";
+    public static final String TEXT_FOOTNOTES_POSITION="text:footnotes-position";
     public static final String TEXT_NOTE_CLASS="text:note-class";
     public static final String TEXT_CITATION_BODY_STYLE_NAME="text:citation-body-style-name";
     public static final String TEXT_CITATION_STYLE_NAME="text:citation-style-name";

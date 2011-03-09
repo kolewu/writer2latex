@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-02-23)
+ *  Version 1.2 (2011-03-08)
  *
  */
 
@@ -41,7 +41,7 @@ import writer2latex.util.Misc;
 
 public class XhtmlConfig extends writer2latex.base.ConfigBase {
     // Implement configuration methods
-    protected int getOptionCount() { return 53; }
+    protected int getOptionCount() { return 54; }
     protected String getDefaultConfigPath() { return "/writer2latex/xhtml/config/"; }
 	
     // Override setOption: To be backwards compatible, we must accept options
@@ -117,25 +117,26 @@ public class XhtmlConfig extends writer2latex.base.ConfigBase {
     private static final int TABSTOP_STYLE = 31;
     private static final int FORMULAS = 32;
     private static final int ENDNOTES_HEADING = 33;
-    private static final int EXTERNAL_TOC_DEPTH = 34;
-    private static final int INCLUDE_TOC = 35;
-    private static final int SPLIT_LEVEL = 36;
-    private static final int REPEAT_LEVELS = 37;
-    private static final int PAGE_BREAK_SPLIT = 38;
-    private static final int SPLIT_AFTER = 39;
-    private static final int CALC_SPLIT = 40;
-    private static final int DISPLAY_HIDDEN_SHEETS = 41;
-    private static final int DISPLAY_HIDDEN_ROWS_COLS = 42;
-    private static final int DISPLAY_FILTERED_ROWS_COLS = 43;
-    private static final int APPLY_PRINT_RANGES = 44;
-    private static final int USE_TITLE_AS_HEADING = 45;
-    private static final int USE_SHEET_NAMES_AS_HEADINGS = 46;
-    private static final int XSLT_PATH = 47;
-    private static final int SAVE_IMAGES_IN_SUBDIR = 48;
-    private static final int UPLINK = 49;
-    private static final int DIRECTORY_ICON = 50;
-    private static final int DOCUMENT_ICON = 51;
-    private static final int ZEN_HACK = 52; // temporary hack for ePub Zen Garden styles
+    private static final int FOOTNOTES_HEADING = 34;
+    private static final int EXTERNAL_TOC_DEPTH = 35;
+    private static final int INCLUDE_TOC = 36;
+    private static final int SPLIT_LEVEL = 37;
+    private static final int REPEAT_LEVELS = 38;
+    private static final int PAGE_BREAK_SPLIT = 39;
+    private static final int SPLIT_AFTER = 40;
+    private static final int CALC_SPLIT = 41;
+    private static final int DISPLAY_HIDDEN_SHEETS = 42;
+    private static final int DISPLAY_HIDDEN_ROWS_COLS = 43;
+    private static final int DISPLAY_FILTERED_ROWS_COLS = 44;
+    private static final int APPLY_PRINT_RANGES = 45;
+    private static final int USE_TITLE_AS_HEADING = 46;
+    private static final int USE_SHEET_NAMES_AS_HEADINGS = 47;
+    private static final int XSLT_PATH = 48;
+    private static final int SAVE_IMAGES_IN_SUBDIR = 49;
+    private static final int UPLINK = 50;
+    private static final int DIRECTORY_ICON = 51;
+    private static final int DOCUMENT_ICON = 52;
+    private static final int ZEN_HACK = 53; // temporary hack for ePub Zen Garden styles
 
     protected ComplexOption xheading = addComplexOption("heading-map");
     protected ComplexOption xpar = addComplexOption("paragraph-map");
@@ -187,6 +188,7 @@ public class XhtmlConfig extends writer2latex.base.ConfigBase {
         options[FLOAT_OBJECTS] = new BooleanOption("float_objects","true");
         options[TABSTOP_STYLE] = new Option("tabstop_style","");
         options[ENDNOTES_HEADING] = new Option("endnotes_heading","");
+        options[FOOTNOTES_HEADING] = new Option("footnotes_heading","");
         options[FORMULAS] = new IntegerOption("formulas","image+starmath") {
         	@Override public void setString(String sValue) {
         		super.setString(sValue);
@@ -351,6 +353,7 @@ public class XhtmlConfig extends writer2latex.base.ConfigBase {
     public boolean xhtmlFloatObjects() { return ((BooleanOption) options[FLOAT_OBJECTS]).getValue(); }
     public String getXhtmlTabstopStyle() { return options[TABSTOP_STYLE].getString(); }
     public String getEndnotesHeading() { return options[ENDNOTES_HEADING].getString(); }
+    public String getFootnotesHeading() { return options[FOOTNOTES_HEADING].getString(); }
     public int formulas() { return ((IntegerOption) options[FORMULAS]).getValue(); }
     public int externalTocDepth() { return ((IntegerOption) options[EXTERNAL_TOC_DEPTH]).getValue(); }
     public boolean includeToc() { return ((BooleanOption) options[INCLUDE_TOC]).getValue(); }

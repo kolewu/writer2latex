@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2010 by Henrik Just
+ *  Copyright: 2002-2011 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-12-29)
+ *  Version 1.2 (2011-03-08)
  *
  */
 
@@ -127,6 +127,9 @@ public class TextConverter extends ConverterHelper {
     private String sFntCitStyle = null;
     private String sEntCitBodyStyle = null;
     private String sEntCitStyle = null;
+    
+    // Footnote position (can be page or document)
+    private boolean bFootnotesAtPage = true;
 
     // Gather the footnotes and endnotes
     private LinkedList<Node> footnotes = new LinkedList<Node>();
@@ -161,6 +164,7 @@ public class TextConverter extends ConverterHelper {
         if (notes!=null) {
             sFntCitBodyStyle = notes.getProperty(XMLString.TEXT_CITATION_BODY_STYLE_NAME);
             sFntCitStyle = notes.getProperty(XMLString.TEXT_CITATION_STYLE_NAME);
+            bFootnotesAtPage = !"document".equals(notes.getProperty(XMLString.TEXT_FOOTNOTES_POSITION));
         }
         notes = ofr.getEndnotesConfiguration();
         if (notes!=null) {
@@ -187,7 +191,11 @@ public class TextConverter extends ConverterHelper {
         }
 
         // Convert content
-        traverseBlockText(onode,hnode);
+        hnode = (Element)traverseBlockText(onode,hnode);
+        
+        // Add footnotes and endnotes
+        insertFootnotes(hnode,true);
+        insertEndnotes(hnode);
 
         // Generate all indexes
         int nIndexCount = indexes.size();
@@ -563,6 +571,7 @@ public class TextConverter extends ConverterHelper {
             // No objections, this is a level that causes splitting
         	nCharacterCount = 0;
         	bPendingPageBreak = false;
+            if (converter.getOutFileIndex()>=0) { insertFootnotes(node,false); }
             return converter.nextOutFile();
         }
         return node;
@@ -1685,22 +1694,37 @@ public class TextConverter extends ConverterHelper {
         footnotes.add(onode);
 	} 
 	
-    public void insertFootnotes(Node hnode) {
+    private void insertFootnotes(Node hnode, boolean bFinal) {
         int n = footnotes.size();
-        for (int i=0; i<n; i++) {
-            Node footnote = footnotes.get(i);
-            String sId = Misc.getAttribute(footnote,XMLString.TEXT_ID); 
-            Node citation = Misc.getChildByTagName(footnote,XMLString.TEXT_FOOTNOTE_CITATION);
-            if (citation==null) { // try oasis
-                citation = Misc.getChildByTagName(footnote,XMLString.TEXT_NOTE_CITATION);
-            }
-            Node body = Misc.getChildByTagName(footnote,XMLString.TEXT_FOOTNOTE_BODY);
-            if (body==null) { // try oasis
-                body = Misc.getChildByTagName(footnote,XMLString.TEXT_NOTE_BODY);
-            }
-            traverseNoteBody(sId,sFntCitStyle,citation,body,hnode);
+        
+        if (n>0 && bFootnotesAtPage) { // Add footnote rule
+        	Element rule = converter.createElement("hr");
+        	StyleInfo info = new StyleInfo();
+        	getPageSc().applyFootnoteRuleStyle(info);
+        	getPageSc().applyStyle(info, rule);
+        	hnode.appendChild(rule);
         }
-        footnotes.clear();
+        else if (bFinal && !bFootnotesAtPage) { // New page if required for footnotes as endnotes
+        	if (nSplit>0) { hnode = converter.nextOutFile(); }
+        	insertNoteHeading(hnode, config.getFootnotesHeading(), "footnotes");        	
+        }
+        
+        if (bFinal || bFootnotesAtPage) { // Insert the footnotes
+        	for (int i=0; i<n; i++) {
+        		Node footnote = footnotes.get(i);
+        		String sId = Misc.getAttribute(footnote,XMLString.TEXT_ID); 
+        		Node citation = Misc.getChildByTagName(footnote,XMLString.TEXT_FOOTNOTE_CITATION);
+        		if (citation==null) { // try oasis
+        			citation = Misc.getChildByTagName(footnote,XMLString.TEXT_NOTE_CITATION);
+        		}
+        		Node body = Misc.getChildByTagName(footnote,XMLString.TEXT_FOOTNOTE_BODY);
+        		if (body==null) { // try oasis
+        			body = Misc.getChildByTagName(footnote,XMLString.TEXT_NOTE_BODY);
+        		}
+        		traverseNoteBody(sId,sFntCitStyle,citation,body,hnode,ofr.getFootnotesConfiguration());
+        	}
+        	footnotes.clear();
+        }
     }
 
     /* Process an endnote */
@@ -1719,27 +1743,11 @@ public class TextConverter extends ConverterHelper {
         endnotes.add(onode);
 	} 
 
-    public void insertEndnotes(Node hnode) {
+    private void insertEndnotes(Node hnode) {
         int n = endnotes.size();
         if (n>0) {
         	if (nSplit>0) { hnode = converter.nextOutFile(); }
-        	
-        	String sHeading = config.getEndnotesHeading();
-        	if (sHeading.length()>0) {
-        		Element heading = converter.createElement("h1");
-        		hnode.appendChild(heading);
-        		heading.appendChild(converter.createTextNode(sHeading));
-
-        		// Add to external content.
-        		if (nSplit>0) {
-                	converter.addContentEntry(sHeading, 1, null);        			
-        		}
-        		else {
-        			//For single output file we need a target
-                    converter.addTarget(heading,"endnotes");                
-                	converter.addContentEntry(sHeading, 1, "endnotes");        			
-        		}
-        	}
+        	insertNoteHeading(hnode, config.getEndnotesHeading(), "endnotes");
         	for (int i=0; i<n; i++) {
         		Node endnote = endnotes.get(i);
         		String sId = Misc.getAttribute(endnote,XMLString.TEXT_ID); 
@@ -1751,15 +1759,33 @@ public class TextConverter extends ConverterHelper {
         		if (body==null) { // try oasis
         			body = Misc.getChildByTagName(endnote,XMLString.TEXT_NOTE_BODY);
         		}
-        		traverseNoteBody(sId,sEntCitStyle,citation,body,hnode);
+        		traverseNoteBody(sId,sEntCitStyle,citation,body,hnode,ofr.getEndnotesConfiguration());
         	}
         }
+    }
+    
+    private void insertNoteHeading(Node hnode, String sHeading, String sTarget) {
+    	if (sHeading.length()>0) {
+    		Element heading = converter.createElement("h1");
+    		hnode.appendChild(heading);
+    		heading.appendChild(converter.createTextNode(sHeading));
+
+    		// Add to external content.
+    		if (nSplit>0) {
+            	converter.addContentEntry(sHeading, 1, null);        			
+    		}
+    		else {
+    			//For single output file we need a target
+                converter.addTarget(heading,sTarget);                
+            	converter.addContentEntry(sHeading, 1, sTarget);        			
+    		}
+    	}
     }
 
 	/*
      * Process the contents of a footnote or endnote
      */
-    private void traverseNoteBody (String sId, String sCitStyle, Node citation,Node onode, Node hnode) {
+    private void traverseNoteBody (String sId, String sCitStyle, Node citation, Node onode, Node hnode, PropertySet noteConfig) {
         // Create the anchor/footnote symbol:
         // Create target and link
         Element link = converter.createLink("body"+sId);
@@ -1767,43 +1793,22 @@ public class TextConverter extends ConverterHelper {
         StyleInfo linkInfo = new StyleInfo();
         getTextSc().applyStyle(sCitStyle,linkInfo);
         applyStyle(linkInfo,link);
+        String sPrefix = noteConfig.getProperty(XMLString.STYLE_NUM_PREFIX);
+        if (sPrefix!=null) {
+        	link.appendChild(converter.createTextNode(sPrefix));
+        }
         traversePCDATA(citation,link);
-        // Add a space and save it for later insertion:
+        String sSuffix = noteConfig.getProperty(XMLString.STYLE_NUM_SUFFIX);
+        if (sSuffix!=null) {
+        	link.appendChild(converter.createTextNode(sSuffix));        	
+        }
+        // Add a space and save it for later insertion 
         Element span = converter.createElement("span");
         span.appendChild(link);
         span.appendChild(converter.createTextNode(" "));
         asapNode = span;
 		
         traverseBlockText(onode,hnode);
-
-        /*if (onode.hasChildNodes()) {
-            NodeList nList = onode.getChildNodes();
-            int len = nList.getLength();
-            
-            for (int i = 0; i < len; i++) {
-                Node child = nList.item(i);
-                
-                if (child.getNodeType() == Node.ELEMENT_NODE) {
-                    String nodeName = child.getNodeName();
-                    
-                    if (nodeName.equals(XMLString.TEXT_H)) {
-                        handleHeading(child,hnode);
-                    }
-
-                    if (nodeName.equals(XMLString.TEXT_P)) {
-                        handleParagraph(child,hnode);
-                    }
-                    
-                    if (nodeName.equals(XMLString.TEXT_ORDERED_LIST)) {
-                        handleOL(child,0,null,hnode);
-                    }
-                    
-                    if (nodeName.equals(XMLString.TEXT_UNORDERED_LIST)) {
-                        handleUL(child,0,null,hnode);
-                    }
-                }
-            }
-        }*/
     }
 
     private void handlePageNumber(Node onode, Node hnode) {

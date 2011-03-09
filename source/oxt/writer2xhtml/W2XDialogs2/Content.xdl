@@ -4,7 +4,7 @@
  <dlg:bulletinboard>
   <dlg:text dlg:id="FormulasHeadingLabel" dlg:tab-index="0" dlg:left="5" dlg:top="8" dlg:width="245" dlg:height="12" dlg:value="Formulas"/>
   <dlg:text dlg:id="FormulasLabel" dlg:tab-index="1" dlg:left="10" dlg:top="22" dlg:width="110" dlg:height="12" dlg:value="Include as"/>
-  <dlg:menulist dlg:id="Formulas" dlg:tab-index="2" dlg:left="130" dlg:top="20" dlg:width="120" dlg:height="12" dlg:spin="true" dlg:linecount="4" dlg:help-url="org.openoffice.da.writer2xhtml.oxt:Formulas">
+  <dlg:menulist dlg:id="Formulas" dlg:tab-index="2" dlg:left="130" dlg:top="20" dlg:width="120" dlg:height="12" dlg:help-url="org.openoffice.da.writer2xhtml.oxt:Formulas" dlg:spin="true" dlg:linecount="4">
    <dlg:menupopup>
     <dlg:menuitem dlg:value="Image with StarMath code"/>
     <dlg:menuitem dlg:value="Image with LaTeX code"/>
@@ -12,8 +12,10 @@
     <dlg:menuitem dlg:value="LaTeX code"/>
    </dlg:menupopup>
   </dlg:menulist>
-  <dlg:text dlg:id="EndnotesCategoryHeadingLabel" dlg:tab-index="3" dlg:left="5" dlg:top="36" dlg:width="245" dlg:height="12" dlg:value="Endnotes"/>
-  <dlg:text dlg:id="EndnotesHeadingLabel" dlg:tab-index="4" dlg:left="10" dlg:top="50" dlg:width="110" dlg:height="12" dlg:value="Heading"/>
+  <dlg:text dlg:id="EndnotesHeadingLabel" dlg:tab-index="4" dlg:left="10" dlg:top="50" dlg:width="110" dlg:height="12" dlg:value="Endnotes heading"/>
   <dlg:textfield dlg:id="EndnotesHeading" dlg:tab-index="5" dlg:left="130" dlg:top="48" dlg:width="120" dlg:height="12" dlg:help-url="org.openoffice.da.writer2xhtml.oxt:EndnotesHeading"/>
+  <dlg:text dlg:id="NotesHeadingsLabel" dlg:tab-index="3" dlg:left="5" dlg:top="36" dlg:width="245" dlg:height="12" dlg:value="Footnotes and endnotes"/>
+  <dlg:text dlg:id="FootnotesHeadingLabel" dlg:tab-index="6" dlg:left="10" dlg:top="64" dlg:width="110" dlg:height="12" dlg:value="Footnotes heading"/>
+  <dlg:textfield dlg:id="FootnotesHeading" dlg:tab-index="7" dlg:left="130" dlg:top="62" dlg:width="120" dlg:height="12" dlg:help-url="org.openoffice.da.writer2xhtml.oxt:FootnotesHeading"/>
  </dlg:bulletinboard>
 </dlg:window>
