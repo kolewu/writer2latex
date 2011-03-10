@@ -1,7 +1,16 @@
 Changelog for Writer2LaTeX version 1.0 -> 1.2
 
-
 ---------- version 1.1.7 ----------
+
+[w2l] Polyglossia bugfix: Now sets the default language correctly
+
+[w2l] Babel bugfix: No language is now ignored rather than exported as English 
+
+[w2x] Bugfix: No language is now exported as zxx rather than zxx-none
+
+[w2l] Added support for unnumbered headings
+
+[w2x] Bugfix: Unnumbered headings are now exported correctly
 
 [w2x] Bugfix: Do not add space to empty labels (e.g. heading numbering)
 

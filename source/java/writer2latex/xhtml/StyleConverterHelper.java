@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2008 by Henrik Just
+ *  Copyright: 2002-2011 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.0 (2008-09-08)
+ *  Version 1.2 (2011-03-10)
  *
  */
 
@@ -102,7 +102,7 @@ public abstract class StyleConverterHelper extends ConverterHelper {
         String sLang = style.getProperty(XMLString.FO_LANGUAGE);
         String sCountry = style.getProperty(XMLString.FO_COUNTRY);
         if (sLang!=null) {
-            if (sCountry==null) { info.sLang = sLang; }
+            if (sCountry==null || sCountry.equals("none")) { info.sLang = sLang; }
             else { info.sLang = sLang+"-"+sCountry; }
         }
     }

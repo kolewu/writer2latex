@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2010 by Henrik Just
+ *  Copyright: 2002-2011 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-12-15)
+ *  Version 1.2 (2011-03-10)
  * 
  */
 
@@ -46,6 +46,7 @@ public class XeTeXI18n extends I18n {
     public XeTeXI18n(OfficeReader ofr, LaTeXConfig config, ConverterPalette palette) {
     	super(ofr,config,palette);
     	polyglossia = new Polyglossia();
+    	polyglossia.applyLanguage(sDefaultLanguage, sDefaultCountry);
     }
 	
     /** Add declarations to the preamble to load the required packages

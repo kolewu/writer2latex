@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2010 by Henrik Just
+ *  Copyright: 2002-2011 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-12-14) 
+ *  Version 1.2 (2011-03-10) 
  * 
  */
 
@@ -49,6 +49,7 @@ public abstract class I18n {
 
     // Collected data
     protected String sDefaultLanguage; // The default ISO language to use
+    protected String sDefaultCountry; // The default ISO country to use
     protected HashSet<String> languages = new HashSet<String>(); // All languages used
 
     // **** Constructors ****
@@ -75,6 +76,7 @@ public abstract class I18n {
                 StyleWithProperties style = ofr.getDefaultParStyle();
                 if (style!=null) { 
                     sDefaultLanguage = style.getProperty(XMLString.FO_LANGUAGE);
+                    sDefaultCountry = style.getProperty(XMLString.FO_COUNTRY);
                 }
             }
             else {
@@ -122,5 +124,13 @@ public abstract class I18n {
      */
     public String getDefaultLanguage() {
     	return sDefaultLanguage;
+    }
+    
+    /** Get the default country
+     * 
+     *  @return the default country
+     */
+    public String getDefaultCountry() {
+    	return sDefaultCountry;
     }
 }

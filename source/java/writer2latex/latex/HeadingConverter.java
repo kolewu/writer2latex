@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2009 by Henrik Just
+ *  Copyright: 2002-2011 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2009-04-30)
+ *  Version 1.2 (2011-03-10)
  *
  */
 
@@ -74,6 +74,8 @@ public class HeadingConverter extends ConverterHelper {
         int nLevel = ofr.isOpenDocument() ?
             Misc.getPosInteger(Misc.getAttribute(node, XMLString.TEXT_OUTLINE_LEVEL),1) :
             Misc.getPosInteger(Misc.getAttribute(node, XMLString.TEXT_LEVEL),1);
+        boolean bUnNumbered = "true".equals(Misc.getAttribute(node,XMLString.TEXT_IS_LIST_HEADER));
+
         HeadingMap hm = config.getHeadingMap();
         String sStyleName = node.getAttribute(XMLString.TEXT_STYLE_NAME);
 
@@ -96,6 +98,7 @@ public class HeadingConverter extends ConverterHelper {
             // Export the heading
             ldp.append(baHardPage.getBefore());
             ldp.append("\\"+hm.getName(nLevel));
+            if (bUnNumbered) { ldp.append("*"); }
             // If this heading contains formatting, add optional argument:
             if (baHardChar.getBefore().length()>0 || containsElements(node)) {
                 ldp.append("[");

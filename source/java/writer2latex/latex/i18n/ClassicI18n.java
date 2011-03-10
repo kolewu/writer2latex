@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2010 by Henrik Just
+ *  Copyright: 2002-2011 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-12-15) 
+ *  Version 1.2 (2011-03-10) 
  * 
  */
 
@@ -181,11 +181,44 @@ public class ClassicI18n extends I18n {
             default: return null;
         }
     }
-		
-    // End of static part of I18n!
 	 
+    private static Hashtable<String,String> babelLanguages; // mappings iso->babel language
+    
+    static {
+        babelLanguages = new Hashtable<String,String>();
+        babelLanguages.put("en", "english"); // latin1
+        babelLanguages.put("bg", "bulgarian"); // cp1251?
+        babelLanguages.put("cs", "czech"); // latin2
+        babelLanguages.put("da", "danish"); // latin1
+        babelLanguages.put("de", "ngerman"); // latin1
+        babelLanguages.put("el", "greek"); // iso-8859-7
+        babelLanguages.put("es", "spanish"); // latin1
+        babelLanguages.put("fi", "finnish"); // latin1 (latin9?)
+        babelLanguages.put("fr", "french"); // latin1 (latin9?)
+        babelLanguages.put("ga", "irish"); // latin1
+        babelLanguages.put("hr", "croatian"); // latin2
+        babelLanguages.put("hu", "magyar"); // latin2
+        babelLanguages.put("la", "latin"); // ascii
+        babelLanguages.put("is", "icelandic"); // latin1
+        babelLanguages.put("it", "italian"); // latin1
+        babelLanguages.put("nl", "dutch"); // latin1
+        babelLanguages.put("nb", "norsk"); // latin1
+        babelLanguages.put("nn", "nynorsk"); // latin1
+        babelLanguages.put("pl", "polish"); // latin2
+        babelLanguages.put("pt", "portuges"); // latin1
+        babelLanguages.put("ro", "romanian"); // latin2
+        babelLanguages.put("ru", "russian"); // cp1251?
+        babelLanguages.put("sk", "slovak"); // latin2
+        babelLanguages.put("sl", "slovene"); // latin2
+        babelLanguages.put("sr", "serbian"); // cp1251?
+        babelLanguages.put("sv", "swedish"); // latin1
+        babelLanguages.put("tr", "turkish");
+        babelLanguages.put("uk", "ukrainian"); // cp1251?
+    }
+
+    // End of static part of I18n!
+
     // **** Global variables ****
-    private Hashtable<String,String> babelLanguages; // mappings iso->babel language
 
     // Unicode translation
     private Hashtable<String,UnicodeTable> tableSet; // all tables
@@ -211,9 +244,6 @@ public class ClassicI18n extends I18n {
         // We don't need the palette and the office reader is only used to
         // identify the default language
 
-        // Set up table for iso->babel translation
-        prepareBabelLanguages();
-        
         nDefaultFontenc = getFontenc(sDefaultLanguage);
 		
         // Unicode stuff
@@ -294,7 +324,10 @@ public class ClassicI18n extends I18n {
                     babelopt.addValue("polutonikogreek");
                 }
                 else {
-                    babelopt.addValue(getBabelLanguage(sLang));
+                	String sBabelLang = getBabelLanguage(sLang);
+                	if (sBabelLang!=null) {
+                		babelopt.addValue(sBabelLang);
+                	}
                 }
             }
         }
@@ -305,7 +338,10 @@ public class ClassicI18n extends I18n {
                 babelopt.addValue("polutonikogreek");
             }
             else {
-                babelopt.addValue(getBabelLanguage(sDefaultLanguage));
+            	String sBabelLang = getBabelLanguage(sDefaultLanguage);
+            	if (sBabelLang!=null) {
+            		babelopt.addValue(sBabelLang);
+            	}
             }
         }
 
@@ -640,40 +676,8 @@ public class ClassicI18n extends I18n {
             return babelLanguages.get(sLang);
         }
         else {
-            return "english"; // interpret unknown languages as English
+            return null; // Unknown language
         }
-    }
-	
-    private void prepareBabelLanguages() {
-        babelLanguages = new Hashtable<String,String>();
-        babelLanguages.put("en", "english"); // latin1
-        babelLanguages.put("bg", "bulgarian"); // cp1251?
-        babelLanguages.put("cs", "czech"); // latin2
-        babelLanguages.put("da", "danish"); // latin1
-        babelLanguages.put("de", "ngerman"); // latin1
-        babelLanguages.put("el", "greek"); // iso-8859-7
-        babelLanguages.put("es", "spanish"); // latin1
-        babelLanguages.put("fi", "finnish"); // latin1 (latin9?)
-        babelLanguages.put("fr", "french"); // latin1 (latin9?)
-        babelLanguages.put("ga", "irish"); // latin1
-        babelLanguages.put("hr", "croatian"); // latin2
-        babelLanguages.put("hu", "magyar"); // latin2
-        babelLanguages.put("la", "latin"); // ascii
-        babelLanguages.put("is", "icelandic"); // latin1
-        babelLanguages.put("it", "italian"); // latin1
-        babelLanguages.put("nl", "dutch"); // latin1
-        babelLanguages.put("nb", "norsk"); // latin1
-        babelLanguages.put("nn", "nynorsk"); // latin1
-        babelLanguages.put("pl", "polish"); // latin2
-        babelLanguages.put("pt", "portuges"); // latin1
-        babelLanguages.put("ro", "romanian"); // latin2
-        babelLanguages.put("ru", "russian"); // cp1251?
-        babelLanguages.put("sk", "slovak"); // latin2
-        babelLanguages.put("sl", "slovene"); // latin2
-        babelLanguages.put("sr", "serbian"); // cp1251?
-        babelLanguages.put("sv", "swedish"); // latin1
-        babelLanguages.put("tr", "turkish");
-        babelLanguages.put("uk", "ukrainian"); // cp1251?
     }
 	
     // **** Helpers to collect various information ****

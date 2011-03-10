@@ -1,5 +1,6 @@
 /************************************************************************
  *
+ *	TextConverter.java
  *
  *  This library is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public
@@ -596,11 +597,11 @@ public class TextConverter extends ConverterHelper {
 	
     private void handleHeading(Element onode, Node hnode, boolean bAfterSplit) {
         int nListLevel = getOutlineLevel((Element)onode);
-        //boolean bUnNumbered = "true".equals(Misc.getAttribute(onode,XMLString.TEXT_IS_LIST_HEADER));
+        boolean bUnNumbered = "true".equals(Misc.getAttribute(onode,XMLString.TEXT_IS_LIST_HEADER));
         boolean bRestart = "true".equals(Misc.getAttribute(onode,XMLString.TEXT_RESTART_NUMBERING));
         int nStartValue = Misc.getPosInteger(Misc.getAttribute(onode,XMLString.TEXT_START_VALUE),1)-1;
         handleHeading(onode, hnode, bAfterSplit, ofr.getOutlineStyle(),
-            nListLevel, false, bRestart, nStartValue);        
+            nListLevel, bUnNumbered, bRestart, nStartValue);        
     }
 
     /*
