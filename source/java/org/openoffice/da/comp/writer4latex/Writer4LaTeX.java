@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-02-01)
+ *  Version 1.2 (2011-03-10)
  *
  */ 
  
@@ -30,6 +30,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.regex.Pattern;
 
 import com.sun.star.beans.PropertyValue;
 import com.sun.star.beans.XPropertyAccess;
@@ -157,13 +158,8 @@ public final class Writer4LaTeX extends WeakBase
         com.sun.star.beans.PropertyValue[] aArguments ) {
         if ( aURL.Protocol.compareTo(PROTOCOL) == 0 ) {
             if ( aURL.Path.compareTo("ProcessDocument") == 0 ) {
-                if (updateLocation()) {
-                    if (updateMediaProperties()) {
-                        process();
-                    }
-                }
-                else {
-                    warnNotSaved();
+                if (updateLocation() && updateMediaProperties()) {
+                	process();
                 }
                 return;
             }
@@ -171,9 +167,6 @@ public final class Writer4LaTeX extends WeakBase
                 if (updateLocation()) {
                 	updateMediaPropertiesSilent();
                     process();
-                }
-                else {
-                    warnNotSaved();
                 }
                 return;
             }
@@ -345,10 +338,6 @@ public final class Writer4LaTeX extends WeakBase
             catch (com.sun.star.uno.Exception e) {
             }
         }
-        else {
-            warnNotSaved();
-        }
-
     }
     
     // Some utility methods
@@ -560,36 +549,49 @@ public final class Writer4LaTeX extends WeakBase
     private boolean updateLocation() {
         String sDocumentUrl = xModel.getURL();
         if (sDocumentUrl.length()!=0) {
-            // Get the file name (without extension)
-            File f = urlToFile(sDocumentUrl);
-            sBaseFileName = f.getName();
-            int iDot = sBaseFileName.lastIndexOf(".");
-            if (iDot>-1) { // remove extension
-                sBaseFileName = sBaseFileName.substring(0,iDot);
-            }
-            sBaseFileName=makeTeXSafe(sBaseFileName);
+        	if (sDocumentUrl.startsWith("file:")) {
+        		if (System.getProperty("os.name").startsWith("Windows")) {
+            		Pattern windowsPattern = Pattern.compile("^file:///[A-Za-z][|:]");
+            		if (!windowsPattern.matcher(sDocumentUrl).matches()) {
+                        MessageBox msgBox = new MessageBox(m_xContext, m_xFrame);
+                        msgBox.showMessage("Please save the document on a location with a drive name!",
+                        		"LaTeX does not support UNC paths");
+                        return false;        		
+            		}
+        		}
+        		// Get the file name (without extension)
+        		File f = urlToFile(sDocumentUrl);
+        		sBaseFileName = f.getName();
+        		int iDot = sBaseFileName.lastIndexOf(".");
+        		if (iDot>-1) { // remove extension
+        			sBaseFileName = sBaseFileName.substring(0,iDot);
+        		}
+        		sBaseFileName=makeTeXSafe(sBaseFileName);
 
-            // Get the path
-            int iSlash = sDocumentUrl.lastIndexOf("/");
-            if (iSlash>-1) {
-                sBasePath = sDocumentUrl.substring(0,iSlash+1);
-            }
-            else {
-                sBasePath = "";
-            }
-			
-            return true;
+        		// Get the path
+        		int iSlash = sDocumentUrl.lastIndexOf("/");
+        		if (iSlash>-1) {
+        			sBasePath = sDocumentUrl.substring(0,iSlash+1);
+        		}
+        		else {
+        			sBasePath = "";
+        		}
+        		
+        		return true;
+        	}
+        	else {
+                MessageBox msgBox = new MessageBox(m_xContext, m_xFrame);
+                msgBox.showMessage("Please save the document locally!","LaTeX does not support documents in remote storages");
+                return false;        		
+        	}
         }
         else {
+            MessageBox msgBox = new MessageBox(m_xContext, m_xFrame);
+            msgBox.showMessage("Document not saved!","Please save the document before processing the file");
             return false;
         }
     }
-
-    private void warnNotSaved() {
-        MessageBox msgBox = new MessageBox(m_xContext, m_xFrame);
-        msgBox.showMessage("Document not saved!","Please save the document before processing the file");
-    }
-	
+    
     private String makeTeXSafe(String sArgument) {
         String sResult = "";
         for (int i=0; i<sArgument.length(); i++) {

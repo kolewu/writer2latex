@@ -98,9 +98,11 @@ public class HeadingConverter extends ConverterHelper {
             // Export the heading
             ldp.append(baHardPage.getBefore());
             ldp.append("\\"+hm.getName(nLevel));
-            if (bUnNumbered) { ldp.append("*"); }
-            // If this heading contains formatting, add optional argument:
-            if (baHardChar.getBefore().length()>0 || containsElements(node)) {
+            if (bUnNumbered) {
+            	ldp.append("*");
+            }
+            else if (baHardChar.getBefore().length()>0 || containsElements(node)) {
+            	// If this heading contains formatting, add optional argument:
                 ldp.append("[");
                 palette.getInlineCv().traversePlainInlineText(node,ldp,ic);
                 ldp.append("]");

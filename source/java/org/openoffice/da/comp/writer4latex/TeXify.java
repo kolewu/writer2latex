@@ -135,6 +135,9 @@ public final class TeXify {
     }
 	
     private boolean doTeXify(String[] sAppList, File file, String sBibinputs) throws IOException {
+    	// Remove the .aux file first (to avoid potential error messages)
+        File aux = new File(file.getParentFile(), file.getName()+".aux");
+        aux.delete();
         for (int i=0; i<sAppList.length; i++) {
             // Execute external application
         	Map<String,String> env =null;

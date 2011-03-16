@@ -604,10 +604,10 @@ public class Converter extends ConverterBase {
         		createMeta(head,"keywords",metaData.getKeywords());
 
         		// Dublin core meta data (optional)
-        		// Format as recommended on dublincore.org
+        		// Format as recommended on dublincore.org (http://dublincore.org/documents/dc-html/)
         		// Declare meta data profile
         		if (config.xhtmlUseDublinCore()) {
-        			head.setAttribute("profile","http://dublincore.org/documents/dcq-html/");
+        			head.setAttribute("profile","http://dublincore.org/documents/2008/08/04/dc-html/");
         			// Add link to declare namespace
         			Element dclink = htmlDOM.createElement("link");
         			dclink.setAttribute("rel","schema.DC");
