@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-03-08)
+ *  Version 1.2 (2011-03-16)
  *
  */
 
@@ -50,6 +50,12 @@ public class XhtmlConfig extends writer2latex.base.ConfigBase {
         if (sName.startsWith("xhtml_")) { sName = sName.substring(6); }
         // this option has been renamed:
         if (sName.equals("keep_image_size")) { sName = "original_image_size"; }
+        // and later renamed and extended:
+        if (sName.equals("original_image_size")) {
+        	sName = "image_size";
+        	if (sValue.equals("true")) { sValue = "none"; }
+        	else { sValue="absolute"; }
+        }
         // this option has been renamed and extended:
         if (sName.equals("use_list_hack")) {
         	sName = "list_formatting";
@@ -69,6 +75,11 @@ public class XhtmlConfig extends writer2latex.base.ConfigBase {
     public static final int CSS1 = 0;
     public static final int CSS1_HACK = 1;
     public static final int HARD_LABELS = 2;
+    
+    // Image dimensions
+    public static final int NONE = 0;
+    public static final int ABSOLUTE = 1;
+    public static final int RELATIVE = 2;
 
     // Formulas (for XHTML 1.0 strict)
     public static final int STARMATH = 0;
@@ -77,7 +88,7 @@ public class XhtmlConfig extends writer2latex.base.ConfigBase {
     public static final int IMAGE_LATEX = 3;
     
     // Page breaks
-    public static final int NONE = 0;
+    // public static final int NONE = 0;
     public static final int STYLES = 1;
     public static final int EXPLICIT = 2;
     public static final int ALL = 3;
@@ -86,7 +97,7 @@ public class XhtmlConfig extends writer2latex.base.ConfigBase {
     private static final int IGNORE_HARD_LINE_BREAKS = 0;
     private static final int IGNORE_EMPTY_PARAGRAPHS = 1;
     private static final int IGNORE_DOUBLE_SPACES = 2;
-    private static final int ORIGINAL_IMAGE_SIZE = 3;
+    private static final int IMAGE_SIZE = 3;
     private static final int NO_DOCTYPE = 4;
     private static final int ADD_BOM = 5;
     private static final int ENCODING = 6;
@@ -151,7 +162,15 @@ public class XhtmlConfig extends writer2latex.base.ConfigBase {
         options[IGNORE_HARD_LINE_BREAKS] = new BooleanOption("ignore_hard_line_breaks","false");
         options[IGNORE_EMPTY_PARAGRAPHS] = new BooleanOption("ignore_empty_paragraphs","false");
         options[IGNORE_DOUBLE_SPACES] = new BooleanOption("ignore_double_spaces","false");
-        options[ORIGINAL_IMAGE_SIZE] = new BooleanOption("original_image_size","false");
+        options[IMAGE_SIZE] = new IntegerOption("image_size","auto") {
+        	@Override public void setString(String sValue) {
+        		super.setString(sValue);
+        		if ("relative".equals(sValue)) { nValue = RELATIVE; }
+        		else if ("none".equals(sValue)) { nValue = NONE; }
+        		else if ("original_image_size".equals(sValue)) { nValue = NONE; }
+        		else { nValue = ABSOLUTE; }
+        	}
+        };
         options[NO_DOCTYPE] = new BooleanOption("no_doctype","false");
         options[ADD_BOM] = new BooleanOption("add_bom","false");
         options[ENCODING] = new Option("encoding","UTF-8");
@@ -323,7 +342,7 @@ public class XhtmlConfig extends writer2latex.base.ConfigBase {
     public boolean ignoreHardLineBreaks() { return ((BooleanOption) options[IGNORE_HARD_LINE_BREAKS]).getValue(); }
     public boolean ignoreEmptyParagraphs() { return ((BooleanOption) options[IGNORE_EMPTY_PARAGRAPHS]).getValue(); }
     public boolean ignoreDoubleSpaces() { return ((BooleanOption) options[IGNORE_DOUBLE_SPACES]).getValue(); }
-    public boolean originalImageSize() { return ((BooleanOption) options[ORIGINAL_IMAGE_SIZE]).getValue(); }
+    public int imageSize() { return ((IntegerOption) options[IMAGE_SIZE]).getValue(); }
     public boolean xhtmlNoDoctype() { return ((BooleanOption) options[NO_DOCTYPE]).getValue(); }
     public boolean xhtmlAddBOM() { return ((BooleanOption) options[ADD_BOM]).getValue(); }
     public String xhtmlEncoding() { return options[ENCODING].getString(); }

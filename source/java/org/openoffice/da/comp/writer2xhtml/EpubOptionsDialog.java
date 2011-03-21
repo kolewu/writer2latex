@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-03-04)
+ *  Version 1.2 (2011-03-21)
  *
  */
 
@@ -82,7 +82,7 @@ public class EpubOptionsDialog extends OptionsDialogBase {
         loadCheckBoxOption(xProps, "UseDefaultFont");
         loadComboBoxOption(xProps, "DefaultFontName");
         loadCheckBoxOption(xProps, "ConvertToPx");
-        loadCheckBoxOption(xProps, "OriginalImageSize");
+        loadListBoxOption(xProps, "ImageSize");
 
         // Fill the font name list with all installed fonts
         setListBoxStringItemList("DefaultFontName", 
@@ -132,7 +132,12 @@ public class EpubOptionsDialog extends OptionsDialogBase {
         saveCheckBoxOption(xProps, helper, "UseDefaultFont", "use_default_font");
         saveTextFieldOption(xProps, helper, "DefaultFontName", "default_font_name");
         saveCheckBoxOption(xProps, helper, "ConvertToPx", "convert_to_px");
-        saveCheckBoxOption(xProps, helper, "OriginalImageSize", "original_image_size");
+        saveListBoxOption(xProps, "ImageSize");
+        switch (getListBoxSelectedItem("ImageSize")) {
+        case 0: helper.put("image_size", "absolute"); break;
+        case 1: helper.put("image_size", "relative"); break;
+        case 2: helper.put("image_size", "none");        
+        }
 
         // AutoCorrect
         saveCheckBoxOption(xProps, helper, "IgnoreHardLineBreaks", "ignore_hard_line_breaks");
@@ -240,7 +245,7 @@ public class EpubOptionsDialog extends OptionsDialogBase {
 		setControlEnabled("DefaultFontName",!isLocked("default_font_name") && bUseDefaultFont);
         
 		setControlEnabled("ConvertToPx",!isLocked("convert_to_px"));
-        setControlEnabled("OriginalImageSize",!isLocked("original_image_size"));
+        setControlEnabled("ImageSize",!isLocked("image_size"));
 
         // AutoCorrect
         setControlEnabled("IgnoreHardLineBreaks",!isLocked("ignore_hard_line_breaks"));

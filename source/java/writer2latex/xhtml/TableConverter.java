@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-03-09)
+ *  Version 1.2 (2011-03-21)
  *
  */
 
@@ -266,7 +266,14 @@ public class TableConverter extends ConverterHelper {
     
                     // Handle content
                     if (!isEmptyCell(cell)) {
-                       getTextCv().traverseBlockText(cell,td);
+                    	String sWidth = view.getCellWidth(nRow, nCol);
+                    	if (sWidth!=null) {
+                    		converter.pushContentWidth(sWidth);
+                    	}
+                    	getTextCv().traverseBlockText(cell,td);
+                    	if (sWidth!=null) {
+                    		converter.popContentWidth();
+                    	}
                     }
                     else {
                         // Hack to display empty cells even in msie...

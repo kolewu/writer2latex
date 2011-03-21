@@ -2,6 +2,10 @@ Changelog for Writer2LaTeX version 1.0 -> 1.2
 
 ---------- version 1.1.7 ----------
 
+[w2x] Renamed the option original_image_size to image_size with extended values: absolute (default, former false),
+  relative (new value: Export images and text boxes using relative width, i.e. as a percentage of the current text width)
+  and none/original_image_size (former true). The old option name is still recognized.
+
 [w4l] Check that the document is saved locally (file) and (on Windows) with a drive letter - otherwise LaTeX cannot run
 
 [w4l] Delete .aux file before TeXifying (this avoids errors in some cases)

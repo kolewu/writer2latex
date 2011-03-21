@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2009 by Henrik Just
+ *  Copyright: 2002-2011 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.0 (2009-02-18)
+ *  Version 1.2 (2011-03-21)
  *
  */ 
  
@@ -108,7 +108,9 @@ public class XhtmlOptionsDialogCalc extends OptionsDialogBase {
         saveCheckBoxOption(xProps, helper, "ConvertToPx", "convert_to_px");
         saveNumericOptionAsPercentage(xProps, helper, "Scaling", "scaling");
         saveNumericOptionAsPercentage(xProps, helper, "ColumnScaling", "column_scaling");
-        saveCheckBoxOption(xProps, helper, "OriginalImageSize", "original_image_size");
+        saveCheckBoxOption(xProps, "OriginalImageSize");
+        // TODO: Support "relative"
+        helper.put("image_size", getCheckBoxStateAsBoolean("OriginalImageSize") ? "none" : "absolute");
 
         // Special content
         saveCheckBoxOption(xProps, helper, "Notes", "notes");
@@ -149,7 +151,7 @@ public class XhtmlOptionsDialogCalc extends OptionsDialogBase {
         setControlEnabled("Scaling",!isLocked("scaling"));
         setControlEnabled("ColumnScalingLabel",!isLocked("column_scaling"));
         setControlEnabled("ColumnScaling",!isLocked("column_scaling"));
-        setControlEnabled("OriginalImageSize",!isLocked("original_image_size"));
+        setControlEnabled("OriginalImageSize",!isLocked("image_size") && !isLocked("original_image_size"));
 
         // Special content
         setControlEnabled("Notes",!isLocked("notes"));

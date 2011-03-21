@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2010 by Henrik Just
+ *  Copyright: 2002-2011 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-05-13)
+ *  Version 1.2 (2011-03-21)
  *
  */
  
@@ -91,11 +91,11 @@ public class DrawConverter extends ConverterHelper {
     private FormReader form = null;
     private String sScale;
     private boolean bConvertToPx;
-    private boolean bOriginalImageSize;
-	
+    private int nImageSize;
+    
     // Frames in spreadsheet documents are collected here
     private Vector<Element> frames = new Vector<Element>();
-    // This flag determines wether to collect frames or insert them immediately
+    // This flag determines whether to collect frames or insert them immediately
     private boolean bCollectFrames = false;
 	
     public DrawConverter(OfficeReader ofr, XhtmlConfig config, Converter converter) {
@@ -109,7 +109,7 @@ public class DrawConverter extends ConverterHelper {
         bCollectFrames = ofr.isSpreadsheet();
         sScale = config.getXhtmlScaling();
         bConvertToPx = config.xhtmlConvertToPx();
-        bOriginalImageSize = config.originalImageSize();
+        nImageSize = config.imageSize();
     }
 	
     ///////////////////////////////////////////////////////////////////////
@@ -414,7 +414,7 @@ public class DrawConverter extends ConverterHelper {
         StyleInfo info = new StyleInfo();
         String sStyleName = Misc.getAttribute(frame, XMLString.DRAW_STYLE_NAME);
         getFrameSc().applyStyle(sStyleName,info);
-        if (!bOriginalImageSize) { applySize(frame,info.props,false); }
+        applyImageSize(frame,info.props,false);
 
         // Apply placement
         applyPlacement(frame, hnodeBlock, hnodeInline, nMode, image, info);
@@ -435,7 +435,7 @@ public class DrawConverter extends ConverterHelper {
         // Add name, if defined
         String sName = Misc.getAttribute(getFrame(onode),XMLString.DRAW_NAME);
         if (sName!=null) { converter.addTarget(textbox,sName+"|frame"); }
-
+        
         // Now style it
         Element frame = getFrame(onode);
         StyleInfo info = new StyleInfo();
@@ -459,47 +459,55 @@ public class DrawConverter extends ConverterHelper {
         }
 		
         // Apply placement
+        String sContentWidth = null;
+        
         switch (nMode) {
-            case INLINE:
-                break;
-            case ABSOLUTE:
-                applySize(frame,info.props,false);
-                applyPosition(frame,info.props);
-                break;
-            case CENTERED:
-                info.props.addValue("maring-top","2px");
-                info.props.addValue("maring-bottom","2px");
-                info.props.addValue("margin-left","auto");
-                info.props.addValue("margin-right","auto");
-                applySize(frame,info.props,true);
-                break;
-            case FLOATING:
-                applySize(frame,info.props,true);
-                StyleWithProperties style = ofr.getFrameStyle(sStyleName);
-                if (style!=null) {
-                    String sPos = style.getProperty(XMLString.STYLE_HORIZONTAL_POS);
-                    String sWrap = style.getProperty(XMLString.STYLE_WRAP);
-                    if (isLeft(sPos) && mayWrapRight(sWrap)) {
-                        info.props.addValue("float","left");
-                    }
-                    else if (isRight(sPos) && mayWrapLeft(sWrap)) {
-                        info.props.addValue("float","right");
-                    }
-                    else if (isFromLeft(sPos)) {
-                        if (mayWrapRight(sWrap)) {
-                            info.props.addValue("float","left");
-                        }
-                        String sX = frame.getAttribute(XMLString.SVG_X);
-                        if (sX!=null && sX.length()>0) {
-                            info.props.addValue("margin-left",scale(sX));
-                        }
-                    }
-                }
+        case INLINE:
+        	break;
+        case ABSOLUTE:
+        	sContentWidth = applyImageSize(frame,info.props,false);
+        	applyPosition(frame,info.props);
+        	break;
+        case CENTERED:
+        	info.props.addValue("maring-top","2px");
+        	info.props.addValue("maring-bottom","2px");
+        	info.props.addValue("margin-left","auto");
+        	info.props.addValue("margin-right","auto");
+        	sContentWidth = applyImageSize(frame,info.props,true);
+        	break;
+        case FLOATING:
+        	sContentWidth = applyImageSize(frame,info.props,true);
+        	StyleWithProperties style = ofr.getFrameStyle(sStyleName);
+        	if (style!=null) {
+        		String sPos = style.getProperty(XMLString.STYLE_HORIZONTAL_POS);
+        		String sWrap = style.getProperty(XMLString.STYLE_WRAP);
+        		if (isLeft(sPos) && mayWrapRight(sWrap)) {
+        			info.props.addValue("float","left");
+        		}
+        		else if (isRight(sPos) && mayWrapLeft(sWrap)) {
+        			info.props.addValue("float","right");
+        		}
+        		else if (isFromLeft(sPos)) {
+        			if (mayWrapRight(sWrap)) {
+        				info.props.addValue("float","left");
+        			}
+        			String sX = frame.getAttribute(XMLString.SVG_X);
+        			if (sX!=null && sX.length()>0) {
+        				info.props.addValue("margin-left",scale(sX));
+        			}
+        		}
+        	}
         }
 
         //Finish
         applyStyle(info,textbox);
+        if (sContentWidth!=null) {
+        	converter.pushContentWidth(sContentWidth);
+        }
         getTextCv().traverseBlockText(onode,textbox);
+        if (sContentWidth!=null) {
+        	converter.popContentWidth();
+        }
         getPresentationSc().exitOutline();
     }
 	
@@ -770,36 +778,38 @@ public class DrawConverter extends ConverterHelper {
             }
         }
     }
-	
-    private void applySize(Element node, CSVList props, boolean bOnlyWidth) {
-    	// The width attribute in css refers to the content width, excluding borders and padding
-    	// We thus have to subtract the borders and padding to get the correct width
-        StyleWithProperties style = ofr.getFrameStyle(node.getAttribute(XMLString.DRAW_STYLE_NAME));
-        
-        String sWidth = node.getAttribute(XMLString.SVG_WIDTH);
-        if (sWidth.length()>0) {
-        	if (style!=null) {
-        		// Subtract padding
-                String s = style.getProperty(XMLString.FO_PADDING_LEFT);
-                if (s!=null) sWidth = Misc.sub(sWidth, s);
-                s = style.getProperty(XMLString.FO_PADDING_RIGHT);
-                if (s!=null) sWidth = Misc.sub(sWidth, s);
-                s = style.getProperty(XMLString.FO_PADDING);
-                if (s!=null) sWidth = Misc.sub(sWidth, Misc.multiply("200%", s));
-                // Subtract border
-                s = style.getProperty(XMLString.FO_BORDER_LEFT);
-                if (s!=null) sWidth = Misc.sub(sWidth, getTableCv().borderWidth(s));
-                s = style.getProperty(XMLString.FO_BORDER_RIGHT);
-                if (s!=null) sWidth = Misc.sub(sWidth, getTableCv().borderWidth(s));
-                s = style.getProperty(XMLString.FO_BORDER);
-                if (s!=null) sWidth = Misc.sub(sWidth, Misc.multiply("200%", getTableCv().borderWidth(s)));
-            }
-        	
-            props.addValue("width",scale(sWidth));
-        }
-        
-        String sHeight = node.getAttribute(XMLString.SVG_HEIGHT);
-        if (sHeight.length()>0 && !bOnlyWidth) {
+    
+	// The width attribute in CSS refers to the content width, excluding borders and padding
+	// We thus have to subtract the borders and padding to get the correct width
+    // This method handles this
+    private String getFrameWidth(Element node, StyleWithProperties style) {
+    	String sWidth = node.getAttribute(XMLString.SVG_WIDTH);
+    	if (sWidth.length()>0) {
+    		if (style!=null) {
+    			// Subtract padding
+    			String s = style.getProperty(XMLString.FO_PADDING_LEFT);
+    			if (s!=null) sWidth = Misc.sub(sWidth, s);
+    			s = style.getProperty(XMLString.FO_PADDING_RIGHT);
+    			if (s!=null) sWidth = Misc.sub(sWidth, s);
+    			s = style.getProperty(XMLString.FO_PADDING);
+    			if (s!=null) sWidth = Misc.sub(sWidth, Misc.multiply("200%", s));
+    			// Subtract border
+    			s = style.getProperty(XMLString.FO_BORDER_LEFT);
+    			if (s!=null) sWidth = Misc.sub(sWidth, getTableCv().borderWidth(s));
+    			s = style.getProperty(XMLString.FO_BORDER_RIGHT);
+    			if (s!=null) sWidth = Misc.sub(sWidth, getTableCv().borderWidth(s));
+    			s = style.getProperty(XMLString.FO_BORDER);
+    			if (s!=null) sWidth = Misc.sub(sWidth, Misc.multiply("200%", getTableCv().borderWidth(s)));
+    		}
+			return sWidth;
+    	}
+        return null;
+    }
+    
+    // Same for height
+    private String getFrameHeight(Element node, StyleWithProperties style) {
+    	String sHeight = node.getAttribute(XMLString.SVG_HEIGHT);
+    	if (sHeight.length()>0) {
         	if (style!=null) {
         		// Subtract padding
                 String s = style.getProperty(XMLString.FO_PADDING_TOP);
@@ -816,9 +826,47 @@ public class DrawConverter extends ConverterHelper {
                 s = style.getProperty(XMLString.FO_BORDER);
                 if (s!=null) sHeight = Misc.sub(sHeight, Misc.multiply("200%", getTableCv().borderWidth(s)));
             }
-        	
-            props.addValue("height",scale(sHeight));
-       	}
+        	return sHeight;
+        }
+    	return null;
+    }
+	
+    // Return the (unscaled) content width, or null if it's unknown
+    private String applySize(Element node, CSVList props, boolean bOnlyWidth) {
+    	StyleWithProperties style = ofr.getFrameStyle(node.getAttribute(XMLString.DRAW_STYLE_NAME));
+
+    	String sWidth = getFrameWidth(node, style);
+    	if (sWidth!=null) {
+    		props.addValue("width",scale(sWidth));
+    	}
+
+    	if (!bOnlyWidth) {
+    		String sHeight = getFrameHeight(node,style);
+    		if (sHeight!=null) {
+    			props.addValue("height",scale(sHeight));
+    		}
+    	}
+    	
+    	return sWidth;
+    }
+    
+    // TODO: For absolute placement, only absolute size makes sense
+    // TODO: How to handle NONE in case of text boxes? (currently using browser default, usually 100% width)
+    private String applyImageSize(Element node, CSVList props, boolean bOnlyWidth) {
+		switch (nImageSize) {
+		case XhtmlConfig.ABSOLUTE:
+			return applySize(node, props, bOnlyWidth);
+		case XhtmlConfig.RELATIVE:
+	    	String sWidth = getFrameWidth(node, ofr.getFrameStyle(node.getAttribute(XMLString.DRAW_STYLE_NAME)));			
+	    	if (sWidth!=null) {    
+				props.addValue("width", Misc.divide(Misc.multiply(sScale,Misc.truncateLength(sWidth)),converter.getContentWidth()));
+			}
+			return sWidth;
+		case XhtmlConfig.NONE:
+			// Nothing to do :-)
+	    	return getFrameWidth(node, ofr.getFrameStyle(node.getAttribute(XMLString.DRAW_STYLE_NAME)));
+		}
+		return null;
     }
 	
     private void applyPosition(Element node, CSVList props) {
@@ -949,7 +997,6 @@ public class DrawConverter extends ConverterHelper {
             return Misc.multiply(sScale,Misc.truncateLength(s));
         }
     }
-	
 }
 
 

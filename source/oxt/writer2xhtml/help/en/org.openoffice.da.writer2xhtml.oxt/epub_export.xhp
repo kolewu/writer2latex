@@ -81,9 +81,24 @@
        	all dimensions are converted to px.</paragraph>
 		<embed href="org.openoffice.da.writer2xhtml.oxt/export.xhp#converttopx4"/>
         
-        <bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:EpubOptionsOriginalImageSize" id="bm_options_originalimagesize"/>
-		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2xhtml.oxt:EpubOptionsOriginalImageSize" visibility="hidden">Check this to use the natural size of images rather than the size defined in the document</ahelp></paragraph>
-		<embed href="org.openoffice.da.writer2xhtml.oxt/export.xhp#originalimagesize"/>
+        <bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:EpubOptionsImageSize" id="bm_options_imagesize"/>
+		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2xhtml.oxt:EpubOptionsImageSize" visibility="hidden">Select how to set the image size in the EPUB document</ahelp></paragraph>
+        <paragraph role="paragraph" xml-lang="en-US">Select how to set the image size in the EPUB document</paragraph>
+        <list type="unordered">
+			<listitem>
+    		    <paragraph role="paragraph" xml-lang="en-US"><emph>Use absolute size</emph>: Images will get the same size in the EPUB
+    		    document as in the original %PRODUCTNAME Writer document.</paragraph>
+        	</listitem>
+			<listitem>
+    		    <paragraph role="paragraph" xml-lang="en-US"><emph>Use relative size (%)</emph>: Image sizes will be exported as
+    		    percentages. This has the advantage that the image size will adapt to the size of the reader screen.</paragraph>
+        	</listitem>
+			<listitem>
+    		    <paragraph role="paragraph" xml-lang="en-US"><emph>Use original image size</emph>: Often images in a %PRODUCTNAME document
+    		    are scaled up or down from their original size. If you select this option, the original (unscaled) image
+        		size will be used.</paragraph>
+        	</listitem>
+        </list>
         
         <paragraph role="heading" level="2" xml-lang="en-US">AutoCorrect</paragraph>
 

@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2010 by Henrik Just
+ *  Copyright: 2002-2011 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-03-08)
+ *  Version 1.2 (2011-03-16)
  *
  */
 
@@ -35,6 +35,7 @@ import writer2latex.office.PageLayout;
 import writer2latex.office.StyleWithProperties;
 import writer2latex.office.XMLString;
 import writer2latex.util.CSVList;
+import writer2latex.util.Misc;
 
 /**
  * This class converts OpenDocument page styles to CSS2 styles.
@@ -58,6 +59,32 @@ public class PageStyleConverter extends StyleConverterHelper {
     public PageStyleConverter(OfficeReader ofr, XhtmlConfig config, Converter converter, int nType) {
         super(ofr,config,converter,nType);
         this.bConvertStyles = config.xhtmlFormatting()==XhtmlConfig.CONVERT_ALL || config.xhtmlFormatting()==XhtmlConfig.IGNORE_HARD;
+    }
+    
+    /** Get the text width of the first master page (page width minus left and right margin)
+     * 
+     *  @return the text width
+     */
+    public String getTextWidth() {
+        MasterPage masterPage = ofr.getFirstMasterPage();
+        if (masterPage!=null) {
+            PageLayout pageLayout = ofr.getPageLayout(masterPage.getPageLayoutName());
+            if (pageLayout!=null) {
+                String sWidth = pageLayout.getProperty(XMLString.FO_PAGE_WIDTH);
+                if (sWidth!=null) {
+                	String sMarginLeft = pageLayout.getProperty(XMLString.FO_MARGIN_LEFT);
+                	if (sMarginLeft!=null) {
+                		sWidth = Misc.sub(sWidth, sMarginLeft);
+                	}
+                	String sMarginRight = pageLayout.getProperty(XMLString.FO_MARGIN_RIGHT);
+                	if (sMarginRight!=null) {
+                		sWidth = Misc.sub(sWidth, sMarginRight);
+                	}
+                	return sWidth;
+                }
+            }
+        }
+        return "17cm"; // Default in Writer, hence usable as a fallback value
     }
     
     /** Apply footnote rule formatting (based on first master page)

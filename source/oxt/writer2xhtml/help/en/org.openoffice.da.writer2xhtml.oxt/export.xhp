@@ -65,7 +65,7 @@
 		<section id="scaling3">
         	<paragraph role="paragraph" xml-lang="en-US">Using this option you can define a percentage used to scale all
         	dimensions. Thus with the setting 140, all dimensions will be 40% larger than in the original document. Depending on the
-        	style you have selected and on the option <emph>Use original image size</emph>, some dimensions may be unaffected by
+        	style you have selected and on the setting for image size below, some dimensions may be unaffected by
         	this option.</paragraph>
        	</section>
         

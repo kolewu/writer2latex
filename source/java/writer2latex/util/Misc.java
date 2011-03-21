@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2010 by Henrik Just
+ *  Copyright: 2002-2011 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-12-19)
+ *  Version 1.2 (2011-03-16)
  *
  */
 
@@ -206,6 +206,12 @@ public class Misc{
     // Divide dividend by divisor and return the quotient as an integer percentage
     // (never below 1% except if the dividend is zero)
     public static final String divide(String sDividend, String sDivisor) {
+    	return divide(sDividend,sDivisor,false);
+    }
+
+    // Divide dividend by divisor and return the quotient as an integer percentage
+    // (never below 1% except if the dividend is zero, and never above 100% if last parameter is true)
+    public static final String divide(String sDividend, String sDivisor, boolean bMax100) {
         if (sDividend.equals("0")) { return "0%"; }
         if (sDivisor.equals("0")) { return "100%"; }
 
@@ -214,7 +220,10 @@ public class Misc{
         float fDivisor=getFloat(sDivisor.substring(0,sDivisor.length()-2),1);
         String sDivisorUnit=sDivisor.substring(sDivisor.length()-2);
         int nPercent = Math.round(100*fDividend*getUpi(sDivisorUnit)/fDivisor/getUpi(sDividendUnit));
-        if (nPercent>0) {
+        if (bMax100 && nPercent>100) {
+        	return "100%";
+        }
+        else if (nPercent>0) {
         	return Integer.toString(nPercent)+"%";
         }
         else {

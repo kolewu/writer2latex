@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-03-09)
+ *  Version 1.2 (2011-03-21)
  *
  */
 
@@ -32,6 +32,7 @@ import java.util.HashSet;
 import java.util.ListIterator;
 import java.util.LinkedList;
 import java.util.Set;
+import java.util.Stack;
 import java.util.Vector;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -108,6 +109,10 @@ public class Converter extends ConverterBase {
     // Strip illegal characters from internal hyperlink targets
     private ExportNameCollection targetNames = new ExportNameCollection(true);
     
+    // The current context (currently we only track the content width, but this might be expanded with formatting
+    // attributes - at least background color and font size later)
+    private Stack<String> contentWidth = new Stack<String>();
+    
     // Constructor setting the DOCTYPE
     public Converter(int nType) {
         super();
@@ -145,6 +150,22 @@ public class Converter extends ConverterBase {
     @Override public void readResource(File file, String sFileName, String sMediaType) throws IOException {
     	readResource(new FileInputStream(file), sFileName, sMediaType);
     }    
+    
+    protected String getContentWidth() {
+    	return contentWidth.peek();
+    }
+    
+    protected String pushContentWidth(String sWidth) {
+    	return contentWidth.push(sWidth);
+    }
+    
+    protected void popContentWidth() {
+    	contentWidth.pop();
+    }
+    
+    protected boolean isTopLevel() {
+    	return contentWidth.size()==1;
+    }
 
     protected StyleConverter getStyleCv() { return styleCv; }
 	
@@ -230,6 +251,9 @@ public class Converter extends ConverterBase {
         if (style!=null) {
             l10n.setLocale(style.getProperty(XMLString.FO_LANGUAGE), style.getProperty(XMLString.FO_COUNTRY));
         }
+        
+        // Set the main content width
+        pushContentWidth(getStyleCv().getPageSc().getTextWidth());
 
         // Traverse the body
         Element body = ofr.getContent();

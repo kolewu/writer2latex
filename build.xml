@@ -254,7 +254,7 @@
             <!-- Add jar and oxt's -->
             <zipfileset dir="${target.lib}" prefix="${basename}"
              includes="${jarfile}.jar,writer2latex.oxt,writer2xhtml.oxt,writer4latex.oxt,xhtml-config-sample.oxt"/>
-        </zip>		
+        </zip>
 		
         <!-- Pack the source distribution -->
         <!--<zip destfile="${target.lib}/${sourcedistrofile}">
