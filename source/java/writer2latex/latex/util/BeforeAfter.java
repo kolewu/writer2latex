@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2008 by Henrik Just
+ *  Copyright: 2002-2011 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.0 (2008-12-02)
+ *  Version 1.2 (2011-03-22)
  *
  */
 
@@ -55,6 +55,15 @@ public class BeforeAfter {
      */
     public void add(String sBefore1, String sAfter1) {
         sBefore+=sBefore1; sAfter=sAfter1+sAfter;
+    }
+    
+    /** <p>Add the content of another <code>BeforeAfter</code> to this <code>BeforeAfter</code></p>
+     *  <p>The new data will be be added "inside"</p>
+     *
+     *  @param ba the code to add
+     */
+    public void add(BeforeAfter ba) {
+    	add(ba.getBefore(), ba.getAfter());
     }
 	
     /** Get LaTeX code to put before

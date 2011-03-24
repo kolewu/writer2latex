@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2010 by Henrik Just
+ *  Copyright: 2002-2011 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-03-12)
+ *  Version 1.2 (2011-03-22)
  *
  */
 
@@ -232,7 +232,7 @@ public class ParConverter extends StyleConverter {
         }
         else {
             // Export character formatting + alignment only
-            BeforeAfter baText = new BeforeAfter();
+            BeforeAfter baFormat = new BeforeAfter();
 
             // Apply hard formatting attributes
             // Note: Left justified text is exported as full justified text!
@@ -240,27 +240,26 @@ public class ParConverter extends StyleConverter {
             if (style!=null) {
                 String sTextAlign = style.getProperty(XMLString.FO_TEXT_ALIGN,true);
                 if (bLastInBlock && context.isInLastTableColumn()) { // no grouping needed, but need to fix problem with \\
-                    if ("center".equals(sTextAlign)) { ba.add("\\centering\\arraybslash ",""); }
-                    else if ("end".equals(sTextAlign)) { ba.add("\\raggedleft\\arraybslash ",""); }
+                    if ("center".equals(sTextAlign)) { baFormat.add("\\centering\\arraybslash",""); }
+                    else if ("end".equals(sTextAlign)) { baFormat.add("\\raggedleft\\arraybslash",""); }
                     bNeedArrayBslash = true;
                 }
                 else if (bLastInBlock) { // no \par needed
-                    if ("center".equals(sTextAlign)) { ba.add("\\centering ",""); }
-                    else if ("end".equals(sTextAlign)) { ba.add("\\raggedleft ",""); }
+                    if ("center".equals(sTextAlign)) { baFormat.add("\\centering",""); }
+                    else if ("end".equals(sTextAlign)) { baFormat.add("\\raggedleft",""); }
                 }
                 else {
-                    if ("center".equals(sTextAlign)) { ba.add("\\centering ","\\par"); }
-                    else if ("end".equals(sTextAlign)) { ba.add("\\raggedleft ","\\par"); }
+                    if ("center".equals(sTextAlign)) { baFormat.add("\\centering","\\par"); }
+                    else if ("end".equals(sTextAlign)) { baFormat.add("\\raggedleft","\\par"); }
                 }
-                palette.getI18n().applyLanguage(style,true,true,baText);
-                palette.getCharSc().applyFont(style,true,true,baText,context);
+                palette.getI18n().applyLanguage(style,true,true,baFormat);
+                palette.getCharSc().applyFont(style,true,true,baFormat,context);
             }
 
-            // Assemble the bits. If there is any hard character formatting
-            // or alignment we must group the contents.
-            if (!baText.isEmpty() && !bLastInBlock) { ba.add("{","}"); }
-            ba.add(baText.getBefore(),baText.getAfter());
-            if (baText.getBefore().length()>0) { ba.add(" ",""); }
+            // If there is any hard character formatting or alignment we must group the contents.
+            if (!baFormat.isEmpty() && !bLastInBlock) { ba.add("{","}"); }
+            ba.add(baFormat);
+            if (ba.getBefore().length()>0) { ba.add(" ",""); }
         } 
 		
         // Update context

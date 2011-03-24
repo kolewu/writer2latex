@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-03-10)
+ *  Version 1.2 (2011-03-23)
  *
  */ 
  
@@ -551,7 +551,7 @@ public final class Writer4LaTeX extends WeakBase
         if (sDocumentUrl.length()!=0) {
         	if (sDocumentUrl.startsWith("file:")) {
         		if (System.getProperty("os.name").startsWith("Windows")) {
-            		Pattern windowsPattern = Pattern.compile("^file:///[A-Za-z][|:]");
+            		Pattern windowsPattern = Pattern.compile("^file:///[A-Za-z][|:].*");
             		if (!windowsPattern.matcher(sDocumentUrl).matches()) {
                         MessageBox msgBox = new MessageBox(m_xContext, m_xFrame);
                         msgBox.showMessage("Please save the document on a location with a drive name!",

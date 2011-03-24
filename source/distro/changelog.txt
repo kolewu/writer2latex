@@ -2,6 +2,14 @@ Changelog for Writer2LaTeX version 1.0 -> 1.2
 
 ---------- version 1.1.7 ----------
 
+[all] Filter bugfix: Do not exclude surrogate pairs
+
+[w2l] Bugfix: Fixed indentation problem with lists after tables if formatting>=convert_most
+
+[w2l] Bugfix: Lists in tables are now exported as standard lists even if formatting>=convert_most
+
+[w2l] Bugfix: Corrected export of centered and right justified paragraphs in tables
+
 [w2x] Renamed the option original_image_size to image_size with extended values: absolute (default, former false),
   relative (new value: Export images and text boxes using relative width, i.e. as a percentage of the current text width)
   and none/original_image_size (former true). The old option name is still recognized.
@@ -32,8 +40,6 @@ Changelog for Writer2LaTeX version 1.0 -> 1.2
 
 [w2x] Export footnotes as endnotes (if text:footnotes-position="document"). A new option footnotes_heading is added:
   The value of this (if non-empty) is used as heading for the footnotes in this case
-
-[w2x] EPUB: Set body margin to zero
 
 [w2x] Export footnote rule (using first master page)
 

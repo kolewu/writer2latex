@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2010 by Henrik Just
+ *  Copyright: 2002-2011 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-03-03)
+ *  Version 1.2 (2011-03-22)
  *
  */
 
@@ -90,7 +90,9 @@ public class ListStyleConverter extends StyleConverter {
 			return;
 		}
 		// Step 3: Export as default lists, but redefine labels
-		if (config.formatting()==LaTeXConfig.CONVERT_BASIC) {
+		// (for list in tables this is the maximum formatting we export)
+		if (config.formatting()==LaTeXConfig.CONVERT_BASIC ||
+				(config.formatting()>=LaTeXConfig.CONVERT_MOST && oc.isInTable())) {
 			if (oc.getListLevel()==1) {
 				if (!styleNames.containsName(getDisplayName(oc.getListStyleName()))) {
 					createListStyleLabels(oc.getListStyleName());
@@ -124,7 +126,8 @@ public class ListStyleConverter extends StyleConverter {
 			+"level"+Misc.int2roman(oc.getListLevel());
 			if (!oc.isInContinuedList() && style.isNumber(oc.getListLevel())) {
 				int nStartValue = Misc.getPosInteger(style.getLevelProperty(oc.getListLevel(),XMLString.TEXT_START_VALUE),1)-1;
-				ba.add("\\setcounter{"+sTeXName+"}{"+Integer.toString(nStartValue)+"}\n","");
+				// Note that we need a blank line after certain constructions to get proper indentation
+				ba.add("\n\\setcounter{"+sTeXName+"}{"+Integer.toString(nStartValue)+"}\n","");
 			}
 			ba.add("\\begin{"+sTeXName+"}","\\end{"+sTeXName+"}");
 		}

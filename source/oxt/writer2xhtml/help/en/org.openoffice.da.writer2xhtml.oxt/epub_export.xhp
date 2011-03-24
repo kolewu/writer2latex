@@ -82,6 +82,7 @@
 		<embed href="org.openoffice.da.writer2xhtml.oxt/export.xhp#converttopx4"/>
         
         <bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:EpubOptionsImageSize" id="bm_options_imagesize"/>
+        <paragraph role="heading" level="3" xml-lang="en-US">Image size</paragraph>
 		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2xhtml.oxt:EpubOptionsImageSize" visibility="hidden">Select how to set the image size in the EPUB document</ahelp></paragraph>
         <paragraph role="paragraph" xml-lang="en-US">Select how to set the image size in the EPUB document</paragraph>
         <list type="unordered">

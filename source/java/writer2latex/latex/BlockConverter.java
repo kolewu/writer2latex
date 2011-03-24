@@ -313,13 +313,13 @@ public class BlockConverter extends ConverterHelper {
             Misc.getPosInteger(node.getAttribute(XMLString.TEXT_START_VALUE),1)-1,
             ba);
 			
-        // export the list item
+        // export the list item (note the special treatment of lists in tables)
         if (ba.getBefore().length()>0) {
             ldp.append(ba.getBefore());
-            if (config.formatting()>=LaTeXConfig.CONVERT_MOST) { ldp.nl(); }
+            if (config.formatting()>=LaTeXConfig.CONVERT_MOST && !oc.isInTable()) { ldp.nl(); }
         }
         traverseBlockText(node,ldp,oc);
-        if (ba.getAfter().length()>0) { ldp.append(ba.getAfter()).nl(); }
+        if (ba.getAfter().length()>0 || oc.isInTable()) { ldp.append(ba.getAfter()).nl(); }
     }
 
     /*

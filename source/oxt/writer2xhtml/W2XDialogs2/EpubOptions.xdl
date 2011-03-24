@@ -96,7 +96,7 @@
    <dlg:menupopup>
     <dlg:menuitem dlg:value="Use absolute size"/>
     <dlg:menuitem dlg:value="Use relative size (%)"/>
-    <dlg:menuitem dlg:value="Use orignal image size"/>
+    <dlg:menuitem dlg:value="Use original image size"/>
    </dlg:menupopup>
   </dlg:menulist>
  </dlg:bulletinboard>

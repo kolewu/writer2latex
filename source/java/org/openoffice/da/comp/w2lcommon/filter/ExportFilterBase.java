@@ -149,14 +149,16 @@ public abstract class ExportFilterBase implements
                 else if (c=='>'){
     	        	buf.append("&gt;");
         	    }  
-        	    else if (c=='\u0009' || c=='\n' || c=='\r' || (c>='\u0020' && c<='\uD7FF') || (c>='\uE000' && c<'\uFFFD')) {
+        	    //else if (c=='\u0009' || c=='\n' || c=='\r' || (c>='\u0020' && c<='\uD7FF') || (c>='\uE000' && c<'\uFFFD')) {
+                else if (c=='\u0009' || c=='\n' || c=='\r' || (c>='\u0020' && c<'\uFFFD')) {
         			// Valid characters found at xml.com
         			// Char ::= #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
+                	// (the latter are represented as surrogate pairs (#xD800-#xDFFF)
         	    	buf.append(c);
         	    }
         	    else {
         	    	// Found illegal character
-        	    	System.out.println("Illegal character : "+Integer.toHexString(c));
+        	    	//System.out.println("Illegal character : "+Integer.toHexString(c));
         	    }
         	}
 	        return buf.toString();

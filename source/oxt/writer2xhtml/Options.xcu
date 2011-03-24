@@ -70,7 +70,7 @@
         <prop oor:name="ColumnScaling" oor:type="xs:int">
             <value>100</value>
         </prop>
-        <prop oor:name="ImageSize" oor:type="xs:int">
+        <prop oor:name="ImageSize" oor:type="xs:short">
             <value>1</value><!-- relative -->
         </prop>
         <prop oor:name="RelativeFontSize" oor:type="xs:boolean">
