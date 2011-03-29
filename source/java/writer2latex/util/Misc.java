@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-03-16)
+ *  Version 1.2 (2011-03-29)
  *
  */
 
@@ -161,8 +161,6 @@ public class Misc{
         return n;
     }
 	
-    //public static int min(int n, int m) { return n<m ? n : m; }
-	
     public static String truncateLength(String sValue) {
         if (sValue.endsWith("inch")) {
             // Cut of inch to in
@@ -173,6 +171,10 @@ public class Misc{
         }
     }
 	
+    public static boolean isZero(String sValue) {
+    	return Math.abs(getFloat(sValue.substring(0, sValue.length()-2),0))<0.001;
+    }
+    
     // Return units per inch for some unit
     private static final float getUpi(String sUnit) {
         if ("in".equals(sUnit)) { return 1.0F; }

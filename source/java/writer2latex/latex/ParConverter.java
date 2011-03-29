@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-03-22)
+ *  Version 1.2 (2011-03-29)
  *
  */
 
@@ -232,7 +232,8 @@ public class ParConverter extends StyleConverter {
         }
         else {
             // Export character formatting + alignment only
-            BeforeAfter baFormat = new BeforeAfter();
+            BeforeAfter baPar = new BeforeAfter();
+            BeforeAfter baText = new BeforeAfter();
 
             // Apply hard formatting attributes
             // Note: Left justified text is exported as full justified text!
@@ -240,25 +241,34 @@ public class ParConverter extends StyleConverter {
             if (style!=null) {
                 String sTextAlign = style.getProperty(XMLString.FO_TEXT_ALIGN,true);
                 if (bLastInBlock && context.isInLastTableColumn()) { // no grouping needed, but need to fix problem with \\
-                    if ("center".equals(sTextAlign)) { baFormat.add("\\centering\\arraybslash",""); }
-                    else if ("end".equals(sTextAlign)) { baFormat.add("\\raggedleft\\arraybslash",""); }
+                    if ("center".equals(sTextAlign)) { baPar.add("\\centering\\arraybslash",""); }
+                    else if ("end".equals(sTextAlign)) { baPar.add("\\raggedleft\\arraybslash",""); }
                     bNeedArrayBslash = true;
                 }
                 else if (bLastInBlock) { // no \par needed
-                    if ("center".equals(sTextAlign)) { baFormat.add("\\centering",""); }
-                    else if ("end".equals(sTextAlign)) { baFormat.add("\\raggedleft",""); }
+                    if ("center".equals(sTextAlign)) { baPar.add("\\centering",""); }
+                    else if ("end".equals(sTextAlign)) { baPar.add("\\raggedleft",""); }
                 }
                 else {
-                    if ("center".equals(sTextAlign)) { baFormat.add("\\centering","\\par"); }
-                    else if ("end".equals(sTextAlign)) { baFormat.add("\\raggedleft","\\par"); }
+                    if ("center".equals(sTextAlign)) { baPar.add("\\centering","\\par"); }
+                    else if ("end".equals(sTextAlign)) { baPar.add("\\raggedleft","\\par"); }
                 }
-                palette.getI18n().applyLanguage(style,true,true,baFormat);
-                palette.getCharSc().applyFont(style,true,true,baFormat,context);
+                palette.getI18n().applyLanguage(style,true,true,baText);
+                palette.getCharSc().applyFont(style,true,true,baText,context);
             }
 
-            // If there is any hard character formatting or alignment we must group the contents.
-            if (!baFormat.isEmpty() && !bLastInBlock) { ba.add("{","}"); }
-            ba.add(baFormat);
+            // Group the contents if this is not the last paragraph in the cell
+            boolean bIsGrouped = false;
+            if ((!baPar.isEmpty() || !baText.isEmpty()) && !bLastInBlock) {
+            	ba.add("{","}");
+            	bIsGrouped = true;
+            }
+            ba.add(baPar);
+            // Group the text formatting in any case (supertabular needs this)
+            if (!baText.isEmpty() && !bIsGrouped) {
+            	ba.add("{", "}");
+            }
+            ba.add(baText);
             if (ba.getBefore().length()>0) { ba.add(" ",""); }
         } 
 		

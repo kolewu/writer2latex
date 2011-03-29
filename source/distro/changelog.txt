@@ -2,6 +2,12 @@ Changelog for Writer2LaTeX version 1.0 -> 1.2
 
 ---------- version 1.1.7 ----------
 
+[w2x] Bugfix: Positioning of text boxes (left, right, center, floating) now works correctly 
+
+[w2x] Support the value "biggest" for the style:wrap attribute
+
+[w2l] Bugfix: No longer creates run-in headings if bottom margin is zero and formatting>=convert_most
+
 [all] Filter bugfix: Do not exclude surrogate pairs
 
 [w2l] Bugfix: Fixed indentation problem with lists after tables if formatting>=convert_most

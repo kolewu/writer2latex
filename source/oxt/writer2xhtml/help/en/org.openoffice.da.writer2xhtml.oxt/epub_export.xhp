@@ -92,7 +92,8 @@
         	</listitem>
 			<listitem>
     		    <paragraph role="paragraph" xml-lang="en-US"><emph>Use relative size (%)</emph>: Image sizes will be exported as
-    		    percentages. This has the advantage that the image size will adapt to the size of the reader screen.</paragraph>
+    		    a percentage of the total width.
+    		    This has the advantage that the image size will adapt to the size of the reader screen.</paragraph>
         	</listitem>
 			<listitem>
     		    <paragraph role="paragraph" xml-lang="en-US"><emph>Use original image size</emph>: Often images in a %PRODUCTNAME document

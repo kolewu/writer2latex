@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-03-10)
+ *  Version 1.2 (2011-03-29)
  *
  */
 
@@ -239,7 +239,9 @@ public class HeadingConverter extends ConverterHelper {
                         // Suppress indentation after heading? currently not..
                         // ldp.append("-"); 
                         ldp.append(sMarginTop)
-                           .append("}{").append(sMarginBottom).append("}{");
+                           .append("}{")
+                           .append(Misc.isZero(sMarginBottom) ? "0.1mm" : sMarginBottom)
+                           .append("}{");
                         // Note: decl.getAfter() may include a page break after, which we ignore
 	                    ldp.append(decl.getBefore());
                         if (!comm.isEmpty()) {

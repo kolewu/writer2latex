@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-03-21)
+ *  Version 1.2 (2011-03-29)
  *
  */
  
@@ -445,17 +445,17 @@ public class DrawConverter extends ConverterHelper {
             getFrameSc().applyStyle(sStyleName,info);
         }
         // Presentation frame style
-        sStyleName = Misc.getAttribute(frame, XMLString.PRESENTATION_STYLE_NAME);
-        if (sStyleName!=null) {
+        String sPresentationStyleName = Misc.getAttribute(frame, XMLString.PRESENTATION_STYLE_NAME);
+        if (sPresentationStyleName!=null) {
             if ("outline".equals(Misc.getAttribute(frame, XMLString.PRESENTATION_CLASS))) {
-                getPresentationSc().enterOutline(sStyleName);
+                getPresentationSc().enterOutline(sPresentationStyleName);
             }
-            getPresentationSc().applyStyle(sStyleName,info);
+            getPresentationSc().applyStyle(sPresentationStyleName,info);
         }
         // Additional text formatting
-        sStyleName = Misc.getAttribute(frame, XMLString.DRAW_TEXT_STYLE_NAME);
-        if (sStyleName!=null) {
-            //getStyleCv().applyParStyle(sStyleName,info);
+        String sTextStyleName = Misc.getAttribute(frame, XMLString.DRAW_TEXT_STYLE_NAME);
+        if (sTextStyleName!=null) {
+            //getStyleCv().applyParStyle(sTextStyleName,info);
         }
 		
         // Apply placement
@@ -469,8 +469,8 @@ public class DrawConverter extends ConverterHelper {
         	applyPosition(frame,info.props);
         	break;
         case CENTERED:
-        	info.props.addValue("maring-top","2px");
-        	info.props.addValue("maring-bottom","2px");
+        	info.props.addValue("margin-top","2px");
+        	info.props.addValue("margin-bottom","2px");
         	info.props.addValue("margin-left","auto");
         	info.props.addValue("margin-right","auto");
         	sContentWidth = applyImageSize(frame,info.props,true);
@@ -481,11 +481,27 @@ public class DrawConverter extends ConverterHelper {
         	if (style!=null) {
         		String sPos = style.getProperty(XMLString.STYLE_HORIZONTAL_POS);
         		String sWrap = style.getProperty(XMLString.STYLE_WRAP);
-        		if (isLeft(sPos) && mayWrapRight(sWrap)) {
-        			info.props.addValue("float","left");
+        		if (isLeft(sPos)) {
+        			if (mayWrapRight(sWrap)) {
+        				info.props.addValue("float","left");
+        			}
+        			else {
+        				// TODO: Remove the margin-right attribute from the existing properties
+        				// and likewise for the other two cases below (requires new CSVList)
+        				info.props.addValue("margin-right", "auto");
+        			}
         		}
-        		else if (isRight(sPos) && mayWrapLeft(sWrap)) {
-        			info.props.addValue("float","right");
+        		else if (isRight(sPos)) {
+        			if (mayWrapLeft(sWrap)) {
+        				info.props.addValue("float","right");
+        			}
+        			else {
+        				info.props.addValue("margin-left", "auto");
+        			}
+        		}
+        		else if (isCenter(sPos)) {
+    				info.props.addValue("margin-left", "auto");
+    				info.props.addValue("margin-right", "auto");        				        			
         		}
         		else if (isFromLeft(sPos)) {
         			if (mayWrapRight(sWrap)) {
@@ -966,9 +982,9 @@ public class DrawConverter extends ConverterHelper {
         return "left".equals(sHPos) || "inside".equals(sHPos);
     }
 
-    /*private boolean isCenter(String sHPos) {
+    private boolean isCenter(String sHPos) {
         return "center".equals(sHPos);
-    }*/
+    }
 
     private boolean isRight(String sHPos) {
         return "right".equals(sHPos) || "outside".equals(sHPos);
@@ -979,12 +995,12 @@ public class DrawConverter extends ConverterHelper {
     }
 	
     private boolean mayWrapLeft(String sWrap) {
-        return "left".equals(sWrap) || "parallel".equals(sWrap) ||
+        return "left".equals(sWrap) || "parallel".equals(sWrap) || "biggest".equals(sWrap) ||
                "dynamic".equals(sWrap) || "run-through".equals(sWrap);
     }
 	
     private boolean mayWrapRight(String sWrap) {
-        return "right".equals(sWrap) || "parallel".equals(sWrap) ||
+        return "right".equals(sWrap) || "parallel".equals(sWrap) || "biggest".equals(sWrap) ||
                "dynamic".equals(sWrap) || "run-through".equals(sWrap);
     }
 	

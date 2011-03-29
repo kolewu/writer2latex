@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-03-22)
+ *  Version 1.2 (2011-03-29)
  *
  */
 
@@ -55,6 +55,19 @@ public class BeforeAfter {
      */
     public void add(String sBefore1, String sAfter1) {
         sBefore+=sBefore1; sAfter=sAfter1+sAfter;
+    }
+    
+    /** <p>Add data to the <code>BeforeAfter</code></p>
+     *  <p>The new data will be be added "outside", thus for example</p>
+     *  <ul><li><code>enclose("\textsf{","}");</code>
+     *  <li><code>enclose("\textit{","}");</code></ul>
+     *  <p>will create the pair <code>\textit{\textsf{</code>, <code>}}</code></p>
+     *
+     *  @param sBefore1 LaTeX code to put before
+     *  @param sAfter1 LaTeX code to put after  
+     */
+    public void enclose(String sBefore1, String sAfter1) {
+        sBefore=sBefore1+sBefore; sAfter+=sAfter1;
     }
     
     /** <p>Add the content of another <code>BeforeAfter</code> to this <code>BeforeAfter</code></p>

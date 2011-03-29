@@ -311,7 +311,7 @@ public class BlockConverter extends ConverterHelper {
             node.getNodeName().equals(XMLString.TEXT_LIST_HEADER),
             "true".equals(node.getAttribute(XMLString.TEXT_RESTART_NUMBERING)),
             Misc.getPosInteger(node.getAttribute(XMLString.TEXT_START_VALUE),1)-1,
-            ba);
+            ba,oc);
 			
         // export the list item (note the special treatment of lists in tables)
         if (ba.getBefore().length()>0) {

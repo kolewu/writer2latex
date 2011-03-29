@@ -135,7 +135,7 @@ public class ListStyleConverter extends StyleConverter {
 
 	/** <p>Apply a list style to a list item.</p> */
 	public void applyListItemStyle(String sStyleName, int nLevel, boolean bHeader,
-			boolean bRestart, int nStartValue, BeforeAfter ba) {
+			boolean bRestart, int nStartValue, BeforeAfter ba, Context oc) {
 		// Step 1. We may have a style map, this always takes precedence
 		String sDisplayName = ofr.getListStyles().getDisplayName(sStyleName);
 		if (config.getListItemStyleMap().contains(sDisplayName)) {
@@ -154,7 +154,9 @@ public class ListStyleConverter extends StyleConverter {
 			return;
 		}
 		// Step 3: Export as default lists (with redefined labels)
-		if (config.formatting()==LaTeXConfig.CONVERT_BASIC) {
+		// (for list in tables this is the maximum formatting we export)
+		if (config.formatting()==LaTeXConfig.CONVERT_BASIC ||
+				(config.formatting()>=LaTeXConfig.CONVERT_MOST && oc.isInTable())) {
 			if (nLevel<=4) {
 				if (bHeader) { 
 					ba.add("\\item[] ","");
