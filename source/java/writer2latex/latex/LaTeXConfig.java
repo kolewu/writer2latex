@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-02-01)
+ *  Version 1.2 (2011-03-30)
  *
  */
 
@@ -42,6 +42,7 @@ import writer2latex.latex.util.HeadingMap;
 import writer2latex.latex.i18n.ClassicI18n;
 import writer2latex.latex.i18n.ReplacementTrie;
 import writer2latex.latex.util.StyleMap;
+import writer2latex.latex.util.StyleMapItem;
 import writer2latex.util.Misc;
 
 public class LaTeXConfig extends writer2latex.base.ConfigBase {
@@ -437,6 +438,7 @@ public class LaTeXConfig extends writer2latex.base.ConfigBase {
             
             if ("paragraph".equals(sFamily)) {
             	if (elm.hasAttribute("line-break")) { attr.put("line-break", elm.getAttribute("line-break")); }
+            	if (elm.hasAttribute("break-after")) { attr.put("break-after", elm.getAttribute("break-after")); }
             	if (elm.hasAttribute("verbatim")) { attr.put("verbatim", elm.getAttribute("verbatim")); }
                 parMap.put(sName, attr);
             }
@@ -552,6 +554,9 @@ public class LaTeXConfig extends writer2latex.base.ConfigBase {
             if (attr.containsKey("line-break")) {
                 smNode.setAttribute("line-break",attr.get("line-break"));
             }
+            if (attr.containsKey("break-after")) {
+            	smNode.setAttribute("break-after", attr.get("break-after"));
+            }
             if (attr.containsKey("verbatim")) {
                 smNode.setAttribute("verbatim",attr.get("verbatim"));
             }
@@ -593,12 +598,15 @@ public class LaTeXConfig extends writer2latex.base.ConfigBase {
     		String sAfter = attr.containsKey("after") ? attr.get("after") : "";
     		String sNext = attr.containsKey("next") ? attr.get("next") : "";
     		boolean bLineBreak = !"false".equals(attr.get("line-break"));
+    		int nBreakAfter = StyleMapItem.PAR;
+    		String sBreakAfter = attr.get("break-after");
+    		if ("none".equals(sBreakAfter)) { nBreakAfter = StyleMapItem.NONE; }
+    		else if ("line".equals(sBreakAfter)) { nBreakAfter = StyleMapItem.LINE; }
     		boolean bVerbatim = "true".equals(attr.get("verbatim"));
-    		map.put(sName, sBefore, sAfter, sNext, bLineBreak, bVerbatim);
+    		map.put(sName, sBefore, sAfter, sNext, bLineBreak, nBreakAfter, bVerbatim);
     	}
     	return map;
     }
-
 
     // Return current string replace as a trie
     public ReplacementTrie getStringReplace() {

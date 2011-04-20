@@ -16,21 +16,26 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2007 by Henrik Just
+ *  Copyright: 2002-2011 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.0 (2007-07-30) 
+ *  Version 1.2 (2011-03-30) 
  * 
  */
  
 package writer2latex.latex.util;
 
 // A struct to hold data about a style map 
-class StyleMapItem {
+public class StyleMapItem {
+	public static final int NONE = 0;
+	public static final int LINE = 1;
+	public static final int PAR = 2;
+	
     String sBefore;
     String sAfter;
     String sNext;
+    int nBreakAfter;
     boolean bLineBreak;
     boolean bVerbatim;
 }

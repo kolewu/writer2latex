@@ -2,6 +2,8 @@ Changelog for Writer2LaTeX version 1.0 -> 1.2
 
 ---------- version 1.1.7 ----------
 
+[w2l] Added the attribute break-after to paragraph style maps with values none, line and par (default)
+
 [w2x] Bugfix: Positioning of text boxes (left, right, center, floating) now works correctly 
 
 [w2x] Support the value "biggest" for the style:wrap attribute

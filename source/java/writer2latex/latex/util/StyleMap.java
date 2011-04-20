@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2009 by Henrik Just
+ *  Copyright: 2002-2011 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2009-09-28) 
+ *  Version 1.2 (2011-03-30) 
  * 
  */
 
@@ -32,22 +32,24 @@ import java.util.Enumeration;
 public class StyleMap {
     private Hashtable<String, StyleMapItem> items = new Hashtable<String, StyleMapItem>();
 	
-    public void put(String sName, String sBefore, String sAfter, String sNext, boolean bLineBreak, boolean bVerbatim) {
+    public void put(String sName, String sBefore, String sAfter, String sNext, boolean bLineBreak, int nBreakAfter, boolean bVerbatim) {
         StyleMapItem item = new StyleMapItem();
         item.sBefore = sBefore;
         item.sAfter = sAfter;
         item.sNext = ";"+sNext+";";
         item.bLineBreak = bLineBreak;
+        item.nBreakAfter = nBreakAfter;
         item.bVerbatim = bVerbatim;
         items.put(sName,item);
     }
 
-    public void put(String sName, String sBefore, String sAfter, boolean bLineBreak, boolean bVerbatim) {
+    public void put(String sName, String sBefore, String sAfter, boolean bLineBreak, int nBreakAfter, boolean bVerbatim) {
         StyleMapItem item = new StyleMapItem();
         item.sBefore = sBefore;
         item.sAfter = sAfter;
         item.sNext = ";;";
         item.bLineBreak = bLineBreak;
+        item.nBreakAfter = nBreakAfter;
         item.bVerbatim = bVerbatim;
         items.put(sName,item);
     }
@@ -58,6 +60,7 @@ public class StyleMap {
         item.sAfter = sAfter;
         item.sNext = ";"+sNext+";";
         item.bLineBreak = true;
+        item.nBreakAfter = StyleMapItem.PAR;
         item.bVerbatim = bVerbatim;
         items.put(sName,item);
     }
@@ -68,6 +71,7 @@ public class StyleMap {
         item.sAfter = sAfter;
         item.sNext = ";;";
         item.bLineBreak = true;
+        item.nBreakAfter = StyleMapItem.PAR;
         item.bVerbatim = false;
         items.put(sName,item);
     }
@@ -96,6 +100,10 @@ public class StyleMap {
 	
     public boolean getLineBreak(String sName) {
         return contains(sName) && items.get(sName).bLineBreak;
+    }
+    
+    public int getBreakAfter(String sName) {
+    	return contains(sName) ? items.get(sName).nBreakAfter : StyleMapItem.PAR;
     }
 
     public boolean getVerbatim(String sName) {

@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-03-29)
+ *  Version 1.2 (2011-03-30)
  *
  */
 
@@ -36,6 +36,7 @@ import writer2latex.util.*;
 import writer2latex.office.*;
 import writer2latex.latex.util.BeforeAfter;
 import writer2latex.latex.util.Context;
+import writer2latex.latex.util.StyleMapItem;
 //import writer2latex.latex.util.HeadingMap;
 import writer2latex.latex.util.StyleMap;
 
@@ -149,20 +150,23 @@ public class ParConverter extends StyleConverter {
         palette.getI18n().pushSpecialTable(palette.getCharSc().getFontName(ofr.getParStyle(sStyleName)));
 		
         // Apply the style
+        int nBreakAfter;
         BeforeAfter ba = new BeforeAfter();
         if (oc.isInTable()) {
-            applyCellParStyle(sStyleName,ba,ic,OfficeReader.getCharacterCount(node)==0,bLastInBlock);
+            nBreakAfter = applyCellParStyle(sStyleName,ba,ic,OfficeReader.getCharacterCount(node)==0,bLastInBlock);
         }
         else {
-            applyParStyle(sStyleName,ba,ic,OfficeReader.getCharacterCount(node)==0);
+            nBreakAfter = applyParStyle(sStyleName,ba,ic,OfficeReader.getCharacterCount(node)==0);
         }
 		
         // Do conversion
         ldp.append(ba.getBefore());
         palette.getInlineCv().traverseInlineText(node,ldp,ic);
         ldp.append(ba.getAfter());
-        // Add a blank line except within verbatim and last in a block:
-        if (!bLastInBlock && !ic.isVerbatim() && !ic.isInSimpleTable()) { ldp.nl(); }
+        // Add line break if desired
+        if (nBreakAfter!=StyleMapItem.NONE) { ldp.nl(); }
+        // Add a blank line except within verbatim and last in a block, and if desired by style map
+        if (!bLastInBlock && !ic.isVerbatim() && !ic.isInSimpleTable() && nBreakAfter==StyleMapItem.PAR) { ldp.nl(); }
 		
         // Flush any pending index marks, reference marks and floating frames
         palette.getFieldCv().flushReferenceMarks(ldp,oc);
@@ -173,14 +177,13 @@ public class ParConverter extends StyleConverter {
         palette.getI18n().popSpecialTable();
     }
 
-    private void applyCellParStyle(String sName, BeforeAfter ba, Context context, boolean bNoTextPar, boolean bLastInBlock) {
+    private int applyCellParStyle(String sName, BeforeAfter ba, Context context, boolean bNoTextPar, boolean bLastInBlock) {
         // Paragraph formatting for paragraphs within table cells
         // We always use simple par styles here
 		
-        // Add newline if *between* paragraphs
-        if (!bLastInBlock) { ba.add("","\n"); }
-        
         context.setVerbatim(false);
+        
+        int nBreakAfter = bLastInBlock ? StyleMapItem.NONE : StyleMapItem.PAR;
         
         if (context.isInSimpleTable()) {
             if (config.formatting()!=LaTeXConfig.IGNORE_ALL) {
@@ -192,6 +195,7 @@ public class ParConverter extends StyleConverter {
                     if (ba.getBefore().length()>0) { ba.add(" ",""); }
                 }
             }
+            nBreakAfter = StyleMapItem.NONE;
         }
         else if (config.getParStyleMap().contains(ofr.getParStyles().getDisplayName(sName))) {
         	// We have a style map in the configuration
@@ -205,6 +209,7 @@ public class ParConverter extends StyleConverter {
                 if (sBefore.length()>0) { ba.add("\n",""); }
                 if (sAfter.length()>0 && !"}".equals(sAfter)) { ba.add("","\n"); }
             }
+            nBreakAfter = sm.getBreakAfter(sDisplayName);
             if (sm.getVerbatim(sDisplayName)) { context.setVerbatim(true); }
         }
         else if (bNoTextPar && (config.formatting()==LaTeXConfig.CONVERT_BASIC || config.formatting()==LaTeXConfig.IGNORE_MOST) ) {
@@ -227,6 +232,7 @@ public class ParConverter extends StyleConverter {
                 else {
                     if ("center".equals(sTextAlign)) { ba.add("{\\centering ","\\par}"); }
                     else if ("end".equals(sTextAlign)) { ba.add("{\\raggedleft ","\\par}"); }
+                    nBreakAfter = StyleMapItem.LINE;
                 }
             }
         }
@@ -274,8 +280,10 @@ public class ParConverter extends StyleConverter {
 		
         // Update context
         StyleWithProperties style = ofr.getParStyle(sName);
-        if (style==null) { return; }
-        context.updateFormattingFromStyle(style);
+        if (style!=null) {
+        	context.updateFormattingFromStyle(style);
+        }
+        return nBreakAfter;
     }
 
 	
@@ -285,15 +293,15 @@ public class ParConverter extends StyleConverter {
      *  @param <code>context</code> the current context. This method will use and update the formatting context
      *  @param <code>bNoTextPar</code> true if this paragraph has no text content (hence character formatting is not needed)  
      */
-    private void applyParStyle(String sName, BeforeAfter ba, Context context, boolean bNoTextPar) {
-        applyParStyle(sName,ba,context,bNoTextPar,true);
+    private int applyParStyle(String sName, BeforeAfter ba, Context context, boolean bNoTextPar) {
+        return applyParStyle(sName,ba,context,bNoTextPar,true);
     }
 	
-    private void applyParStyle(String sName, BeforeAfter ba, Context context, boolean bNoTextPar, boolean bBreakInside) {
+    private int applyParStyle(String sName, BeforeAfter ba, Context context, boolean bNoTextPar, boolean bBreakInside) {
         // No style specified?
-        if (sName==null) { return; }
+        if (sName==null) { return StyleMapItem.PAR; }
         
-        if (context.isInSimpleTable()) {
+        /*if (context.isInSimpleTable()) {
             if (config.formatting()!=LaTeXConfig.IGNORE_ALL) {
                 // only character formatting!
                 StyleWithProperties style = ofr.getParStyle(sName);
@@ -304,9 +312,11 @@ public class ParConverter extends StyleConverter {
                 }
             }
         }
-        else if (bNoTextPar && (config.formatting()==LaTeXConfig.CONVERT_BASIC || config.formatting()==LaTeXConfig.IGNORE_MOST) ) {
-            // Always end with a line break
-            ba.add("","\n");
+        else*/
+        int nBreakAfter = StyleMapItem.PAR;
+        
+        if (bNoTextPar && (config.formatting()==LaTeXConfig.CONVERT_BASIC || config.formatting()==LaTeXConfig.IGNORE_MOST) ) {
+        	//TODO: If there is a style map, we should respect that despite the fact that the paragraph is empty
             // only alignment!
             StyleWithProperties style = ofr.getParStyle(sName);
             if (style!=null) {
@@ -314,13 +324,11 @@ public class ParConverter extends StyleConverter {
                 // Note: Left justified text is exported as full justified text!
                 palette.getPageSc().applyPageBreak(style,false,ba);
                 String sTextAlign = style.getProperty(XMLString.FO_TEXT_ALIGN,true);
-                if ("center".equals(sTextAlign)) { ba.add("{\\centering ","\\par}"); }
-                else if ("end".equals(sTextAlign)) { ba.add("{\\raggedleft ","\\par}"); }
+                if ("center".equals(sTextAlign)) { ba.add("{\\centering ","\\par}"); nBreakAfter = StyleMapItem.LINE; }
+                else if ("end".equals(sTextAlign)) { ba.add("{\\raggedleft ","\\par}"); nBreakAfter = StyleMapItem.LINE; }
             }
         }
         else {
-            // Always end with a line break
-            ba.add("","\n");
             // Apply the style
             if (!styleMap.contains(sName)) { createParStyle(sName); }
             String sBefore = styleMap.getBefore(sName); 
@@ -331,13 +339,18 @@ public class ParConverter extends StyleConverter {
                 if (sBefore.length()>0) { ba.add("\n",""); }
                 if (sAfter.length()>0 && !"}".equals(sAfter)) { ba.add("","\n"); }
             }
+            nBreakAfter = styleMap.getBreakAfter(sName);
+            System.out.println(sName+"-"+nBreakAfter);
         } 
 		
         // Update context
         StyleWithProperties style = ofr.getParStyle(sName);
-        if (style==null) { return; }
-        context.updateFormattingFromStyle(style);
+        if (style!=null) {
+        	context.updateFormattingFromStyle(style);
+        }
         context.setVerbatim(styleMap.getVerbatim(sName));
+        
+        return nBreakAfter;
     }
 	
     /** <p>Convert a paragraph style to LaTeX. </p> 
@@ -354,7 +367,7 @@ public class ParConverter extends StyleConverter {
         StyleMap sm = config.getParStyleMap();
         if (sm.contains(sDisplayName)) {
             styleMap.put(sName,sm.getBefore(sDisplayName),sm.getAfter(sDisplayName),
-                               sm.getLineBreak(sDisplayName),sm.getVerbatim(sDisplayName));
+                               sm.getLineBreak(sDisplayName),sm.getBreakAfter(sDisplayName),sm.getVerbatim(sDisplayName));
             return;
         }
         // Does the style exist?
@@ -396,7 +409,7 @@ public class ParConverter extends StyleConverter {
         String sParentName = style.getParentName();
         if (styleMap.getVerbatim(sParentName)) {
             styleMap.put(style.getName(),styleMap.getBefore(sParentName),styleMap.getAfter(sParentName),
-                         styleMap.getLineBreak(sParentName),styleMap.getVerbatim(sParentName));
+                         styleMap.getLineBreak(sParentName),styleMap.getBreakAfter(sParentName),styleMap.getVerbatim(sParentName));
             return;
         }
         applyParStyle(sParentName,baPar,context,false,false);
@@ -413,7 +426,7 @@ public class ParConverter extends StyleConverter {
         ba.add(baText.getBefore(),baText.getAfter());
         boolean bLineBreak = styleMap.getLineBreak(sParentName);
         if (!bLineBreak && !baText.isEmpty()) { ba.add(" ",""); }
-        styleMap.put(style.getName(),ba.getBefore(),ba.getAfter(),bLineBreak,false);
+        styleMap.put(style.getName(),ba.getBefore(),ba.getAfter(),bLineBreak,styleMap.getBreakAfter(sParentName), false);
     }
 	
     private void createSimpleParStyle(StyleWithProperties style, Context context) {
