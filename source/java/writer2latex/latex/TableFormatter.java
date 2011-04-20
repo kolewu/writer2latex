@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2009 by Henrik Just
+ *  Copyright: 2002-2011 by Henrik Just
  *
  *  All Rights Reserved.
  *  
- *  Version 1.0 (2009-05-22)
+ *  Version 1.2 (2011-04-20)
  *  
  */
  
@@ -82,7 +82,7 @@ public class TableFormatter extends ConverterHelper {
         	// Collect chars to be counted in this column
         	for (int nRow=0; nRow<nRowCount; nRow++) {
         		Element cell = table.getCell(nRow, nCol);
-        		if (Misc.isElement(cell, XMLString.TABLE_TABLE_CELL)) {
+        		if (cell!=null && Misc.isElement(cell, XMLString.TABLE_TABLE_CELL)) {
         			// Now we're here: Collect alignment
         			if (OfficeReader.isSingleParagraph(cell)) {
                         Node par = Misc.getChildByTagName(cell,XMLString.TEXT_P);
@@ -160,43 +160,48 @@ public class TableFormatter extends ConverterHelper {
             int nCol = 0;
             while (nCol<nColCount) {
                 Node cell = table.getCell(nRow,nCol);
-                String sStyleName = Misc.getAttribute(cell,XMLString.TABLE_STYLE_NAME);
-                StyleWithProperties style = ofr.getCellStyle(sStyleName);
-                int nColSpan = Misc.getPosInteger(Misc.getAttribute(cell,
-                                   XMLString.TABLE_NUMBER_COLUMNS_SPANNED),1);
-                boolean bLeft = false;
-                boolean bRight = false;
-                boolean bTop = false;
-                boolean bBottom = false;
-                if (style!=null) {
-                    String sBorder = style.getProperty(XMLString.FO_BORDER);
-                    if (sBorder!=null && !"none".equals(sBorder)) {
-                        bLeft = true; bRight = true; bTop = true; bBottom = true;
-                    }
-                    sBorder = style.getProperty(XMLString.FO_BORDER_LEFT);
-                    if (sBorder!=null && !"none".equals(sBorder)) {
-                        bLeft = true;
-                    }
-                    sBorder = style.getProperty(XMLString.FO_BORDER_RIGHT);
-                    if (sBorder!=null && !"none".equals(sBorder)) {
-                        bRight = true;
-                    }
-                    sBorder = style.getProperty(XMLString.FO_BORDER_TOP);
-                    if (sBorder!=null && !"none".equals(sBorder)) {
-                        bTop = true;
-                    }
-                    sBorder = style.getProperty(XMLString.FO_BORDER_BOTTOM);
-                    if (sBorder!=null && !"none".equals(sBorder)) {
-                        bBottom = true;
-                    }
+                if (cell!=null) {
+                	String sStyleName = Misc.getAttribute(cell,XMLString.TABLE_STYLE_NAME);
+                	StyleWithProperties style = ofr.getCellStyle(sStyleName);
+                	int nColSpan = Misc.getPosInteger(Misc.getAttribute(cell,
+                			XMLString.TABLE_NUMBER_COLUMNS_SPANNED),1);
+                	boolean bLeft = false;
+                	boolean bRight = false;
+                	boolean bTop = false;
+                	boolean bBottom = false;
+                	if (style!=null) {
+                		String sBorder = style.getProperty(XMLString.FO_BORDER);
+                		if (sBorder!=null && !"none".equals(sBorder)) {
+                			bLeft = true; bRight = true; bTop = true; bBottom = true;
+                		}
+                		sBorder = style.getProperty(XMLString.FO_BORDER_LEFT);
+                		if (sBorder!=null && !"none".equals(sBorder)) {
+                			bLeft = true;
+                		}
+                		sBorder = style.getProperty(XMLString.FO_BORDER_RIGHT);
+                		if (sBorder!=null && !"none".equals(sBorder)) {
+                			bRight = true;
+                		}
+                		sBorder = style.getProperty(XMLString.FO_BORDER_TOP);
+                		if (sBorder!=null && !"none".equals(sBorder)) {
+                			bTop = true;
+                		}
+                		sBorder = style.getProperty(XMLString.FO_BORDER_BOTTOM);
+                		if (sBorder!=null && !"none".equals(sBorder)) {
+                			bBottom = true;
+                		}
+                	}
+                	bVBorder[nRow][nCol] |= bLeft;
+                	bVBorder[nRow][nCol+nColSpan] |= bRight;
+                	do {
+                		bHBorder[nRow][nCol] |= bTop;
+                		bHBorder[nRow+1][nCol] |= bBottom;
+                		nCol++;
+                	} while (--nColSpan>0);
                 }
-                bVBorder[nRow][nCol] |= bLeft;
-                bVBorder[nRow][nCol+nColSpan] |= bRight;
-                do {
-                    bHBorder[nRow][nCol] |= bTop;
-                    bHBorder[nRow+1][nCol] |= bBottom;
-                    nCol++;
-                } while (--nColSpan>0);
+                else { // Non-existing cell, treat as empty cell with no borders
+                	nCol++;
+                }
             }
         }
 		

@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2010 by Henrik Just
+ *  Copyright: 2002-2011 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-04-29)
+ *  Version 1.2 (2011-04-20)
  *
  */
 
@@ -440,24 +440,29 @@ public class TableConverter extends ConverterHelper {
             		int nCol = 0;
             		while (nCol<nColCount) {
             			Element cell = (Element) table.getCell(nRow,nCol);
-            			if (XMLString.TABLE_TABLE_CELL.equals(cell.getNodeName())) {
-            				Context icCell = (Context) icRow.clone();
-            				BeforeAfter baCell = new BeforeAfter();
-            				formatter.applyCellStyle(nRow,nCol,baCell,icCell);
-            				ldp.append(baCell.getBefore());
-            				if (nCol==nColCount-1) { icCell.setInLastTableColumn(true); }
-            				palette.getBlockCv().traverseBlockText(cell,ldp,icCell);
-            				ldp.append(baCell.getAfter());
+            			if (cell!=null) {
+            				if (XMLString.TABLE_TABLE_CELL.equals(cell.getNodeName())) {
+            					Context icCell = (Context) icRow.clone();
+            					BeforeAfter baCell = new BeforeAfter();
+            					formatter.applyCellStyle(nRow,nCol,baCell,icCell);
+            					ldp.append(baCell.getBefore());
+            					if (nCol==nColCount-1) { icCell.setInLastTableColumn(true); }
+            					palette.getBlockCv().traverseBlockText(cell,ldp,icCell);
+            					ldp.append(baCell.getAfter());
+            				}
+            				// Otherwise ignore; the cell is covered by a \multicolumn entry.
+            				// (table:covered-table-cell)
+            				int nColSpan = Misc.getPosInteger(cell.getAttribute(
+            						XMLString.TABLE_NUMBER_COLUMNS_SPANNED),1);
+            				if (nCol+nColSpan<nColCount) {
+            					if (formatter.isSimple()) { ldp.append(" & "); }
+            					else { ldp.append(" &").nl(); }
+            				}
+            				nCol+=nColSpan;
             			}
-            			// Otherwise ignore; the cell is covered by a \multicolumn entry.
-            			// (table:covered-table-cell)
-            			int nColSpan = Misc.getPosInteger(cell.getAttribute(
-            					XMLString.TABLE_NUMBER_COLUMNS_SPANNED),1);
-            			if (nCol+nColSpan<nColCount) {
-            				if (formatter.isSimple()) { ldp.append(" & "); }
-            				else { ldp.append(" &").nl(); }
+            			else { // Non-existing cell, ignore (assuming it is a trailing cell)
+            				nCol++;
             			}
-            			nCol+=nColSpan;
             		}
             		ldp.append("\\\\");
             	}

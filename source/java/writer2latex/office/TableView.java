@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2008 by Henrik Just
+ *  Copyright: 2002-2011 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.0 (2008-09-07) 
+ *  Version 1.2 (2011-04-20) 
  *
  */
 
@@ -97,33 +97,47 @@ public class TableView {
             for (int nCol=0; nCol<=range.getLastCol(); nCol++) {
                 if (nViewCol<nColCount && nColMap[nViewCol]<nCol) { nViewCol++; }
                 Element cell = reader.getCell(nRow,nCol);
-                if (Misc.isElement(cell,XMLString.TABLE_TABLE_CELL)) {
-                    int nRowSpan = Misc.getPosInteger(cell.getAttribute(XMLString.TABLE_NUMBER_ROWS_SPANNED),1);
-                    int nColSpan = Misc.getPosInteger(cell.getAttribute(XMLString.TABLE_NUMBER_COLUMNS_SPANNED),1);
-                    // Test if (parts of) the cell belongs the view
-                    if (nViewRow<nRowCount && nRowMap[nViewRow]<nRow+nRowSpan &&
-                        nViewCol<nColCount && nColMap[nViewCol]<nCol+nColSpan) {
-                        cells[nViewRow][nViewCol].cell=cell;
-                        cells[nViewRow][nViewCol].nOriginalRow=nRow;
-                        cells[nViewRow][nViewCol].nOriginalCol=nCol;
-                        // Calculate rowspan in view
-                        int i=nViewRow+1;
-                        while (i<nRowCount && nRowMap[i]<nRow+nRowSpan) { i++; }
-                        cells[nViewRow][nViewCol].nRowSpan = i-nViewRow;
-                        // Calculate colspan in view
-                        int j=nViewCol+1;
-                        while (j<nColCount && nColMap[j]<nCol+nColSpan) { j++; }
-                        cells[nViewRow][nViewCol].nColSpan = j-nViewCol;
-                    }
+                if (cell!=null) {
+                	if (Misc.isElement(cell,XMLString.TABLE_TABLE_CELL)) {
+                		int nRowSpan = Misc.getPosInteger(cell.getAttribute(XMLString.TABLE_NUMBER_ROWS_SPANNED),1);
+                		int nColSpan = Misc.getPosInteger(cell.getAttribute(XMLString.TABLE_NUMBER_COLUMNS_SPANNED),1);
+                		// Test if (parts of) the cell belongs the view
+                		if (nViewRow<nRowCount && nRowMap[nViewRow]<nRow+nRowSpan &&
+                				nViewCol<nColCount && nColMap[nViewCol]<nCol+nColSpan) {
+                			cells[nViewRow][nViewCol].cell=cell;
+                			cells[nViewRow][nViewCol].nOriginalRow=nRow;
+                			cells[nViewRow][nViewCol].nOriginalCol=nCol;
+                			// Calculate rowspan in view
+                			int i=nViewRow+1;
+                			while (i<nRowCount && nRowMap[i]<nRow+nRowSpan) { i++; }
+                			cells[nViewRow][nViewCol].nRowSpan = i-nViewRow;
+                			// Calculate colspan in view
+                			int j=nViewCol+1;
+                			while (j<nColCount && nColMap[j]<nCol+nColSpan) { j++; }
+                			cells[nViewRow][nViewCol].nColSpan = j-nViewCol;
+                		}
+                	}
+                	else if (Misc.isElement(cell,XMLString.TABLE_COVERED_TABLE_CELL)) {
+                		// Don't overwrite, the position may be occupied with a relocated cell
+                		if (cells[nViewRow][nViewCol].cell==null) {
+                			cells[nViewRow][nViewCol].cell=cell;
+                			cells[nViewRow][nViewCol].nOriginalRow=nRow;
+                			cells[nViewRow][nViewCol].nOriginalCol=nCol;
+                		}
+                	}
                 }
-                if (Misc.isElement(cell,XMLString.TABLE_COVERED_TABLE_CELL)) {
-                    // Don't overwrite, the position may be occupied with a relocated cell
-                    if (cells[nViewRow][nViewCol].cell==null) {
-                        cells[nViewRow][nViewCol].cell=cell;
-                        cells[nViewRow][nViewCol].nOriginalRow=nRow;
-                        cells[nViewRow][nViewCol].nOriginalCol=nCol;
-                    }
-                 }
+                else { // Non-existing cell, treat as empty
+            		// Test if the cell belongs the view
+            		if (nViewRow<nRowCount && nRowMap[nViewRow]<nRow+1 &&
+            				nViewCol<nColCount && nColMap[nViewCol]<nCol+1) {
+            			cells[nViewRow][nViewCol].cell=null;
+            			cells[nViewRow][nViewCol].nOriginalRow=nRow;
+            			cells[nViewRow][nViewCol].nOriginalCol=nCol;
+            			cells[nViewRow][nViewCol].nRowSpan = 1;
+            			cells[nViewRow][nViewCol].nColSpan = 1;
+            		}
+                	
+                }
             }
         }
     }

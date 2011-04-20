@@ -103,7 +103,6 @@ public class ParConverter extends StyleConverter {
         // Get the style name for this paragraph
         String sStyleName = node.getAttribute(XMLString.TEXT_STYLE_NAME);
         String sDisplayName = ofr.getParStyles().getDisplayName(sStyleName);
-
 		
         // Check for strict handling of styles
         if (config.otherStyles()!=LaTeXConfig.ACCEPT && !config.getParStyleMap().contains(sDisplayName)) {
@@ -340,7 +339,6 @@ public class ParConverter extends StyleConverter {
                 if (sAfter.length()>0 && !"}".equals(sAfter)) { ba.add("","\n"); }
             }
             nBreakAfter = styleMap.getBreakAfter(sName);
-            System.out.println(sName+"-"+nBreakAfter);
         } 
 		
         // Update context

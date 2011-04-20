@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-03-21)
+ *  Version 1.2 (2011-04-20)
  *
  */
 
@@ -251,51 +251,56 @@ public class TableConverter extends ConverterHelper {
 
             for (int nCol=0; nCol<view.getColCount(); nCol++) {
                 Node cell = view.getCell(nRow,nCol);
-                if (cell!=null && XMLString.TABLE_TABLE_CELL.equals(cell.getNodeName())) {
-                    // Create cell
-                    Element td = converter.createElement("td");
-                    tr.appendChild(td);
-                    int nRowSpan = view.getRowSpan(nRow,nCol);
-                    if (nRowSpan>1) {
-                        td.setAttribute("rowspan",Integer.toString(nRowSpan));
-                    }
-                    int nColSpan = view.getColSpan(nRow,nCol);
-                    if (nColSpan>1) {
-                        td.setAttribute("colspan",Integer.toString(nColSpan));
-                    }
-    
-                    // Handle content
-                    if (!isEmptyCell(cell)) {
-                    	String sWidth = view.getCellWidth(nRow, nCol);
-                    	if (sWidth!=null) {
-                    		converter.pushContentWidth(sWidth);
-                    	}
-                    	getTextCv().traverseBlockText(cell,td);
-                    	if (sWidth!=null) {
-                    		converter.popContentWidth();
-                    	}
-                    }
-                    else {
-                        // Hack to display empty cells even in msie...
-                        Element par = converter.createElement("p");
-                        td.appendChild(par);
-                        par.setAttribute("style","margin:0;font-size:1px");
-                        par.appendChild(converter.createTextNode("\u00A0"));
-                    }
+                if (cell!=null) {
+                	if (XMLString.TABLE_TABLE_CELL.equals(cell.getNodeName())) {
+                		// Create cell
+                		Element td = converter.createElement("td");
+                		tr.appendChild(td);
+                		int nRowSpan = view.getRowSpan(nRow,nCol);
+                		if (nRowSpan>1) {
+                			td.setAttribute("rowspan",Integer.toString(nRowSpan));
+                		}
+                		int nColSpan = view.getColSpan(nRow,nCol);
+                		if (nColSpan>1) {
+                			td.setAttribute("colspan",Integer.toString(nColSpan));
+                		}
 
-                    // Is this a subtable?
-                    Node subTable = Misc.getChildByTagName(cell,XMLString.TABLE_SUB_TABLE);
-                    String sTotalWidth=null;
-                    if (nColSpan==1) {
-                        sTotalWidth = view.getCellWidth(nRow,nCol);
-                    }
-                    String sValueType = ofr.isOpenDocument() ?
-                        Misc.getAttribute(cell,XMLString.OFFICE_VALUE_TYPE) :
-                        Misc.getAttribute(cell,XMLString.TABLE_VALUE_TYPE);
-                    applyCellStyle(view.getCellStyleName(nRow,nCol), view.getRelTableWidth()!=null, sTotalWidth, sValueType, td, subTable!=null);
+                		// Handle content
+                		if (!isEmptyCell(cell)) {
+                			String sWidth = view.getCellWidth(nRow, nCol);
+                			if (sWidth!=null) {
+                				converter.pushContentWidth(sWidth);
+                			}
+                			getTextCv().traverseBlockText(cell,td);
+                			if (sWidth!=null) {
+                				converter.popContentWidth();
+                			}
+                		}
+                		else {
+                			// Hack to display empty cells even in msie...
+                			Element par = converter.createElement("p");
+                			td.appendChild(par);
+                			par.setAttribute("style","margin:0;font-size:1px");
+                			par.appendChild(converter.createTextNode("\u00A0"));
+                		}
+
+                		// Is this a subtable?
+                		Node subTable = Misc.getChildByTagName(cell,XMLString.TABLE_SUB_TABLE);
+                		String sTotalWidth=null;
+                		if (nColSpan==1) {
+                			sTotalWidth = view.getCellWidth(nRow,nCol);
+                		}
+                		String sValueType = ofr.isOpenDocument() ?
+                				Misc.getAttribute(cell,XMLString.OFFICE_VALUE_TYPE) :
+                					Misc.getAttribute(cell,XMLString.TABLE_VALUE_TYPE);
+                				applyCellStyle(view.getCellStyleName(nRow,nCol), view.getRelTableWidth()!=null, sTotalWidth, sValueType, td, subTable!=null);
+                	}
+                	else if (XMLString.TABLE_COVERED_TABLE_CELL.equals(cell.getNodeName())) {
+                		// covered table cells are not part of xhtml table model
+                	}
                 }
-                else if (XMLString.TABLE_COVERED_TABLE_CELL.equals(cell.getNodeName())) {
-                    // covered table cells are not part of xhtml table model
+                else {
+                	// non-existing cell, not needed in the xhtml table model (it will probably be a trailing cell)
                 }
             }
         }
