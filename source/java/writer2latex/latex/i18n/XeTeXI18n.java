@@ -20,11 +20,13 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-03-10)
+ *  Version 1.2 (2011-05-06)
  * 
  */
 
 package writer2latex.latex.i18n;
+
+import java.text.Bidi;
 
 import writer2latex.office.*;
 import writer2latex.latex.LaTeXConfig;
@@ -37,6 +39,8 @@ import writer2latex.latex.util.BeforeAfter;
 public class XeTeXI18n extends I18n {
 
     private Polyglossia polyglossia;
+    private boolean bUsePolyglossia;
+    private boolean bUseXepersian;
 
     /** Construct a new XeTeXI18n as ConverterHelper
      *  @param ofr the OfficeReader to get language information from
@@ -47,6 +51,14 @@ public class XeTeXI18n extends I18n {
     	super(ofr,config,palette);
     	polyglossia = new Polyglossia();
     	polyglossia.applyLanguage(sDefaultLanguage, sDefaultCountry);
+    	
+    	// Currently all languages except farsi (fa_IR) are handled with polyglossia
+    	// Actually only LTR languages are supported as yet
+    	// TODO: Support CTL languages using polyglossia
+    	bUsePolyglossia = !"fa".equals(sDefaultCTLLanguage);
+    	// For farsi, we load xepersian.sty
+    	// TODO: Add a use_xepersian option, using polyglossia if false
+    	bUseXepersian = !bUsePolyglossia;
     }
 	
     /** Add declarations to the preamble to load the required packages
@@ -58,20 +70,35 @@ public class XeTeXI18n extends I18n {
     		.append("\\usepackage{fontspec}").nl()
     		.append("\\usepackage{xunicode}").nl()
     		.append("\\usepackage{xltxtra}").nl();
-    	String[] polyglossiaDeclarations = polyglossia.getDeclarations();
-    	for (String s: polyglossiaDeclarations) {
-    		pack.append(s).nl();
+    	if (bUsePolyglossia) {
+    		String[] polyglossiaDeclarations = polyglossia.getDeclarations();
+    		for (String s: polyglossiaDeclarations) {
+    			pack.append(s).nl();
+    		}
+    	}
+    	else if (bUseXepersian) {
+        	// xepersian.sty must be loaded as the last package
+    		// We put it in the declarations part to achieve this
+    		decl.append("\\usepackage{xepersian}").nl();
+    		// Set the default font to the default CTL font defined in the document
+    		StyleWithProperties defaultStyle = ofr.getDefaultParStyle();
+    		if (defaultStyle!=null) {
+    			String sDefaultCTLFont = defaultStyle.getProperty(XMLString.STYLE_FONT_NAME_COMPLEX);
+    			if (sDefaultCTLFont!=null) {
+    	    		decl.append("\\settextfont{").append(sDefaultCTLFont).append("}").nl();
+    			}
+    		}
     	}
     }
-	
-    /** Apply a language language
+    
+    /** Apply a language
      *  @param style the OOo style to read attributes from
      *  @param bDecl true if declaration form is required
      *  @param bInherit true if inherited properties should be used
      *  @param ba the <code>BeforeAfter</code> to add LaTeX code to.
      */
     public void applyLanguage(StyleWithProperties style, boolean bDecl, boolean bInherit, BeforeAfter ba) {
-        if (!bAlwaysUseDefaultLang && style!=null) {
+        if (bUsePolyglossia && !bAlwaysUseDefaultLang && style!=null) {
         	// TODO: Support CTL and CJK
             String sISOLang = style.getProperty(XMLString.FO_LANGUAGE,bInherit);
             String sISOCountry = style.getProperty(XMLString.FO_COUNTRY, bInherit);
@@ -109,34 +136,71 @@ public class XeTeXI18n extends I18n {
     public String convert(String s, boolean bMathMode, String sLang){
     	// TODO: Do we need anything special for math mode?
     	StringBuffer buf = new StringBuffer();
+    	int nLen = s.length();
         char c;
-        int nLen = s.length();
-        int i = 0;
-        while (i<nLen) {
-            ReplacementTrieNode node = stringReplace.get(s,i,nLen);
-            if (node!=null) {
-                buf.append(node.getLaTeXCode());
-                i += node.getInputLength();
-            }
-            else {
-        		c = s.charAt(i++);
-        		switch (c) {
-        			case '#' : buf.append("\\#"); break; // Parameter
-        			case '$' : buf.append("\\$"); break; // Math shift
-        			case '%' : buf.append("\\%"); break; // Comment
-        			case '&' : buf.append("\\&"); break; // Alignment tab
-        			case '\\' : buf.append("\\textbackslash{}"); break; // Escape
-        			case '^' : buf.append("\\^{}"); break; // Superscript
-        			case '_' : buf.append("\\_"); break; // Subscript
-        			case '{' : buf.append("\\{"); break; // Begin group
-        			case '}' : buf.append("\\}"); break; // End group
-        			case '~' : buf.append("\\textasciitilde{}"); break; // Active (non-breaking space)
-        			case '\u00A0' : buf.append('~'); break; // Make non-breaking spaces visible
-        			default: buf.append(c);
+        if (bUsePolyglossia) {
+        	int i = 0;
+        	while (i<nLen) {
+        		ReplacementTrieNode node = stringReplace.get(s,i,nLen);
+        		if (node!=null) {
+        			buf.append(node.getLaTeXCode());
+        			i += node.getInputLength();
         		}
-            }
+        		else {
+        			c = s.charAt(i++);
+        			convert (c,buf);
+        		}
+        	}
         }
-    	return buf.toString();
+        else if (bUseXepersian) {
+        	// TODO: Add support for string replace
+			Bidi bidi = new Bidi(s,Bidi.DIRECTION_RIGHT_TO_LEFT);
+			int nCurrentLevel = bidi.getBaseLevel();
+			int nNestingLevel = 0;
+			for (int i=0; i<nLen; i++) {
+				int nLevel = bidi.getLevelAt(i);
+				if (nLevel>nCurrentLevel) {
+					if (nLevel%2==0) { // even is LTR
+						buf.append("\\lr{");
+					}
+					else { // odd is RTL
+						buf.append("\\rl{");						
+					}
+					nCurrentLevel=nLevel;
+					nNestingLevel++;
+				}
+				else if (nLevel<nCurrentLevel) {
+					buf.append("}");
+					nCurrentLevel=nLevel;
+					nNestingLevel--;
+				}
+				convert(s.charAt(i),buf);
+			}
+			while (nNestingLevel>0) {
+				buf.append("}");
+				nNestingLevel--;
+			}
+		}
+        
+        return buf.toString();
+    }
+    
+    private void convert(char c, StringBuffer buf) {
+		switch (c) {
+		case '#' : buf.append("\\#"); break; // Parameter
+		case '$' : buf.append("\\$"); break; // Math shift
+		case '%' : buf.append("\\%"); break; // Comment
+		case '&' : buf.append("\\&"); break; // Alignment tab
+		case '\\' : buf.append("\\textbackslash{}"); break; // Escape
+		case '^' : buf.append("\\^{}"); break; // Superscript
+		case '_' : buf.append("\\_"); break; // Subscript
+		case '{' : buf.append("\\{"); break; // Begin group
+		case '}' : buf.append("\\}"); break; // End group
+		case '~' : buf.append("\\textasciitilde{}"); break; // Active (non-breaking space)
+		case '\u00A0' : buf.append('~'); break; // Make non-breaking spaces visible
+		default: buf.append(c);
+	}
+    	
     }
     
 

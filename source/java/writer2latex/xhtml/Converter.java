@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-03-21)
+ *  Version 1.2 (2011-05-09)
  *
  */
 
@@ -249,7 +249,13 @@ public class Converter extends ConverterBase {
         // Set locale to document language
         StyleWithProperties style = ofr.isSpreadsheet() ? ofr.getDefaultCellStyle() : ofr.getDefaultParStyle();
         if (style!=null) {
-            l10n.setLocale(style.getProperty(XMLString.FO_LANGUAGE), style.getProperty(XMLString.FO_COUNTRY));
+        	// The only CTL language recognized currently is farsi
+        	if ("fa".equals(style.getProperty(XMLString.STYLE_LANGUAGE_COMPLEX))) {
+        		l10n.setLocale("fa", "IR");
+        	}
+        	else {
+        		l10n.setLocale(style.getProperty(XMLString.FO_LANGUAGE), style.getProperty(XMLString.FO_COUNTRY));
+        	}
         }
         
         // Set the main content width

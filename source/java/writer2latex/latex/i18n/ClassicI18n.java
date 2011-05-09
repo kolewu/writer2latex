@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-03-10) 
+ *  Version 1.2 (2011-05-07) 
  * 
  */
 
@@ -393,7 +393,7 @@ public class ClassicI18n extends I18n {
         pack.append("\\usepackage{amssymb,amsfonts,textcomp}").nl();
 		
     }
-	
+    
     /** Apply a language language
      *  @param style the OOo style to read attributes from
      *  @param bDecl true if declaration form is required

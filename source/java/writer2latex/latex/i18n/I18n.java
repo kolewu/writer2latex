@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-03-10) 
+ *  Version 1.2 (2011-05-09) 
  * 
  */
 
@@ -40,6 +40,9 @@ import writer2latex.latex.util.BeforeAfter;
  */
 public abstract class I18n {
     // **** Global variables ****
+	
+	// The office reader
+	protected OfficeReader ofr;
 
     // Configuration items
     protected LaTeXConfig config;
@@ -48,9 +51,11 @@ public abstract class I18n {
     protected boolean bAlwaysUseDefaultLang; // Ignore sLang parameter to convert()
 
     // Collected data
-    protected String sDefaultLanguage; // The default ISO language to use
-    protected String sDefaultCountry; // The default ISO country to use
-    protected HashSet<String> languages = new HashSet<String>(); // All languages used
+    protected String sDefaultCTLLanguage; // The default CTL ISO language to use
+    protected String sDefaultCTLCountry; // The default CTL ISO country to use
+    protected String sDefaultLanguage; // The default LCG ISO language to use
+    protected String sDefaultCountry; // The default LCG ISO country to use
+    protected HashSet<String> languages = new HashSet<String>(); // All LCG languages used
 
     // **** Constructors ****
 
@@ -60,8 +65,8 @@ public abstract class I18n {
      *  @param palette the ConverterPalette (unused)
      */
     public I18n(OfficeReader ofr, LaTeXConfig config, ConverterPalette palette) {
-        // We don't need the palette and the office reader is only used to
-        // identify the default language
+        // We don't need the palette
+    	this.ofr = ofr;
 
         // Set up config items
         this.config = config;
@@ -77,6 +82,8 @@ public abstract class I18n {
                 if (style!=null) { 
                     sDefaultLanguage = style.getProperty(XMLString.FO_LANGUAGE);
                     sDefaultCountry = style.getProperty(XMLString.FO_COUNTRY);
+                    sDefaultCTLLanguage = style.getProperty(XMLString.STYLE_LANGUAGE_COMPLEX);
+                    sDefaultCTLCountry = style.getProperty(XMLString.STYLE_COUNTRY_COMPLEX);
                 }
             }
             else {

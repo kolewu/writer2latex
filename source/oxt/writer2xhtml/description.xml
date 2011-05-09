@@ -5,7 +5,7 @@
 			 
   <identifier value="org.openoffice.da.writer2xhtml.oxt" />
   
-  <version value="1.1.7" />
+  <version value="1.1.8" />
   
   <dependencies>
     <OpenOffice.org-minimal-version value="3.0" d:name="OpenOffice.org 3.0"/>
@@ -32,6 +32,7 @@
     <name lang="ru">Фильтры экспорта Writer2xhtml</name>
     <name lang="uk">Фільтри експорту Writer2xhtml</name>
     <name lang="tr">Writer2LaTeX ihraç etme filitreleri</name>
+    <name lang="fa">Writer2xhtml export filters</name>
   </display-name>
   
   <icon>

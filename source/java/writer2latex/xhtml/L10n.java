@@ -279,6 +279,20 @@ public class L10n {
                 case DOCUMENT: return "Document";
             }
         }
+        if (sLocale.startsWith("fa")) { // Farsi
+            switch (nString) {
+                case UP: return "\u0628\u0627\u0644\u0627";
+                case FIRST : return "\u0627\u0648\u0644";
+                case PREVIOUS : return "\u0642\u0628\u0644\u06cc";
+                case NEXT : return "\u0628\u0639\u062f\u06cc";
+                case LAST : return "\u0627\u062e\u0631\u06cc\u0646";
+                //case CONTENTS : return "??";
+                case INDEX : return "\u0641\u0647\u0631\u0633\u062a";
+                case HOME : return "\u062e\u0627\u0646\u0647";
+                case DIRECTORY: return "\u067e\u0648\u0634\u0647";
+                case DOCUMENT: return "\u0645\u0633\u062a\u0646\u062f";
+            }
+        }
         // English - default
         switch (nString) {
             case UP: return "Up";
