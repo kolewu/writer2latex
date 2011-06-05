@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-03-09)
+ *  Version 1.2 (2011-06-05)
  *
  */
 
@@ -610,18 +610,6 @@ public class TextConverter extends ConverterHelper {
     private void handleHeading(Element onode, Node hnode, boolean bAfterSplit,
         ListStyle listStyle, int nListLevel, boolean bUnNumbered,
         boolean bRestart, int nStartValue) {
-    	String sStyleName = onode.getAttribute(XMLString.TEXT_STYLE_NAME);
-		StyleWithProperties style = ofr.getParStyle(sStyleName);
-        if (!bDisplayHiddenText && style!=null && "none".equals(style.getProperty(XMLString.TEXT_DISPLAY))) { return; }
-    	if (!bUnNumbered) {
-    		// If the heading uses a paragraph style which sets an explicit empty list style name, it's unnumbered
-    		if (style!=null) {
-    			String sListStyleName = style.getListStyleName();
-    			if (sListStyleName!=null && sListStyleName.length()==0) {
-    				bUnNumbered = true;
-    			}
-    		}
-    	}
 
         // Note: nListLevel may in theory be different from the outline level,
         // though the ui in OOo does not allow this
@@ -632,31 +620,66 @@ public class TextConverter extends ConverterHelper {
 
         // Note: Conditional styles are not supported
         int nLevel = getOutlineLevel(onode);
-        if (nLevel<=6) {
-            if (nLevel==1) { currentChapter = onode; }
-            // If split output, add headings of higher levels
-            if (bAfterSplit && nSplit>0) {
-                int nFirst = nLevel-nRepeatLevels;
-                if (nFirst<0) { nFirst=0; }                
-                for (int i=nFirst; i<nLevel; i++) {
-                    if (currentHeading[i]!=null) {
-                        hnode.appendChild(converter.importNode(currentHeading[i],true));
-                    }
-                }
-            }		
+        if (nLevel<=6) { // Export as heading
+        	String sStyleName = onode.getAttribute(XMLString.TEXT_STYLE_NAME);
+    		StyleWithProperties style = ofr.getParStyle(sStyleName);
+    		
+    		// Check for hidden text
+            if (!bDisplayHiddenText && style!=null && "none".equals(style.getProperty(XMLString.TEXT_DISPLAY))) { return; }
             
-            // Apply style
-            StyleInfo info = new StyleInfo();
-            info.sTagName = "h"+nLevel;
-            getHeadingSc().applyStyle(nLevel, sStyleName, info);
+            // Numbering
+        	if (!bUnNumbered) {
+        		// If the heading uses a paragraph style which sets an explicit empty list style name, it's unnumbered
+        		if (style!=null) {
+        			String sListStyleName = style.getListStyleName();
+        			if (sListStyleName!=null && sListStyleName.length()==0) {
+        				bUnNumbered = true;
+        			}
+        		}
+        	}
+        	ListCounter counter = null;
+        	String sLabel="";
+            if (!bUnNumbered) {
+            	counter = getListCounter(listStyle); 
+            	if (bRestart) { counter.restart(nListLevel,nStartValue); }
+            	sLabel = counter.step(nListLevel).getLabel();
+            }        	
+        	
+    		// In EPUB export, a striked out heading will only appear in the external toc            
+        	boolean bTocOnly = false;
+        	if (converter.isOPS() && style!=null) {
+        		String sStrikeOut = style.getProperty(XMLString.STYLE_TEXT_LINE_THROUGH_STYLE, true);
+        		if (sStrikeOut!=null && !"none".equals(sStrikeOut)) {
+        			bTocOnly = true;
+        		}
+        	}
 
-			// add root element
-            Element heading = converter.createElement(info.sTagName);
-            hnode.appendChild(heading);
-            applyStyle(info,heading);
-            traverseFloats(onode,hnode,heading);
-            // Apply writing direction
-            /*String sStyleName = Misc.getAttribute(onode,XMLString.TEXT_STYLE_NAME);
+        	// Export the heading
+        	if (!bTocOnly) {
+        		if (nLevel==1) { currentChapter = onode; }
+        		// If split output, add headings of higher levels
+        		if (bAfterSplit && nSplit>0) {
+        			int nFirst = nLevel-nRepeatLevels;
+        			if (nFirst<0) { nFirst=0; }                
+        			for (int i=nFirst; i<nLevel; i++) {
+        				if (currentHeading[i]!=null) {
+        					hnode.appendChild(converter.importNode(currentHeading[i],true));
+        				}
+        			}
+        		}		
+
+        		// Apply style
+        		StyleInfo info = new StyleInfo();
+        		info.sTagName = "h"+nLevel;
+        		getHeadingSc().applyStyle(nLevel, sStyleName, info);
+
+        		// add root element
+        		Element heading = converter.createElement(info.sTagName);
+        		hnode.appendChild(heading);
+        		applyStyle(info,heading);
+        		traverseFloats(onode,hnode,heading);
+        		// Apply writing direction
+        		/*String sStyleName = Misc.getAttribute(onode,XMLString.TEXT_STYLE_NAME);
             StyleWithProperties style = ofr.getParStyle(sStyleName);
             if (style!=null) {
                 StyleInfo headInfo = new StyleInfo(); 
@@ -664,63 +687,82 @@ public class TextConverter extends ConverterHelper {
                 getParSc().applyStyle(headInfo,heading);
             }*/
 
-            // Prepend asapNode
-            prependAsapNode(heading);
-			
-            // Prepend numbering
-            String sLabel="";
-            if (!bUnNumbered) {
-            	ListCounter counter = getListCounter(listStyle); 
-            	if (bRestart) { counter.restart(nListLevel,nStartValue); }
-            	sLabel = counter.step(nListLevel).getLabel();
-            	if (config.zenHack() && nLevel==2) {
-            		// Hack for ePub Zen Garden: Special style for the prefix at level 2
-            		// TODO: Replace by some proper style map construct...
-            		insertListLabel(listStyle,nListLevel,"SectionNumber",counter.getPrefix(),counter.getLabelAndSuffix(),heading);
-            	}
-            	else {
-            		insertListLabel(listStyle,nListLevel,"SectionNumber",null,sLabel,heading);            	
-            	}
-            }
+        		// Prepend asapNode
+        		prependAsapNode(heading);
 
-            // Add to toc
-            if (!bInToc) {
-            	String sTarget = "toc"+(++nTocIndex);
-                converter.addTarget(heading,sTarget);
-                
-                // Add in external content. For single file output we include all level 1 headings + their target
-                // Targets are added only when the toc level is deeper than the split level 
-                if (nLevel<=nExternalTocDepth) {
-                	converter.addContentEntry(sLabel+converter.getPlainInlineText(onode), nLevel,
-                			nLevel>nSplit ? sTarget : null);
+        		// Prepend numbering
+        		if (!bUnNumbered) {
+        			if (config.zenHack() && nLevel==2) {
+        				// Hack for ePub Zen Garden: Special style for the prefix at level 2
+        				// TODO: Replace by some proper style map construct...
+        				insertListLabel(listStyle,nListLevel,"SectionNumber",counter.getPrefix(),counter.getLabelAndSuffix(),heading);
+        			}
+        			else {
+        				insertListLabel(listStyle,nListLevel,"SectionNumber",null,sLabel,heading);            	
+        			}
+        		}
+
+        		// Add to toc
+        		if (!bInToc) {
+        			String sTarget = "toc"+(++nTocIndex);
+        			converter.addTarget(heading,sTarget);
+
+        			// Add in external content. For single file output we include all level 1 headings + their target
+        			// Targets are added only when the toc level is deeper than the split level 
+        			if (nLevel<=nExternalTocDepth) {
+        				converter.addContentEntry(sLabel+converter.getPlainInlineText(onode), nLevel,
+        						nLevel>nSplit ? sTarget : null);
+        			}
+
+        			// Add to real toc
+        			TocEntry entry = new TocEntry();
+        			entry.onode = onode;
+        			entry.sLabel = sLabel;
+        			entry.nFileIndex = converter.getOutFileIndex();
+        			entry.nOutlineLevel = nLevel; 
+        			entry.nOutlineNumber = naturalOutline.step(nLevel).getValues();
+        			tocEntries.add(entry);
+        		}
+
+        		// Convert content
+        		StyleInfo innerInfo = new StyleInfo();
+        		getHeadingSc().applyInnerStyle(nLevel, sStyleName, innerInfo);
+        		Element content = heading;
+        		if (innerInfo.sTagName!=null && innerInfo.sTagName.length()>0) {
+        			content = converter.createElement(innerInfo.sTagName);
+        			heading.appendChild(content);
+        			applyStyle(innerInfo, content);
+        		}
+        		traverseInlineText(onode,content);
+                // Keep track of current headings for split output
+                currentHeading[nLevel] = heading;
+                for (int i=nLevel+1; i<=6; i++) {
+                    currentHeading[i] = null;
                 }
-
-                // Add to real toc
-                TocEntry entry = new TocEntry();
-                entry.onode = onode;
-                entry.sLabel = sLabel;
-                entry.nFileIndex = converter.getOutFileIndex();
-                entry.nOutlineLevel = nLevel; 
-                entry.nOutlineNumber = naturalOutline.step(nLevel).getValues();
-                tocEntries.add(entry);
-            }
-
-            // Convert content
-            StyleInfo innerInfo = new StyleInfo();
-            getHeadingSc().applyInnerStyle(nLevel, sStyleName, innerInfo);
-            Element content = heading;
-            if (innerInfo.sTagName!=null && innerInfo.sTagName.length()>0) {
-            	content = converter.createElement(innerInfo.sTagName);
-            	heading.appendChild(content);
-            	applyStyle(innerInfo, content);
-            }
-            traverseInlineText(onode,content);
-			
-            // Keep track of current headings for split output
-            currentHeading[nLevel] = heading;
-            for (int i=nLevel+1; i<=6; i++) {
-                currentHeading[i] = null;
-            }
+        	}
+        	else {
+        		if (!bInToc) {
+        			// Add in external content. For single file output we include all level 1 headings + their target
+        			// Targets are added only when the toc level is deeper than the split level 
+        			if (nLevel<=nExternalTocDepth) {
+                		// Add an empty div to use as target, if required
+        				String sTarget = null;
+        				if (nLevel>nSplit) {
+        					Element div = converter.createElement("div");        			
+        					hnode.appendChild(div);
+        					sTarget = "toc"+(++nTocIndex);
+        					converter.addTarget(div,sTarget);
+        				}
+        				converter.addContentEntry(sLabel+converter.getPlainInlineText(onode), nLevel, sTarget);
+        			}
+        		}
+                // Keep track of current headings for split output
+                currentHeading[nLevel] = null;
+                for (int i=nLevel+1; i<=6; i++) {
+                    currentHeading[i] = null;
+                }
+        		
+        	}
         }
         else { // beyond h6 - export as ordinary paragraph
             handleParagraph(onode,hnode);

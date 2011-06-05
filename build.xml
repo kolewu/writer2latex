@@ -35,7 +35,7 @@
     <!-- configure the directories -->
     <property name="jarfile" value="writer2latex"/>
     <property name="basename" value="writer2latex11"/>
-    <property name="distrofile" value="${basename}7alpha.zip" />
+    <property name="distrofile" value="${basename}8alpha.zip" />
     <!--<property name="sourcedistrofile" value="${basename}source.zip" />-->
     <property name="src" location="source/java"/>
     <property name="source.distro" location="source/distro" />
