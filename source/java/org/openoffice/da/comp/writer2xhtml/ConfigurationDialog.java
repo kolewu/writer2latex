@@ -20,7 +20,7 @@
 *
 *  All Rights Reserved.
 * 
-*  Version 1.2 (2011-03-08)
+*  Version 1.2 (2011-06-06)
 *
 */ 
 
@@ -30,11 +30,16 @@ import java.util.Map;
 
 import org.openoffice.da.comp.w2lcommon.filter.ConfigurationDialogBase;
 import org.openoffice.da.comp.w2lcommon.helper.DialogAccess;
+import org.openoffice.da.comp.w2lcommon.helper.FilePicker;
 
+import com.sun.star.container.NoSuchElementException;
 import com.sun.star.lang.XServiceInfo;
+import com.sun.star.ucb.CommandAbortedException;
+import com.sun.star.uno.Exception;
 import com.sun.star.uno.XComponentContext;
 
 public class ConfigurationDialog extends ConfigurationDialogBase implements XServiceInfo {
+	private String sResourceDirName;
 
     // Implement the interface XServiceInfo
 
@@ -70,6 +75,14 @@ public class ConfigurationDialog extends ConfigurationDialogBase implements XSer
     public ConfigurationDialog(XComponentContext xContext) {
     	super(xContext);
     	
+        // Create the resource dir name
+        try {
+            sResourceDirName = xPathSub.substituteVariables("$(user)/writer2xhtml-resources", false);
+        }
+		catch (NoSuchElementException e) {
+			sResourceDirName = "writer2xhtml-resources";
+		}
+    	
     	pageHandlers.put("General", new GeneralHandler());
     	pageHandlers.put("Template", new TemplateHandler());
     	pageHandlers.put("Stylesheets", new StylesheetsHandler());
@@ -84,7 +97,8 @@ public class ConfigurationDialog extends ConfigurationDialogBase implements XSer
     public String[] getSupportedMethodNames() {
     	String[] sNames = { "EncodingChange", // General
     			"CustomTemplateChange", "LoadTemplateClick", // Template
-    			"UseCustomStylesheetChange", "IncludeCustomStylesheetClick", "LoadStylesheetClick", // Stylesheet
+    			"UseCustomStylesheetChange", "IncludeCustomStylesheetClick", "LoadStylesheetClick",
+    			"NewResourceClick", "DeleteResourceClick", // Stylesheet
     			"StyleFamilyChange", "StyleNameChange", "NewStyleClick", "DeleteStyleClick", "LoadDefaultsClick" // Styles1
     	};
     	return sNames;
@@ -198,6 +212,11 @@ public class ConfigurationDialog extends ConfigurationDialogBase implements XSer
     	}
     	
     	protected void useCustomInner(DialogAccess dlg, boolean bEnable) {
+    		dlg.setControlEnabled("ResourceLabel", bEnable);
+    		dlg.setControlEnabled("Resources", bEnable);
+    		dlg.setControlEnabled("NewResourceButton", bEnable);
+    		dlg.setControlEnabled("DeleteResourceButton", bEnable);
+    		updateResources(dlg);
     	}
 
     	
@@ -207,6 +226,8 @@ public class ConfigurationDialog extends ConfigurationDialogBase implements XSer
     		textFieldFromConfig(dlg, "CustomStylesheetURL", "custom_stylesheet");
     		
     		linkCustomStylesheetChange(dlg);
+    		
+    		updateResources(dlg);
     	}
     	
     	@Override protected void getControls(DialogAccess dlg) {
@@ -227,15 +248,80 @@ public class ConfigurationDialog extends ConfigurationDialogBase implements XSer
     			linkCustomStylesheetChange(dlg);
     			return true;
     		}
+    		else if (sMethod.equals("NewResourceClick")) {
+    			newResourceClick(dlg);
+    			return true;
+    		}
+    		else if (sMethod.equals("DeleteResourceClick")) {
+    			deleteResourceClick(dlg);
+    			return true;
+    		}
     		return false;
     	}
     	
-    	private void linkCustomStylesheetChange(DialogAccess dlg) {
+		private void linkCustomStylesheetChange(DialogAccess dlg) {
     		boolean bLinkCustomStylesheet = dlg.getCheckBoxStateAsBoolean("LinkCustomStylesheet");
     		dlg.setControlEnabled("CustomStylesheetURLLabel", bLinkCustomStylesheet);
     		dlg.setControlEnabled("CustomStylesheetURL", bLinkCustomStylesheet);
     	}
     	
+    	private void newResourceClick(DialogAccess dlg) {
+    		FilePicker filePicker = new FilePicker(xContext);
+			String sFileName=filePicker.getPath();
+			if (sFileName!=null) {
+				createResourceDir();
+				String sBaseFileName = sFileName.substring(sFileName.lastIndexOf('/'));
+				try {
+					String sTargetFileName = sResourceDirName+"/"+sBaseFileName; 
+					if (fileExists(sTargetFileName)) { killFile(sTargetFileName); }
+					sfa2.copy(sFileName, sTargetFileName);
+				} catch (CommandAbortedException e) {
+					e.printStackTrace();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				updateResources(dlg);
+			}
+    	}
+
+    	private void deleteResourceClick(DialogAccess dlg) {
+    		int nItem = dlg.getListBoxSelectedItem("Resources");
+    		if (nItem>=0) {
+    			String sFileName = dlg.getListBoxStringItemList("Resources")[nItem];
+    			if (deleteItem(sFileName)) {
+    				killFile(sResourceDirName+"/"+sFileName);
+    				updateResources(dlg);
+    			}
+    		}
+    	}
+    	
+    	private void createResourceDir() {
+    		try {
+				if (!sfa2.isFolder(sResourceDirName)) {
+					sfa2.createFolder(sResourceDirName);
+				}
+			} catch (CommandAbortedException e) {
+				e.printStackTrace();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+    	}
+    	
+    	private void updateResources(DialogAccess dlg) {
+    		try {
+    			String[] sFiles = sfa2.getFolderContents(sResourceDirName, false); // do not include folders
+    			int nCount = sFiles.length;
+    			for (int i=0; i<nCount; i++) {
+    				sFiles[i] = sFiles[i].substring(sFiles[i].lastIndexOf('/')+1);
+    			}
+				dlg.setListBoxStringItemList("Resources", sFiles);
+			} catch (CommandAbortedException e) {
+				e.printStackTrace();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+    	}
+
     }
     
     private class Styles1Handler extends StylesPageHandler {

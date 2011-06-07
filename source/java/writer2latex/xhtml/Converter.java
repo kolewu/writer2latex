@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-05-09)
+ *  Version 1.2 (2011-06-07)
  *
  */
 
@@ -65,6 +65,7 @@ import writer2latex.util.Misc;
  *
  */
 public class Converter extends ConverterBase {
+	private static final String EPUB_STYLES_FOLDER = "styles/";
 	private static final String EPUB_STYLESHEET = "styles/styles1.css";
 	private static final String EPUB_CUSTOM_STYLESHEET = "styles/styles.css";
 	
@@ -142,7 +143,21 @@ public class Converter extends ConverterBase {
     }
     
     @Override public void readResource(InputStream is, String sFileName, String sMediaType) throws IOException {
-    	ResourceDocument doc = new ResourceDocument(sFileName, sMediaType);
+    	if (sMediaType==null) {
+    		// Guess the media type from the file extension
+    		sMediaType="";
+    		String sfilename = sFileName.toLowerCase();
+    		// PNG, JPEG and GIF are the basic raster image formats that must be supported by EPUB readers
+    		if (sfilename.endsWith(MIMETypes.PNG_EXT)) { sMediaType = MIMETypes.PNG; }
+    		else if (sfilename.endsWith(MIMETypes.JPEG_EXT)) { sMediaType = MIMETypes.JPEG; }
+    		else if (sfilename.endsWith(".jpeg")) { sMediaType = MIMETypes.JPEG; }
+    		else if (sfilename.endsWith(MIMETypes.GIF_EXT)) { sMediaType = MIMETypes.GIF; }
+    		// The OPS 2.0.1 specification recommends (and only mentions) OpenType with this media type
+    		else if (sfilename.endsWith(".otf")) { sMediaType = "application/vnd.ms-opentype"; }
+    		// For convenience we also include a media type for true type fonts (the most common, it seems)
+    		else if (sfilename.endsWith(".ttf")) { sMediaType = "application/x-font-ttf"; }
+    	}
+    	ResourceDocument doc = new ResourceDocument(EPUB_STYLES_FOLDER+sFileName, sMediaType);
     	doc.read(is);
     	resources.add(doc);
     }

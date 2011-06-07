@@ -7,7 +7,7 @@
         </topic>
     </meta>
     <body>
-        <paragraph role="heading" level="1" xml-lang="en-US">Stylesheets</paragraph>
+        <paragraph role="heading" level="1" xml-lang="en-US">Style sheets</paragraph>
         <paragraph role="paragraph" xml-lang="en-US">Use this page to provide your own style sheets for the exported documents.</paragraph>
 
         <section id="howtoget" xml-lang="en-US">
@@ -33,9 +33,37 @@
         <paragraph role="heading" level="3" xml-lang="en-US">Include custom style sheet (EPUB export)</paragraph>
         <paragraph role="paragraph" xml-lang="en-US">Check this to include a custom style sheet in the EPUB document.</paragraph>
 
+        <bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:CustomStylesheet" id="bm_configcustomstylesheet"/>
+        <paragraph role="heading" level="3" xml-lang="en-US">Custom style sheet</paragraph>
+        <paragraph role="paragraph" xml-lang="en-US">Enter the CSS code for your custom style sheet here.</paragraph>
+
         <bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:LoadStylesheet" id="bm_configloadstylesheet"/>
         <paragraph role="heading" level="3" xml-lang="en-US">Load...</paragraph>
-        <paragraph role="paragraph" xml-lang="en-US">Click to load the style sheet from a file.</paragraph>
+        <paragraph role="paragraph" xml-lang="en-US">Click to load the style sheet from a file.
+        This will create a copy of the original file. If you change, move or delete the original file, nothing
+        will happen to the style sheet. If you want to update the style sheet with a new version of the original file, click
+        this button again.</paragraph>
+        
+        <bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:Resources" id="bm_configresources"/>
+        <paragraph role="heading" level="3" xml-lang="en-US">Style resources</paragraph>
+        <paragraph role="paragraph" xml-lang="en-US">This is a list of resource files to include with the custom style sheet.
+        You can refer to these files from your style sheet. The reference should be by file name only, as the resource files
+        are placed in the same directory as the style sheet. For example:</paragraph>
+        <paragraph role="code" xml-lang="en-US">body { background-image:url('myimage.jpg'); }</paragraph>
+        <paragraph role="paragraph" xml-lang="en-US">Note that changes to this list will <emph>not</emph> be undone if
+        you click <emph>Cancel</emph>.</paragraph>
+        
+        <bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:NewResource" id="bm_newresource"/>
+        <paragraph role="heading" level="3" xml-lang="en-US">New...</paragraph>
+        <paragraph role="paragraph" xml-lang="en-US">Click this to add a new resource file to the list. Select the file and press
+        <emph>Open</emph>. This will create a copy of the original file. If you change, move or delete the original file, nothing
+        will happen to the resource file. If you want to update the resource file with a new version of the original file, click
+        this button again.</paragraph>
+
+        <bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:DeleteResource" id="bm_deleteresource"/>
+        <paragraph role="heading" level="3" xml-lang="en-US">Delete...</paragraph>
+        <paragraph role="paragraph" xml-lang="en-US">Click this to delete the currently selected resource file from the list.
+        This will not affect the original file.</paragraph>
 
     </body>
 </helpdocument>

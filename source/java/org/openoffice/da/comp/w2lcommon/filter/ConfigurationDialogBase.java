@@ -16,11 +16,11 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 *  MA  02111-1307  USA
 *
-*  Copyright: 2002-2010 by Henrik Just
+*  Copyright: 2002-2011 by Henrik Just
 *
 *  All Rights Reserved.
 * 
-*  Version 1.2 (2010-12-09)
+*  Version 1.2 (2011-06-06)
 *
 */ 
 
@@ -79,13 +79,13 @@ public abstract class ConfigurationDialogBase extends WeakBase implements XConta
 	protected XComponentContext xContext;
 	
 	// File picker wrapper
-	private FilePicker filePicker = null;
+	protected FilePicker filePicker = null;
 	
 	// UNO simple file access service
 	protected XSimpleFileAccess2 sfa2 = null;
 
 	// UNO path substitution
-    private XStringSubstitution xPathSub = null;
+    protected XStringSubstitution xPathSub = null;
 	
 	// The configuration implementation
 	protected Config config;
@@ -287,6 +287,38 @@ public abstract class ConfigurationDialogBase extends WeakBase implements XConta
 			config.setOption(sConfigName, sConfigValues[dlg.getListBoxSelectedItem(sListBoxName)]);
 		}
 				
+		// Method to get a named dialog
+		protected XDialog getDialog(String sDialogName) {
+			XMultiComponentFactory xMCF = xContext.getServiceManager();
+		   	try {
+		   		Object provider = xMCF.createInstanceWithContext(
+		   				"com.sun.star.awt.DialogProvider2", xContext);
+		   		XDialogProvider2 xDialogProvider = (XDialogProvider2)
+		   		UnoRuntime.queryInterface(XDialogProvider2.class, provider);
+		   		String sDialogUrl = "vnd.sun.star.script:"+sDialogName+"?location=application";
+		   		return xDialogProvider.createDialog(sDialogUrl);
+		   	}
+		   	catch (Exception e) {
+		   		return null;
+		   	}
+		}
+
+		// Method to display delete dialog
+		protected boolean deleteItem(String sName) {
+			XDialog xDialog=getDialog(getDialogLibraryName()+".DeleteDialog");
+		   	if (xDialog!=null) {
+		   		DialogAccess ddlg = new DialogAccess(xDialog);
+		   		String sLabel = ddlg.getLabelText("DeleteLabel");
+		   		sLabel = sLabel.replaceAll("%s", sName);
+		   		ddlg.setLabelText("DeleteLabel", sLabel);
+		   		boolean bDelete = xDialog.execute()==ExecutableDialogResults.OK;
+		   		xDialog.endExecute();
+		   		return bDelete;
+		   	}
+		   	return false;
+		}
+		   
+		
 	}
 	
 	protected abstract class CustomFileHandler extends PageHandler {
@@ -373,7 +405,7 @@ public abstract class ConfigurationDialogBase extends WeakBase implements XConta
 		// Helpers for sfa2
 		
 		// Checks that the file exists
-		private boolean fileExists(String sFileName) {
+		protected boolean fileExists(String sFileName) {
 			try {
 				return sfa2!=null && sfa2.exists(sFileName);
 			}
@@ -385,7 +417,7 @@ public abstract class ConfigurationDialogBase extends WeakBase implements XConta
 		}
 		
 		// Delete a file if it exists, return true on success
-		private boolean killFile(String sFileName) {
+		protected boolean killFile(String sFileName) {
 			try {
 				if (sfa2!=null && sfa2.exists(sFileName)) {
 					sfa2.kill(sFileName);
@@ -453,35 +485,6 @@ public abstract class ConfigurationDialogBase extends WeakBase implements XConta
 	protected abstract class UserListPageHandler extends PageHandler {
 		
 		// Methods to handle user controlled lists
-		protected XDialog getDialog(String sDialogName) {
-			XMultiComponentFactory xMCF = xContext.getServiceManager();
-		   	try {
-		   		Object provider = xMCF.createInstanceWithContext(
-		   				"com.sun.star.awt.DialogProvider2", xContext);
-		   		XDialogProvider2 xDialogProvider = (XDialogProvider2)
-		   		UnoRuntime.queryInterface(XDialogProvider2.class, provider);
-		   		String sDialogUrl = "vnd.sun.star.script:"+sDialogName+"?location=application";
-		   		return xDialogProvider.createDialog(sDialogUrl);
-		   	}
-		   	catch (Exception e) {
-		   		return null;
-		   	}
-		}
-
-		private boolean deleteItem(String sName) {
-			XDialog xDialog=getDialog(getDialogLibraryName()+".DeleteDialog");
-		   	if (xDialog!=null) {
-		   		DialogAccess ddlg = new DialogAccess(xDialog);
-		   		String sLabel = ddlg.getLabelText("DeleteLabel");
-		   		sLabel = sLabel.replaceAll("%s", sName);
-		   		ddlg.setLabelText("DeleteLabel", sLabel);
-		   		boolean bDelete = xDialog.execute()==ExecutableDialogResults.OK;
-		   		xDialog.endExecute();
-		   		return bDelete;
-		   	}
-		   	return false;
-		}
-		   
 		protected boolean deleteCurrentItem(DialogAccess dlg, String sListName) {
 		   	String[] sItems = dlg.getListBoxStringItemList(sListName);
 		   	short nSelected = dlg.getListBoxSelectedItem(sListName);

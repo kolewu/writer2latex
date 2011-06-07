@@ -2,6 +2,14 @@ Changelog for Writer2LaTeX version 1.0 -> 1.2
 
 ---------- version 1.1.8 ----------
 
+[w2x] The EPUB export now supports additional resource files (e.g. images, fonts) to the custom style sheet
+  - using the readResource method of the converter API
+  - using the -resource method of the command line application
+  - using the ResourceURL or Resources property of the filter API
+  - by specifying the resource files in a custom configuration
+
+[all] API change: Added the method readResource to the Converter interface (only used by EPUB export currently) 
+
 [w2x] Crossed out headings are ignored in EPUB export, but retained in the external toc
 
 [all] Added Farsi translation from Mostafa Barmshory

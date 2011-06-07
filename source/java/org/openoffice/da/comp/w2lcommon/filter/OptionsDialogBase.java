@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-02-23)
+ *  Version 1.2 (2011-06-07)
  *
  */ 
  
@@ -393,21 +393,39 @@ public abstract class OptionsDialogBase extends DialogBase implements
         short nConfig = getListBoxSelectedItem("Config");
         int nStdConfigs = getListBoxStringItemList("Config").length - sConfigNames.length;
         if (nConfig>=nStdConfigs) { // only handle registry configurations
-            int i = nConfig-nStdConfigs;
-            try {
-                Object config = xNameAccess.getByName(sConfigNames[i]);
-                XPropertySet xCfgProps = (XPropertySet)
-                    UnoRuntime.queryInterface(XPropertySet.class,config);
-                MacroExpander expander = new MacroExpander(xContext);
-                filterData.put("ConfigURL",expander.expandMacros(XPropertySetHelper.getPropertyValueAsString(xCfgProps,"ConfigURL")));
-                filterData.put("TemplateURL",expander.expandMacros(XPropertySetHelper.getPropertyValueAsString(xCfgProps,"TargetTemplateURL")));
-                filterData.put("StyleSheetURL",expander.expandMacros(XPropertySetHelper.getPropertyValueAsString(xCfgProps,"StyleSheetURL")));
-                // TODO: Resources...
-                XPropertySetHelper.setPropertyValue(xProps,"ConfigName",sConfigNames[i]);
-                bFound = true;
-            }
-            catch (Exception e) {
-            }
+        	int i = nConfig-nStdConfigs;
+        	try {
+        		Object config = xNameAccess.getByName(sConfigNames[i]);
+        		XPropertySet xCfgProps = (XPropertySet)
+        		UnoRuntime.queryInterface(XPropertySet.class,config);
+        		MacroExpander expander = new MacroExpander(xContext);
+        		filterData.put("ConfigURL",expander.expandMacros(XPropertySetHelper.getPropertyValueAsString(xCfgProps,"ConfigURL")));
+        		filterData.put("TemplateURL",expander.expandMacros(XPropertySetHelper.getPropertyValueAsString(xCfgProps,"TargetTemplateURL")));
+        		filterData.put("StyleSheetURL",expander.expandMacros(XPropertySetHelper.getPropertyValueAsString(xCfgProps,"StyleSheetURL")));
+
+        		// The resources are provided as a set
+        		Object resources = XPropertySetHelper.getPropertyValue(xCfgProps,"Resources");
+        		XNameAccess xResourceNameAccess = (XNameAccess) UnoRuntime.queryInterface(XNameAccess.class,resources);
+        		if (xResourceNameAccess!=null) {
+        			StringBuffer buf = new StringBuffer();
+        			String[] sResourceNames = xResourceNameAccess.getElementNames();
+        			for (String sName : sResourceNames) {
+        				Object resource = xResourceNameAccess.getByName(sName);
+        				XPropertySet xResourceProps = (XPropertySet) UnoRuntime.queryInterface(XPropertySet.class,resource);
+        				String sURL = expander.expandMacros(XPropertySetHelper.getPropertyValueAsString(xResourceProps,"URL"));
+        				String sFileName = expander.expandMacros(XPropertySetHelper.getPropertyValueAsString(xResourceProps,"FileName"));
+        				String sMediaType = expander.expandMacros(XPropertySetHelper.getPropertyValueAsString(xResourceProps,"MediaType"));
+        				if (buf.length()>0) { buf.append(';'); }
+        				buf.append(sURL).append("::").append(sFileName).append("::").append(sMediaType);
+        			}
+    				filterData.put("Resources",buf.toString());
+
+        			XPropertySetHelper.setPropertyValue(xProps,"ConfigName",sConfigNames[i]);
+        			bFound = true;
+        		}
+        	}
+        	catch (Exception e) {
+        	}
         }
         XPropertySetHelper.setPropertyValue(xProps,"Config",nConfig);
         if (!bFound) { XPropertySetHelper.setPropertyValue(xProps,"ConfigName",""); }

@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-01-15)
+ *  Version 1.2 (2011-06-07)
  *
  */ 
  
@@ -38,6 +38,7 @@ import com.sun.star.io.XOutputStream;
 import com.sun.star.ucb.CommandAbortedException;
 import com.sun.star.ucb.XSimpleFileAccess2;
 import com.sun.star.uno.AnyConverter;
+import com.sun.star.uno.Exception;
 import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
 import com.sun.star.util.XStringSubstitution;
@@ -109,7 +110,7 @@ public class FilterDataParser {
         
         PropertyHelper props = new PropertyHelper(filterData);
         
-        // Get the special properties TemplateURL, StyleSheetURL, Resources, ConfigURL and AutoCreate
+        // Get the special properties TemplateURL, StyleSheetURL, ResourceURL, Resources, ConfigURL and AutoCreate
         Object tpl = props.get("TemplateURL");
         String sTemplate = null;
         if (tpl!=null && AnyConverter.isString(tpl)) {
@@ -132,7 +133,19 @@ public class FilterDataParser {
             }
         }
 
-        // This property accepts a semicolon separated list of <mime type>!<file name>!<URL> (not very elegant)
+        // This property accepts an URL pointing to a folder containing the resources to include
+        Object resourcedir = props.get("ResourceURL");
+        String sResourceURL = null;
+        if (resourcedir!=null && AnyConverter.isString(resourcedir)) {
+            try {
+                sResourceURL = substituteVariables(AnyConverter.toString(resourcedir));
+            }
+            catch (com.sun.star.lang.IllegalArgumentException e) {
+                // Failed to convert to String; should not happen - ignore   
+            }
+        }
+
+        // This property accepts a semicolon separated list of <URL>[[::<file name>]::<mime type>]
         Object resources = props.get("Resources");
         String[] sResources = null;
         if (resources!=null && AnyConverter.isString(resources)) {
@@ -218,33 +231,70 @@ public class FilterDataParser {
             }
         }
         
+        // Load the resource from the specified folder URL, if any
+        if (sfa2!=null && sResourceURL!=null && sResourceURL.length()>0) {
+        	String[] sURLs;
+        	try {
+        		sURLs = sfa2.getFolderContents(sResourceURL, false); // do not include folders
+        		for (String sURL : sURLs) {
+        			XInputStream xIs = sfa2.openFileRead(sURL);
+        			if (xIs!=null) {
+        				String sFileName = sURL.substring(sURL.lastIndexOf('/')+1);
+        				InputStream is = new XInputStreamToInputStreamAdapter(xIs);
+        				converter.readResource(is,sFileName,null);
+        				is.close();
+        				xIs.closeInput();
+        			}
+        		}
+        	} catch (IOException e) {
+        		// ignore
+        	} catch (CommandAbortedException e1) {
+        		// ignore
+        	} catch (Exception e1) {
+        		// ignore
+        	}
+        }
+        
         // Load the resources from the specified URLs, if any
         if (sfa2!=null && sResources!=null) {
         	for (String sResource : sResources) {
-        		try {
-        			String[] sParts = sResource.split("!");
+        		// Format is <URL>[[::<file name>]::<mime type>]
+        		String[] sParts = sResource.split("::");
+        		if (sParts.length>0) {
+            		String sURL=sParts[0];
+            		String sFileName;
+            		String sMediaType=null;
         			if (sParts.length==3) {
-        				// Format is <mime type>!<file name>!<URL>
-        				XInputStream xIs = sfa2.openFileRead(sParts[2]);
+        				sFileName = sParts[1];
+        				sMediaType = sParts[2];
+        			}
+        			else {
+        				sFileName = sURL.substring(sURL.lastIndexOf('/')+1);
+        				if (sParts.length==2) {
+        					sMediaType = sParts[1];
+        				}
+        			}
+        			try {
+        				XInputStream xIs = sfa2.openFileRead(sURL);
         				if (xIs!=null) {
         					InputStream is = new XInputStreamToInputStreamAdapter(xIs);
-        					converter.readResource(is, sParts[1], sParts[0]);
+        					converter.readResource(is, sFileName, sMediaType);
         					is.close();
         					xIs.closeInput();
-        				}
-        			} // otherwise wrong format, ignore
-        		}
-        		catch (IOException e) {
-        			// ignore
-        		}
-        		catch (NotConnectedException e) {
-        			// ignore
-        		}
-        		catch (CommandAbortedException e) {
-        			// ignore
-        		}
-        		catch (com.sun.star.uno.Exception e) {
-        			// ignore
+        				} // otherwise wrong format, ignore
+        			}
+        			catch (IOException e) {
+        				// ignore
+        			}
+        			catch (NotConnectedException e) {
+        				// ignore
+        			}
+        			catch (CommandAbortedException e) {
+        				// ignore
+        			}
+        			catch (com.sun.star.uno.Exception e) {
+        				// ignore
+        			}
         		}
         	}
         }

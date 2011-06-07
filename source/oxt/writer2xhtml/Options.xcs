@@ -15,9 +15,9 @@
             <set oor:name="Resources" oor:node-type="Resource" />			
         </group>
         <group oor:name="Resource">
-        	<prop oor:name="MediaType" oor:type="xs:string" />
-        	<prop oor:name="FileName" oor:type="xs:string" />
         	<prop oor:name="URL" oor:type="xs:string" />
+        	<prop oor:name="FileName" oor:type="xs:string" />
+        	<prop oor:name="MediaType" oor:type="xs:string" />
         </group>
         <group oor:name="Template">
             <prop oor:name="TemplateName" oor:type="xs:string" />

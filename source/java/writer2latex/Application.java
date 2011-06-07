@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2010 by Henrik Just
+ *  Copyright: 2002-2011 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-04-12) 
+ *  Version 1.2 (2011-06-05) 
  *
  */
  
@@ -33,7 +33,9 @@ import java.io.FileNotFoundException;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Set;
 import java.util.Vector;
 
 import writer2latex.api.BatchConverter;
@@ -59,6 +61,7 @@ import writer2latex.util.Misc;
  * <li><code>-config[=]filename</code>
  * <li><code>-template[=]filename</code>
  * <li><code>-stylesheet[=]filename</code>
+ * <li><code>-resource[=]filename[::media type]</code>
  * <li><code>-option[=]value</code>
  * </ul>
  * <p>where <code>option</code> can be any simple option known to Writer2LaTeX
@@ -72,6 +75,7 @@ public final class Application {
     private Vector<String> configFileNames = new Vector<String>();
     private String sTemplateFileName = null;
     private String sStyleSheetFileName = null;
+    private Set<String> resources = new HashSet<String>(); 
     private Hashtable<String,String> options = new Hashtable<String,String>();
     private String sSource = null;
     private String sTarget = null;
@@ -194,6 +198,30 @@ public final class Application {
                 System.out.println("    "+e.getMessage());
             }
         }
+        
+        // Step 5c: Read style resources
+        for (String sResource : resources) {
+        	String sMediaType;
+        	String sFileName;
+        	int nSeparator = sResource.indexOf("::");
+        	if (nSeparator>-1) {
+        		sFileName = sResource.substring(0,nSeparator);
+        		sMediaType = sResource.substring(nSeparator+2);
+        	}
+        	else {
+        		sFileName = sResource;
+        		sMediaType = null;
+        	}
+        	System.out.println("Reading resource file "+sFileName);
+        	try {
+        		byte [] resourceBytes = Misc.inputStreamToByteArray(new FileInputStream(sFileName));
+        		converter.readResource(new ByteArrayInputStream(resourceBytes),sFileName,sMediaType);
+        	} catch (IOException e) {
+                System.out.println("--> Failed to read the resource file!");
+                System.out.println("    "+e.getMessage());
+        	}        		
+        	
+        }
 		
         // Step 6: Read config
         for (int i=0; i<configFileNames.size(); i++) {
@@ -302,6 +330,7 @@ public final class Application {
         System.out.println("   -recurse");
         System.out.println("   -template[=]<template file>");
         System.out.println("   -stylesheet[=]<style sheet file>");
+        System.out.println("   -resource[=]<resource file>[::<media type>]");
         System.out.println("   -ultraclean");
         System.out.println("   -clean");
         System.out.println("   -pdfprint");
@@ -353,6 +382,7 @@ public final class Application {
                     if ("-config".equals(sArg)) { configFileNames.add(sArg2); }
                     else if ("-template".equals(sArg)) { sTemplateFileName = sArg2; }
                     else if ("-stylesheet".equals(sArg)) { sStyleSheetFileName = sArg2; }
+                    else if ("-resource".equals(sArg)) { resources.add(sArg2); }
                     else { // configuration option
                         options.put(sArg.substring(1),sArg2);
                     }

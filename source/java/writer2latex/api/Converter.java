@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2010 by Henrik Just
+ *  Copyright: 2002-2011 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-12-21)
+ *  Version 1.2 (2011-06-05)
  *
  */
  
@@ -96,7 +96,7 @@ public interface Converter {
      *
      *  @param is an <code>InputStream</code> from which to read the resource
      *  @param sFileName the file name to use for the resource
-     *  @param sMediaType the media type of the resource
+     *  @param sMediaType the media type of the resource, if null the media type will be guessed from the file name
      *  @throws IOException if some exception occurs while reading the resource
      */
     public void readResource(InputStream is, String sFileName, String sMediaType) throws IOException;
@@ -107,7 +107,7 @@ public interface Converter {
      *
      *  @param file a file from which to read the style sheet
      *  @param sFileName the file name to use for the resource
-     *  @param sMediaType the media type of the resource
+     *  @param sMediaType the media type of the resource, if null the media type will be guessed from the file name
      *  @throws IOException if the file does not exist or some exception occurs
      *  while reading the resource
      */

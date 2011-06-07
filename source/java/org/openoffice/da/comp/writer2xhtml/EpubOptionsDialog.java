@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-03-21)
+ *  Version 1.2 (2011-06-06)
  *
  */
 
@@ -123,6 +123,7 @@ public class EpubOptionsDialog extends OptionsDialogBase {
             		helper.put("AutoCreate","true");
             		helper.put("TemplateURL", "$(user)/writer2xhtml-template.xhtml");
             		helper.put("StyleSheetURL", "$(user)/writer2xhtml-styles.css");
+            		helper.put("ResourceURL", "$(user)/writer2xhtml-resources");
         }
 		
         saveNumericOptionAsPercentage(xProps, helper, "Scaling", "scaling");
