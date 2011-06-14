@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-06-05)
+ *  Version 1.2 (2011-06-14)
  *
  */
 
@@ -500,6 +500,7 @@ public class TextConverter extends ConverterHelper {
                 if (nDontSplitLevel==0) {
                     bAfterHeading = nodeName.equals(XMLString.TEXT_H);
                 }
+                hnode = getDrawCv().flushFullscreenFrames((Element)hnode);
             }
             i++;
         }

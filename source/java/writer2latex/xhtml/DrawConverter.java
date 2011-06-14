@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-06-08)
+ *  Version 1.2 (2011-06-14)
  *
  */
  
@@ -87,6 +87,10 @@ public class DrawConverter extends ConverterHelper {
 	
     /** Identifies objects that should be placed centered */
     public static final int CENTERED = 3;
+    
+    /** Identifies objects that should fill the entire screen */
+    public static final int FULL_SCREEN = 4;
+    
 	
     private FormReader form = null;
     private String sScale;
@@ -100,6 +104,8 @@ public class DrawConverter extends ConverterHelper {
     
     // Large images (for full screen) in EPUB export are collected here
     private Vector<Element> fullscreenFrames = new Vector<Element>();
+    // This flag determines whether to collect full screen images or insert them immediately
+    private boolean bCollectFullscreenFrames = false;
 	
     public DrawConverter(OfficeReader ofr, XhtmlConfig config, Converter converter) {
         super(ofr,config,converter);
@@ -110,6 +116,7 @@ public class DrawConverter extends ConverterHelper {
             form = formsIterator.next();
         }
         bCollectFrames = ofr.isSpreadsheet();
+        bCollectFullscreenFrames = true;
         sScale = config.getXhtmlScaling();
         bConvertToPx = config.xhtmlConvertToPx();
         nImageSize = config.imageSize();
@@ -219,6 +226,22 @@ public class DrawConverter extends ConverterHelper {
     private Element getFrame(Element onode) {
         if (ofr.isOpenDocument()) return (Element) onode.getParentNode();
         else return onode;
+    }
+    
+    // Flush all full screen images, returning the new document node
+    public Element flushFullscreenFrames(Element hnode) {
+    	Element currentFrame = hnode;
+    	if (converter.isTopLevel() && !fullscreenFrames.isEmpty()) {
+    		bCollectFullscreenFrames = false;
+    		currentFrame = converter.nextOutFile();
+    		for (Element image : fullscreenFrames) {
+    			handleDrawElement(image,currentFrame,null,FULL_SCREEN);
+    			currentFrame = converter.nextOutFile();
+    		}
+    		fullscreenFrames.clear();
+    		bCollectFullscreenFrames = true;
+    	}
+    	return currentFrame;
     }
 	
     public void flushFrames(Element hnode) {
@@ -373,6 +396,26 @@ public class DrawConverter extends ConverterHelper {
     }
 	
     private void handleDrawImage(Element onode, Element hnodeBlock, Element hnodeInline, int nMode) {
+        Element frame = getFrame(onode);
+        
+        // First check to see if we should treat this image as a "full screen" image
+        // This is only supported for EPUB documents with relative image size
+        // (Currently only images are handled like this, hence the code is here rather than in handleDrawElement)
+        if (bCollectFullscreenFrames && converter.isOPS() && nImageSize==XhtmlConfig.RELATIVE && converter.isTopLevel()) {
+        	StyleWithProperties style = ofr.getFrameStyle(frame.getAttribute(XMLString.DRAW_STYLE_NAME));
+        	String sWidth = getFrameWidth(frame, style);
+        	String sHeight = getFrameHeight(frame, style);
+        	// It is if the image width exceeds 30% of the current text width and the height is greater than 1.33*the width
+        	// Values recommended by Michel "Coolmicro", should probably be configurable
+        	if (sWidth!=null && sHeight!=null &&
+        			Misc.sub(Misc.multiply("133%",sWidth), sHeight).startsWith("-") &&
+        			Misc.sub(Misc.multiply("30%",converter.getContentWidth()),
+        					Misc.multiply(sScale,Misc.truncateLength(sWidth))).startsWith("-")) {
+        		fullscreenFrames.add(onode);
+        		return;
+        	}
+        }
+        
         // Get the image from the ImageLoader
         String sFileName = null;
         String sHref = Misc.getAttribute(onode,XMLString.XLINK_HREF);
@@ -397,7 +440,7 @@ public class DrawConverter extends ConverterHelper {
         }
 		
         if (sFileName==null) { return; } // TODO: Add warning?
-		
+        
         // Create the image (sFileName contains the file name)
         Element image = converter.createElement("img");
         String sName = Misc.getAttribute(getFrame(onode),XMLString.DRAW_NAME);
@@ -405,7 +448,6 @@ public class DrawConverter extends ConverterHelper {
         image.setAttribute("src",sFileName);
 		
         // Add alternative text, using either alt.text, name or file name
-        Element frame = getFrame(onode);
         Element desc = Misc.getChildByTagName(frame,XMLString.SVG_DESC);
         if (desc==null) {
             desc = Misc.getChildByTagName(frame,XMLString.SVG_TITLE);        	
@@ -872,19 +914,26 @@ public class DrawConverter extends ConverterHelper {
     // TODO: For absolute placement, only absolute size makes sense
     // TODO: How to handle NONE in case of text boxes? (currently using browser default, usually 100% width)
     private String applyImageSize(Element node, CSVList props, boolean bOnlyWidth) {
-		switch (nImageSize) {
-		case XhtmlConfig.ABSOLUTE:
-			return applySize(node, props, bOnlyWidth);
-		case XhtmlConfig.RELATIVE:
-	    	String sWidth = getFrameWidth(node, ofr.getFrameStyle(node.getAttribute(XMLString.DRAW_STYLE_NAME)));			
-	    	if (sWidth!=null) {    
-				props.addValue("width", Misc.divide(Misc.multiply(sScale,Misc.truncateLength(sWidth)),converter.getContentWidth()));
-			}
-			return sWidth;
-		case XhtmlConfig.NONE:
-			// Nothing to do :-)
-	    	return getFrameWidth(node, ofr.getFrameStyle(node.getAttribute(XMLString.DRAW_STYLE_NAME)));
-		}
+    	if (bCollectFullscreenFrames) { // Normal image
+    		switch (nImageSize) {
+    		case XhtmlConfig.ABSOLUTE:
+    			return applySize(node, props, bOnlyWidth);
+    		case XhtmlConfig.RELATIVE:
+    			String sWidth = getFrameWidth(node, ofr.getFrameStyle(node.getAttribute(XMLString.DRAW_STYLE_NAME)));			
+    			if (sWidth!=null) {    
+    				props.addValue("width", Misc.divide(Misc.multiply(sScale,Misc.truncateLength(sWidth)),converter.getContentWidth()));
+    			}
+    			return sWidth;
+    		case XhtmlConfig.NONE:
+    			// Nothing to do :-)
+    			return getFrameWidth(node, ofr.getFrameStyle(node.getAttribute(XMLString.DRAW_STYLE_NAME)));
+    		}
+    	}
+    	else { // Full screen image
+    		props.addValue("max-width","100%");
+    		props.addValue("height","100%");
+    		
+    	}
 		return null;
     }
 	
@@ -932,6 +981,11 @@ public class DrawConverter extends ConverterHelper {
                 hnodeBlock.appendChild(centerdiv);
                 centerdiv.appendChild(object);
                 break;
+            case FULL_SCREEN:
+            	if (hnodeBlock!=null) {
+            		hnodeBlock.appendChild(object);
+            	}
+            	break;
             case FLOATING:
                 boolean bWrap = false;
                 String sAlign = "center";
