@@ -56,7 +56,8 @@
         <bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:NewResource" id="bm_newresource"/>
         <paragraph role="heading" level="3" xml-lang="en-US">New...</paragraph>
         <paragraph role="paragraph" xml-lang="en-US">Click this to add a new resource file to the list. Select the file and press
-        <emph>Open</emph>. This will create a copy of the original file. If you change, move or delete the original file, nothing
+        <emph>Open</emph> (On some systems you can select more than one file).
+        This will create a copy of the original file. If you change, move or delete the original file, nothing
         will happen to the resource file. If you want to update the resource file with a new version of the original file, click
         this button again.</paragraph>
 

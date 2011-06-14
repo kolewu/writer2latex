@@ -20,7 +20,7 @@
 *
 *  All Rights Reserved.
 * 
-*  Version 1.2 (2011-06-06)
+*  Version 1.2 (2011-06-11)
 *
 */ 
 
@@ -266,22 +266,23 @@ public class ConfigurationDialog extends ConfigurationDialogBase implements XSer
     	}
     	
     	private void newResourceClick(DialogAccess dlg) {
-    		FilePicker filePicker = new FilePicker(xContext);
-			String sFileName=filePicker.getPath();
-			if (sFileName!=null) {
-				createResourceDir();
-				String sBaseFileName = sFileName.substring(sFileName.lastIndexOf('/'));
-				try {
-					String sTargetFileName = sResourceDirName+"/"+sBaseFileName; 
-					if (fileExists(sTargetFileName)) { killFile(sTargetFileName); }
-					sfa2.copy(sFileName, sTargetFileName);
-				} catch (CommandAbortedException e) {
-					e.printStackTrace();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-				updateResources(dlg);
-			}
+    		String[] sFileNames=filePicker.getPaths();
+    		if (sFileNames!=null) {
+    			createResourceDir();
+    			for (String sFileName : sFileNames) {
+    				String sBaseFileName = sFileName.substring(sFileName.lastIndexOf('/')+1);
+    				try {
+    					String sTargetFileName = sResourceDirName+"/"+sBaseFileName;
+    					if (fileExists(sTargetFileName)) { killFile(sTargetFileName); }
+    					sfa2.copy(sFileName, sTargetFileName);
+    				} catch (CommandAbortedException e) {
+    					e.printStackTrace();
+    				} catch (Exception e) {
+    					e.printStackTrace();
+    				}
+    			}
+    			updateResources(dlg);
+    		}
     	}
 
     	private void deleteResourceClick(DialogAccess dlg) {
@@ -295,19 +296,8 @@ public class ConfigurationDialog extends ConfigurationDialogBase implements XSer
     		}
     	}
     	
-    	private void createResourceDir() {
-    		try {
-				if (!sfa2.isFolder(sResourceDirName)) {
-					sfa2.createFolder(sResourceDirName);
-				}
-			} catch (CommandAbortedException e) {
-				e.printStackTrace();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-    	}
-    	
     	private void updateResources(DialogAccess dlg) {
+    		createResourceDir();
     		try {
     			String[] sFiles = sfa2.getFolderContents(sResourceDirName, false); // do not include folders
     			int nCount = sFiles.length;
@@ -322,6 +312,18 @@ public class ConfigurationDialog extends ConfigurationDialogBase implements XSer
 			}
     	}
 
+    	private void createResourceDir() {
+    		try {
+				if (!sfa2.isFolder(sResourceDirName)) {
+					sfa2.createFolder(sResourceDirName);
+				}
+			} catch (CommandAbortedException e) {
+				e.printStackTrace();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+    	}
+    	
     }
     
     private class Styles1Handler extends StylesPageHandler {

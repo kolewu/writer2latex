@@ -2,6 +2,8 @@ Changelog for Writer2LaTeX version 1.0 -> 1.2
 
 ---------- version 1.1.8 ----------
 
+[w2x] In EPUB export, a large image is now automatically placed in a separate file as a full screen image
+
 [w2x] The EPUB export now supports additional resource files (e.g. images, fonts) to the custom style sheet
   - using the readResource method of the converter API
   - using the -resource method of the command line application

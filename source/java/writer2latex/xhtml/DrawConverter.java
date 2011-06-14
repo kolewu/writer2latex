@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-03-29)
+ *  Version 1.2 (2011-06-08)
  *
  */
  
@@ -97,6 +97,9 @@ public class DrawConverter extends ConverterHelper {
     private Vector<Element> frames = new Vector<Element>();
     // This flag determines whether to collect frames or insert them immediately
     private boolean bCollectFrames = false;
+    
+    // Large images (for full screen) in EPUB export are collected here
+    private Vector<Element> fullscreenFrames = new Vector<Element>();
 	
     public DrawConverter(OfficeReader ofr, XhtmlConfig config, Converter converter) {
         super(ofr,config,converter);
