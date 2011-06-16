@@ -24,12 +24,10 @@
   <dlg:checkbox dlg:id="IgnoreHardLineBreaks" dlg:tab-index="14" dlg:left="10" dlg:top="162" dlg:width="155" dlg:height="12" dlg:help-url="org.openoffice.da.writer2xhtml.oxt:EpubOptionsIgnoreHardLineBreaks" dlg:value="Ignore hard line breaks" dlg:checked="false"/>
   <dlg:checkbox dlg:id="IgnoreEmptyParagraphs" dlg:tab-index="15" dlg:left="10" dlg:top="176" dlg:width="155" dlg:height="12" dlg:help-url="org.openoffice.da.writer2xhtml.oxt:EpubOptionsIgnoreEmptyParagraphs" dlg:value="Ignore empty paragraphs" dlg:checked="false"/>
   <dlg:checkbox dlg:id="IgnoreDoubleSpaces" dlg:tab-index="16" dlg:left="10" dlg:top="190" dlg:width="155" dlg:height="15" dlg:help-url="org.openoffice.da.writer2xhtml.oxt:EpubOptionsIgnoreDoubleSpaces" dlg:value="Ignore double spaces" dlg:checked="false"/>
-  <dlg:checkbox dlg:id="Split" dlg:tab-index="20" dlg:left="190" dlg:top="78" dlg:width="155" dlg:height="12" dlg:help-url="org.openoffice.da.writer2xhtml.oxt:EpubOptionsSplit" dlg:value="Split document at headings" dlg:checked="false">
-   <script:event script:event-name="on-itemstatechange" script:macro-name="vnd.sun.star.UNO:SplitChange" script:language="UNO"/>
-  </dlg:checkbox>
-  <dlg:text dlg:id="SplitLevelLabel" dlg:tab-index="32" dlg:left="199" dlg:top="92" dlg:width="100" dlg:height="12" dlg:value="Heading level"/>
-  <dlg:menulist dlg:id="SplitLevel" dlg:tab-index="21" dlg:left="305" dlg:top="90" dlg:width="40" dlg:height="12" dlg:help-url="org.openoffice.da.writer2xhtml.oxt:EpubOptionsSplitLevel" dlg:spin="true" dlg:linecount="6">
+  <dlg:text dlg:id="SplitLevelLabel" dlg:tab-index="32" dlg:left="190" dlg:top="78" dlg:width="90" dlg:height="12" dlg:value="At heading level"/>
+  <dlg:menulist dlg:id="SplitLevel" dlg:tab-index="20" dlg:left="285" dlg:top="76" dlg:width="60" dlg:height="12" dlg:help-url="org.openoffice.da.writer2xhtml.oxt:EpubOptionsSplitLevel" dlg:spin="true" dlg:linecount="7">
    <dlg:menupopup>
+    <dlg:menuitem dlg:value="None"/>
     <dlg:menuitem dlg:value="1"/>
     <dlg:menuitem dlg:value="2"/>
     <dlg:menuitem dlg:value="3"/>
@@ -54,12 +52,10 @@
   <dlg:text dlg:id="DefaultFontNameLabel" dlg:tab-index="39" dlg:left="19" dlg:top="106" dlg:width="50" dlg:height="12" dlg:value="Font name"/>
   <dlg:combobox dlg:id="DefaultFontName" dlg:tab-index="11" dlg:left="75" dlg:top="104" dlg:width="90" dlg:height="12" dlg:help-url="org.openoffice.da.writer2xhtml.oxt:EpubOptionsDefaultFontName" dlg:spin="true"/>
   <dlg:checkbox dlg:id="DisplayHiddenText" dlg:tab-index="17" dlg:left="190" dlg:top="22" dlg:width="155" dlg:height="12" dlg:help-url="org.openoffice.da.writer2xhtml.oxt:EpubOptionsDisplayHiddenText" dlg:value="Display hidden text" dlg:checked="false"/>
-  <dlg:checkbox dlg:id="UsePageBreakSplit" dlg:tab-index="22" dlg:left="190" dlg:top="106" dlg:width="155" dlg:height="12" dlg:help-url="org.openoffice.da.writer2xhtml.oxt:EpubOptionsPageBreakSplit" dlg:value="Split document at page breaks" dlg:checked="false">
-   <script:event script:event-name="on-itemstatechange" script:macro-name="vnd.sun.star.UNO:UsePageBreakSplitChange" script:language="UNO"/>
-  </dlg:checkbox>
-  <dlg:text dlg:id="PageBreakSplitLabel" dlg:tab-index="40" dlg:left="199" dlg:top="120" dlg:width="45" dlg:height="12" dlg:value="Types"/>
-  <dlg:menulist dlg:id="PageBreakSplit" dlg:tab-index="23" dlg:left="255" dlg:top="118" dlg:width="90" dlg:height="12" dlg:help-url="org.openoffice.da.writer2xhtml.oxt:EpubOptionsPageBreakSplitType" dlg:spin="true" dlg:linecount="3">
+  <dlg:text dlg:id="PageBreakSplitLabel" dlg:tab-index="40" dlg:left="190" dlg:top="92" dlg:width="90" dlg:height="12" dlg:value="At page breaks"/>
+  <dlg:menulist dlg:id="PageBreakSplit" dlg:tab-index="21" dlg:left="285" dlg:top="90" dlg:width="60" dlg:height="12" dlg:help-url="org.openoffice.da.writer2xhtml.oxt:EpubOptionsPageBreakSplit" dlg:spin="true" dlg:linecount="4">
    <dlg:menupopup>
+    <dlg:menuitem dlg:value="None"/>
     <dlg:menuitem dlg:value="Defined by styles"/>
     <dlg:menuitem dlg:value="All explicit"/>
     <dlg:menuitem dlg:value="All"/>
@@ -69,10 +65,10 @@
   <dlg:checkbox dlg:id="UseSplitAfter" dlg:tab-index="24" dlg:left="190" dlg:top="134" dlg:width="155" dlg:height="12" dlg:help-url="org.openoffice.da.writer2xhtml.oxt:EpubOptionsUseEpubAutoSplit" dlg:value="Automatic split of long documents" dlg:checked="false">
    <script:event script:event-name="on-itemstatechange" script:macro-name="vnd.sun.star.UNO:UseSplitAfterChange" script:language="UNO"/>
   </dlg:checkbox>
-  <dlg:text dlg:id="SplitAfterLabel" dlg:tab-index="41" dlg:left="199" dlg:top="148" dlg:width="100" dlg:height="12" dlg:value="After (in 1000 characters)"/>
-  <dlg:numericfield dlg:id="SplitAfter" dlg:tab-index="25" dlg:left="305" dlg:top="146" dlg:width="40" dlg:height="12" dlg:help-url="org.openoffice.da.writer2xhtml.oxt:EpubOptionsEpubAutoSplit" dlg:strict-format="true" dlg:decimal-accuracy="0" dlg:value-min="10" dlg:value-max="1000" dlg:value-step="10" dlg:spin="true"/>
-  <dlg:text dlg:id="ExternalTocDepthLabel" dlg:tab-index="42" dlg:left="190" dlg:top="176" dlg:width="110" dlg:height="12" dlg:value="Number of heading levels to include"/>
-  <dlg:menulist dlg:id="ExternalTocDepth" dlg:tab-index="26" dlg:left="305" dlg:top="174" dlg:width="40" dlg:height="12" dlg:help-url="org.openoffice.da.writer2xhtml.oxt:EpubOptionsExternalTocDepth" dlg:spin="true" dlg:linecount="10">
+  <dlg:text dlg:id="SplitAfterLabel" dlg:tab-index="41" dlg:left="199" dlg:top="148" dlg:width="90" dlg:height="12" dlg:value="After (in 1000 characters)"/>
+  <dlg:numericfield dlg:id="SplitAfter" dlg:tab-index="25" dlg:left="300" dlg:top="146" dlg:width="45" dlg:height="12" dlg:help-url="org.openoffice.da.writer2xhtml.oxt:EpubOptionsEpubAutoSplit" dlg:strict-format="true" dlg:decimal-accuracy="0" dlg:value-min="10" dlg:value-max="1000" dlg:value-step="10" dlg:spin="true"/>
+  <dlg:text dlg:id="ExternalTocDepthLabel" dlg:tab-index="42" dlg:left="190" dlg:top="176" dlg:width="100" dlg:height="12" dlg:value="Number of heading levels to include"/>
+  <dlg:menulist dlg:id="ExternalTocDepth" dlg:tab-index="26" dlg:left="300" dlg:top="174" dlg:width="45" dlg:height="12" dlg:help-url="org.openoffice.da.writer2xhtml.oxt:EpubOptionsExternalTocDepth" dlg:spin="true" dlg:linecount="10">
    <dlg:menupopup>
     <dlg:menuitem dlg:value="1"/>
     <dlg:menuitem dlg:value="2"/>
@@ -92,12 +88,19 @@
    <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.UNO:EditMetadataClick" script:language="UNO"/>
   </dlg:button>
   <dlg:text dlg:id="ImageSizeLabel" dlg:tab-index="44" dlg:left="10" dlg:top="134" dlg:width="60" dlg:height="12" dlg:value="Image size"/>
-  <dlg:menulist dlg:id="ImageSize" dlg:tab-index="13" dlg:left="75" dlg:top="132" dlg:width="90" dlg:height="12" dlg:spin="true" dlg:linecount="3" dlg:help-url="org.openoffice.da.writer2xhtml.oxt:EpubOptionsImageSize">
+  <dlg:menulist dlg:id="ImageSize" dlg:tab-index="13" dlg:left="75" dlg:top="132" dlg:width="90" dlg:height="12" dlg:help-url="org.openoffice.da.writer2xhtml.oxt:EpubOptionsImageSize" dlg:spin="true" dlg:linecount="3">
    <dlg:menupopup>
     <dlg:menuitem dlg:value="Use absolute size"/>
     <dlg:menuitem dlg:value="Use relative size (%)"/>
     <dlg:menuitem dlg:value="Use original image size"/>
    </dlg:menupopup>
+   <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.UNO:ImageSizeChange" script:language="UNO"/>   
   </dlg:menulist>
+  <dlg:checkbox dlg:id="UseImageSplit" dlg:tab-index="22" dlg:left="190" dlg:top="106" dlg:width="155" dlg:height="12" dlg:value="Use full screen for large images" dlg:checked="false" dlg:help-url="org.openoffice.da.writer2xhtml.oxt:EpubOptionsUseImageSplit">
+   <script:event script:event-name="on-itemstatechange" script:macro-name="vnd.sun.star.UNO:UseImageSplitChange" script:language="UNO"/>
+  </dlg:checkbox>
+  <dlg:text dlg:id="ImageSplitLabel" dlg:tab-index="45" dlg:left="199" dlg:top="120" dlg:width="90" dlg:height="12" dlg:value="Minimum width"/>
+  <dlg:text dlg:id="ImageSplitPercentLabel" dlg:tab-index="46" dlg:left="335" dlg:top="120" dlg:width="10" dlg:height="12" dlg:value="%"/>
+  <dlg:numericfield dlg:id="ImageSplit" dlg:tab-index="23" dlg:left="300" dlg:top="118" dlg:width="30" dlg:height="12" dlg:strict-format="true" dlg:decimal-accuracy="0" dlg:value="100" dlg:value-min="0" dlg:value-max="100" dlg:spin="true" dlg:help-url="org.openoffice.da.writer2xhtml.oxt:EpubOptionsImageSplit"/>
  </dlg:bulletinboard>
 </dlg:window>

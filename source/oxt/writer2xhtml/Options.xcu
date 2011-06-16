@@ -103,17 +103,17 @@
         <prop oor:name="UseDublinCore" oor:type="xs:boolean">
             <value>true</value>
         </prop>
-        <prop oor:name="Split" oor:type="xs:boolean">
-            <value>false</value>
-        </prop>
         <prop oor:name="SplitLevel" oor:type="xs:short">
             <value>1</value>
         </prop>
-        <prop oor:name="UsePageBreakSplit" oor:type="xs:boolean">
-            <value>false</value>
-        </prop>
         <prop oor:name="PageBreakSplit" oor:type="xs:short">
             <value>0</value>
+        </prop>
+        <prop oor:name="UseImageSplit" oor:type="xs:boolean">
+            <value>false</value>
+        </prop>
+        <prop oor:name="ImageSplit" oor:type="xs:int">
+            <value>30</value>
         </prop>
         <prop oor:name="UseSplitAfter" oor:type="xs:boolean">
             <value>true</value>

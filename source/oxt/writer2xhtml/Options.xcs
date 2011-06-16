@@ -71,10 +71,10 @@
             <prop oor:name="Notes" oor:type="xs:boolean" />
             <prop oor:name="UseDublinCore" oor:type="xs:boolean" />
             <!-- Files -->
-            <prop oor:name="Split" oor:type="xs:boolean" />
             <prop oor:name="SplitLevel" oor:type="xs:short" />
-            <prop oor:name="UsePageBreakSplit" oor:type="xs:boolean" />
             <prop oor:name="PageBreakSplit" oor:type="xs:short" />
+            <prop oor:name="UseImageSplit" oor:type="xs:boolean" />
+            <prop oor:name="ImageSplit" oor:type="xs:int" />
             <prop oor:name="UseSplitAfter" oor:type="xs:boolean" />
             <prop oor:name="SplitAfter" oor:type="xs:int" />
             <!-- Table of contents -->

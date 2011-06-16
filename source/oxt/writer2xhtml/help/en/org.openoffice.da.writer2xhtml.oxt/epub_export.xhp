@@ -144,32 +144,30 @@
       	<paragraph role="heading" level="2" xml-lang="en-US">Document division</paragraph>
    		<paragraph role="paragraph" xml-lang="en-US">Technically an EPUB document consists of several document parts in XHTML format.
    		In principle you can have only one part, but this is not recommended. For performance reasons and because some EPUB readers have
-   		a limitation on the size of the individual files in the doucment you should select one of the following options to split the document.
+   		a limitation on the size of the individual files in the doucment you should select one or more
+   		of the following options to split the document.
    		</paragraph>
 
-    	<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:EpubOptionsSplit" id="bm_options_split"/>
-        <paragraph role="heading" level="3" xml-lang="en-US">Split document at headings</paragraph>
-   		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2xhtml.oxt:EpubOptionsSplit" visibility="hidden">Check this to create a new document part for each heading</ahelp></paragraph>
-        <paragraph role="paragraph" xml-lang="en-US">Use this option to split the document at headings. This is the most common way
-        to split the document.</paragraph>
-        <paragraph role="paragraph" xml-lang="en-US">Note that this option has no effect for headings
-        inside tables.</paragraph>
 
     	<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:EpubOptionsSplitLevel" id="bm_options_splitlevel"/>
-   		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2xhtml.oxt:EpubOptionsSplitLevel" visibility="hidden">Select the heading level at which spliting should occur</ahelp></paragraph>
-    	<embed href="org.openoffice.da.writer2xhtml.oxt/export.xhp#splitlevel"/>
+   		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2xhtml.oxt:EpubOptionsSplitLevel" visibility="hidden">Select the heading level at which spliting should occur, or "None" if you do not want to split at headings</ahelp></paragraph>
+        <paragraph role="heading" level="3" xml-lang="en-US">At heading level</paragraph>
+        <paragraph role="paragraph" xml-lang="en-US">Use this option to split the document at headings. This is the most common way
+        to split the document. Note that this option has no effect for headings
+        inside tables.</paragraph>
+      	<paragraph role="paragraph" xml-lang="en-US">You can either select <emph>None</emph> (the document will not split at headings),
+      	or you can select at which level splitting should occur.
+      	For example 2 to split the document at all headings of level 1 or 2.</paragraph>
 
     	<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:EpubOptionsPageBreakSplit" id="bm_options_pagebreaksplit"/>
-        <paragraph role="heading" level="3" xml-lang="en-US">Split document at page breaks</paragraph>
-   		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2xhtml.oxt:EpubOptionsPageBreakSplit" visibility="hidden">Check this to create a new document par at page breaks</ahelp></paragraph>
-        <paragraph role="paragraph" xml-lang="en-US">Use this option to split the document at the original page breaks.</paragraph>
-
-    	<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:EpubOptionsPageBreakSplitType" id="bm_options_pagebreaksplittype"/>
-        <paragraph role="heading" level="3" xml-lang="en-US">Types of page break</paragraph>
-   		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2xhtml.oxt:EpubOptionsPageBreakSplitType" visibility="hidden">Select the types of page breaks at which splitting should occur</ahelp></paragraph>
-        <paragraph role="paragraph" xml-lang="en-US">If you have chosen to split the document at page break, use this option to select
-        the types of page breaks to use:</paragraph>
+        <paragraph role="heading" level="3" xml-lang="en-US">At page breaks</paragraph>
+   		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2xhtml.oxt:EpubOptionsPageBreakSplit" visibility="hidden">Select the type page breaks at which you want to split the document</ahelp></paragraph>
+        <paragraph role="paragraph" xml-lang="en-US">This option enables you to split the document at the original page breaks.
+        Select the type of page breaks in the list:</paragraph>
         <list type="unordered">
+        	<listitem>
+        		<paragraph role="paragraph" xml-lang="en-US">Select <emph>None</emph> if you do not want to split at page breaks.</paragraph>
+        	</listitem>
         	<listitem>
         		<paragraph role="paragraph" xml-lang="en-US">Select <emph>Defined by styles</emph> to split at page breaks defined
         		in paragraph styles.</paragraph>
@@ -183,6 +181,18 @@
         		includes automatic page breaks, but Writer2xhtml will never split the document inside a paragraph, list or table.</paragraph>
         	</listitem>
         </list>
+
+    	<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:EpubOptionsUseImageSplit" id="bm_options_useimagesplit"/>
+        <paragraph role="heading" level="3" xml-lang="en-US">Use full screen for large images</paragraph>
+   		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2xhtml.oxt:EpubOptionsUseImageSplit" visibility="hidden">Select this option to show large images on full screen rather than embedded in the text</ahelp></paragraph>
+        <paragraph role="paragraph" xml-lang="en-US">Select this option to show large images on full screen rather than embedded
+        in the text.</paragraph>
+
+    	<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:EpubOptionsImageSplit" id="bm_options_imagesplit"/>
+        <paragraph role="heading" level="3" xml-lang="en-US">Minimum width</paragraph>
+   		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2xhtml.oxt:EpubOptionsUseEpubAutoSplit" visibility="hidden">Enter the minimum width used to identify a large image</ahelp></paragraph>
+        <paragraph role="paragraph" xml-lang="en-US">Enter the minimum width for a large image. Only images with at least this relative width
+        and an aspect ratio of 3:4 or higher will be export as full screen images.</paragraph>
 
     	<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:EpubOptionsUseEpubAutoSplit" id="bm_options_useepubautosplit"/>
         <paragraph role="heading" level="3" xml-lang="en-US">Automatic split of long documents</paragraph>

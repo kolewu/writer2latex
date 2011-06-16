@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-06-06)
+ *  Version 1.2 (2011-06-16)
  *
  */
 
@@ -98,10 +98,10 @@ public class EpubOptionsDialog extends OptionsDialogBase {
         loadCheckBoxOption(xProps, "Notes");
 			
         // Document division
-        loadCheckBoxOption(xProps, "Split");
         loadListBoxOption(xProps, "SplitLevel");
-        loadCheckBoxOption(xProps, "UsePageBreakSplit");
         loadListBoxOption(xProps, "PageBreakSplit");
+        loadCheckBoxOption(xProps, "UseImageSplit");
+        loadNumericOption(xProps, "ImageSplit");
         loadCheckBoxOption(xProps, "UseSplitAfter");
         loadNumericOption(xProps, "SplitAfter");
         
@@ -150,30 +150,30 @@ public class EpubOptionsDialog extends OptionsDialogBase {
         saveCheckBoxOption(xProps, helper, "Notes", "notes");
   		
         // Document division
-        boolean bSplit = saveCheckBoxOption(xProps, "Split");
         short nSplitLevel = saveListBoxOption(xProps, "SplitLevel");
         if (!isLocked("split_level")) {
-            if (bSplit) {
-               helper.put("split_level",Integer.toString(nSplitLevel+1));
-            }
-            else {
-                helper.put("split_level","0");
-            }
+        	helper.put("split_level",Integer.toString(nSplitLevel));
         }
         
-        boolean bUsePageBreakSplit = saveCheckBoxOption(xProps, "UsePageBreakSplit");
         short nPageBreakSplit = saveListBoxOption(xProps, "PageBreakSplit");
         if (!isLocked("page_break_split")) {
-            if (bUsePageBreakSplit) {
-            	switch (nPageBreakSplit) {
-            	case 0: helper.put("page_break_split", "styles"); break;
-            	case 1: helper.put("page_break_split", "explicit"); break;
-            	case 2: helper.put("page_break_split", "all");
-            	}
-            }
-            else {
-                helper.put("page_break_split","none");
-            }
+        	switch (nPageBreakSplit) {
+        	case 0: helper.put("page_break_split","none"); break;
+        	case 1: helper.put("page_break_split", "styles"); break;
+        	case 2: helper.put("page_break_split", "explicit"); break;
+        	case 3: helper.put("page_break_split", "all");
+        	}
+        }
+        
+        boolean bUseImageSplit = saveCheckBoxOption(xProps, "UseImageSplit");
+        int nImageSplit = saveNumericOption(xProps, "ImageSplit");
+        if (!isLocked("image_split")) {
+        	if (bUseImageSplit) {
+        		helper.put("image_split", nImageSplit+"%");
+        	}
+        	else {
+        		helper.put("image_split", "none");
+        	}
         }
 
         boolean bUseSplitAfter = saveCheckBoxOption(xProps, "UseSplitAfter");
@@ -206,14 +206,14 @@ public class EpubOptionsDialog extends OptionsDialogBase {
         else if (sMethod.equals("UseDefaultFontChange")) {
         	useDefaultFontChange();
         }
+        else if (sMethod.equals("ImageSizeChange")) {
+        	imageSizeChange();
+        }
         else if (sMethod.equals("EditMetadataClick")) {
             editMetadataClick();
         }
-        else if (sMethod.equals("SplitChange")) {
-            splitChange();
-        }
-        else if (sMethod.equals("UsePageBreakSplitChange")) {
-        	usePageBreakSplitChange();
+        else if (sMethod.equals("UseImageSplitChange")) {
+            useImageSplitChange();
         }
         else if (sMethod.equals("UseSplitAfterChange")) {
         	useSplitAfterChange();
@@ -223,7 +223,7 @@ public class EpubOptionsDialog extends OptionsDialogBase {
 
     @Override public String[] getSupportedMethodNames() {
         String[] sNames = { "ConfigChange", "RelativeFontSizeChange", "UseDefaultFontChange", "EditMetadataClick",
-        		"SplitChange", "UsePageBreakSplitChange", "UseSplitAfterChange" };
+        		"UseImageSplitChange", "UseSplitAfterChange" };
         return sNames;
     }
 	
@@ -258,16 +258,18 @@ public class EpubOptionsDialog extends OptionsDialogBase {
         setControlEnabled("Notes",!isLocked("notes"));
 			
         // Document division
-        boolean bSplit = getCheckBoxStateAsBoolean("Split");
-        setControlEnabled("Split",!isLocked("split_level"));
-        setControlEnabled("SplitLevelLabel",!isLocked("split_level") && bSplit);
-        setControlEnabled("SplitLevel",!isLocked("split_level") && bSplit);
+        setControlEnabled("SplitLevelLabel",!isLocked("split_level"));
+        setControlEnabled("SplitLevel",!isLocked("split_level"));
         
-        boolean bUsePageBreakSplit = getCheckBoxStateAsBoolean("UsePageBreakSplit");
-        setControlEnabled("UsePageBreakSplit",!isLocked("page_break_split"));
-        setControlEnabled("PageBreakSplitLabel",!isLocked("page_break_split") && bUsePageBreakSplit);
-        setControlEnabled("PageBreakSplit",!isLocked("page_break_split") && bUsePageBreakSplit);
-
+        setControlEnabled("PageBreakSplitLabel",!isLocked("page_break_split"));
+        setControlEnabled("PageBreakSplit",!isLocked("page_break_split"));
+        
+        boolean bUseImageSplit = getCheckBoxStateAsBoolean("UseImageSplit");
+        setControlEnabled("UseImageSplit",!isLocked("image_split"));
+        setControlEnabled("ImageSplitLabel",!isLocked("image_split") && bUseImageSplit);
+        setControlEnabled("ImageSplit",!isLocked("image_split") && bUseImageSplit);
+        setControlEnabled("ImageSplitPercentLabel",!isLocked("image_split") && bUseImageSplit);
+        
         boolean bUseSplitAfter = getCheckBoxStateAsBoolean("UseSplitAfter");
         setControlEnabled("UseSplitAfter",!isLocked("split_after"));
         setControlEnabled("SplitAfterLabel",!isLocked("split_after") && bUseSplitAfter);
@@ -296,6 +298,13 @@ public class EpubOptionsDialog extends OptionsDialogBase {
     	}    	
     }
     
+    private void imageSizeChange() {
+    	if (!isLocked("image_split")) {
+    		setControlEnabled("UseImageSplit", getListBoxSelectedItem("ImageSize")==1);
+    		useImageSplitChange();
+    	}
+    }
+    
     private void editMetadataClick() {
         Object dialog;
 		try {
@@ -313,20 +322,13 @@ public class EpubOptionsDialog extends OptionsDialogBase {
 		}
     }
     
-    private void splitChange() {
-        if (!isLocked("split_level")) {
-            boolean bState = getCheckBoxStateAsBoolean("Split");
-            setControlEnabled("SplitLevelLabel",bState);
-            setControlEnabled("SplitLevel",bState);
+    private void useImageSplitChange() {
+        if (!isLocked("image_split")) {
+            boolean bEnable = getCheckBoxStateAsBoolean("UseImageSplit") && (getListBoxSelectedItem("ImageSize")==1);
+            setControlEnabled("ImageSplitLabel",bEnable);
+            setControlEnabled("ImageSplit",bEnable);
+            setControlEnabled("ImageSplitPercentLabel",bEnable);
         }
-    }
-    
-    private void usePageBreakSplitChange() {
-        if (!isLocked("page_break_split")) {
-            boolean bState = getCheckBoxStateAsBoolean("UsePageBreakSplit");
-            setControlEnabled("PageBreakSplitLabel",bState);
-            setControlEnabled("PageBreakSplit",bState);
-        }    	
     }
     
     private void useSplitAfterChange() {
@@ -336,7 +338,5 @@ public class EpubOptionsDialog extends OptionsDialogBase {
             setControlEnabled("SplitAfter",bState);
         }
     }
-    
-    
-    
+
 }

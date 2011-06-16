@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-06-14)
+ *  Version 1.2 (2011-06-16)
  *
  */
  
@@ -96,6 +96,7 @@ public class DrawConverter extends ConverterHelper {
     private String sScale;
     private boolean bConvertToPx;
     private int nImageSize;
+    private String sImageSplit;
     
     // Frames in spreadsheet documents are collected here
     private Vector<Element> frames = new Vector<Element>();
@@ -120,6 +121,7 @@ public class DrawConverter extends ConverterHelper {
         sScale = config.getXhtmlScaling();
         bConvertToPx = config.xhtmlConvertToPx();
         nImageSize = config.imageSize();
+        sImageSplit = config.imageSplit();
     }
 	
     ///////////////////////////////////////////////////////////////////////
@@ -233,10 +235,10 @@ public class DrawConverter extends ConverterHelper {
     	Element currentFrame = hnode;
     	if (converter.isTopLevel() && !fullscreenFrames.isEmpty()) {
     		bCollectFullscreenFrames = false;
-    		currentFrame = converter.nextOutFile();
+    		currentFrame = getTextCv().doMaybeSplit(hnode, 0);
     		for (Element image : fullscreenFrames) {
     			handleDrawElement(image,currentFrame,null,FULL_SCREEN);
-    			currentFrame = converter.nextOutFile();
+    			currentFrame = getTextCv().doMaybeSplit(hnode, 0);
     		}
     		fullscreenFrames.clear();
     		bCollectFullscreenFrames = true;
@@ -401,15 +403,16 @@ public class DrawConverter extends ConverterHelper {
         // First check to see if we should treat this image as a "full screen" image
         // This is only supported for EPUB documents with relative image size
         // (Currently only images are handled like this, hence the code is here rather than in handleDrawElement)
-        if (bCollectFullscreenFrames && converter.isOPS() && nImageSize==XhtmlConfig.RELATIVE && converter.isTopLevel()) {
+        if (bCollectFullscreenFrames && converter.isOPS() && nImageSize==XhtmlConfig.RELATIVE && !"none".equals(sImageSplit)
+        		&& converter.isTopLevel()) {
         	StyleWithProperties style = ofr.getFrameStyle(frame.getAttribute(XMLString.DRAW_STYLE_NAME));
         	String sWidth = getFrameWidth(frame, style);
         	String sHeight = getFrameHeight(frame, style);
-        	// It is if the image width exceeds 30% of the current text width and the height is greater than 1.33*the width
-        	// Values recommended by Michel "Coolmicro", should probably be configurable
+        	// It is if the image width exceeds a certain percentage of the current text width and the height is
+        	// greater than 1.33*the width (recommended by Michel "Coolmicro")
         	if (sWidth!=null && sHeight!=null &&
         			Misc.sub(Misc.multiply("133%",sWidth), sHeight).startsWith("-") &&
-        			Misc.sub(Misc.multiply("30%",converter.getContentWidth()),
+        			Misc.sub(Misc.multiply(sImageSplit,converter.getContentWidth()),
         					Misc.multiply(sScale,Misc.truncateLength(sWidth))).startsWith("-")) {
         		fullscreenFrames.add(onode);
         		return;
@@ -458,7 +461,7 @@ public class DrawConverter extends ConverterHelper {
         // Now style it
         StyleInfo info = new StyleInfo();
         String sStyleName = Misc.getAttribute(frame, XMLString.DRAW_STYLE_NAME);
-        getFrameSc().applyStyle(sStyleName,info);
+        if (nMode!=FULL_SCREEN) { getFrameSc().applyStyle(sStyleName,info); }
         applyImageSize(frame,info.props,false);
 
         // Apply placement
@@ -511,6 +514,8 @@ public class DrawConverter extends ConverterHelper {
         	break;
         case ABSOLUTE:
         	sContentWidth = applyImageSize(frame,info.props,false);
+        	info.props.addValue("margin-left","auto");
+        	info.props.addValue("margin-right","auto");
         	applyPosition(frame,info.props);
         	break;
         case CENTERED:
@@ -932,7 +937,9 @@ public class DrawConverter extends ConverterHelper {
     	else { // Full screen image
     		props.addValue("max-width","100%");
     		props.addValue("height","100%");
-    		
+    		props.addValue("display","block");
+    		props.addValue("margin-left","auto");
+    		props.addValue("margin-right","auto");
     	}
 		return null;
     }

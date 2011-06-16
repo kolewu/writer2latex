@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-06-14)
+ *  Version 1.2 (2011-06-16)
  *
  */
 
@@ -499,8 +499,8 @@ public class TextConverter extends ConverterHelper {
                 // Remember if this was a heading
                 if (nDontSplitLevel==0) {
                     bAfterHeading = nodeName.equals(XMLString.TEXT_H);
+                    hnode = getDrawCv().flushFullscreenFrames((Element)hnode);
                 }
-                hnode = getDrawCv().flushFullscreenFrames((Element)hnode);
             }
             i++;
         }
@@ -558,15 +558,15 @@ public class TextConverter extends ConverterHelper {
     	}
     }
 
-    private Node doMaybeSplit(Node node, int nLevel) {
+    protected Element doMaybeSplit(Node node, int nLevel) {
         if (nDontSplitLevel>1) { // we cannot split due to a nested structure
-            return node;
+            return (Element) node;
         }
         if (!converter.isOPS() && bAfterHeading && nLevel-nLastSplitLevel<=nRepeatLevels) {
             // we cannot split because we are right after a heading and the
             // maximum number of parent headings on the page is not reached
         	// TODO: Something wrong here....nLastSplitLevel is never set???
-            return node;
+            return (Element) node;
         }
         if (nSplit>=nLevel && converter.outFileHasContent()) {
             // No objections, this is a level that causes splitting
@@ -575,7 +575,7 @@ public class TextConverter extends ConverterHelper {
             if (converter.getOutFileIndex()>=0) { insertFootnotes(node,false); }
             return converter.nextOutFile();
         }
-        return node;
+        return (Element) node;
     }
 
     /* Process a text:section tag (returns current html node) */
@@ -817,6 +817,11 @@ public class TextConverter extends ConverterHelper {
             par.appendChild( converter.createTextNode("\u00A0") );
             sCurrentListLabel = null;
         }        
+        
+        // Finally, in EPUB export, if the exported paragraph turns out to be empty, remove it
+        if (converter.isOPS() && !par.hasChildNodes()) {
+        	hnode.removeChild(par);
+        }
     }
     
     private void prependAsapNode(Node node) {
