@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2010 by Henrik Just
+ *  Copyright: 2002-2011 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-10-27)
+ *  Version 1.2 (2011-06-16)
  *
  */
 
@@ -308,6 +308,9 @@ public class OfficeReader {
 	
     // The main content element
     private Element content = null;
+    
+    // The first image in the document
+    private Element firstImage = null;
 	
     // Identify OASIS OpenDocument format
     private boolean bOpenDocument = false;
@@ -704,6 +707,14 @@ public class OfficeReader {
      */
     public TableReader getTableReader(Element node) {
         return new TableReader(this,node);
+    }
+    
+    /** Get the very first image in this document, if any 
+     * 
+     *  @return the first image, or null if no images exists
+     */
+    public Element getFirstImage() {
+    	return firstImage;
     }
 
     /** Constructor; read a document */
@@ -1122,6 +1133,11 @@ public class OfficeReader {
             }
         }
         // todo: other indexes
+        else if (firstImage==null && sName.equals(XMLString.DRAW_FRAME)) {
+        	// This may be an image (note that a replacement image for an object is OK by this definition)
+        	Element image = Misc.getChildByTagName(node, XMLString.DRAW_IMAGE);
+        	if (image!=null) { firstImage=image; }
+        }
 		
         // Traverse the children
         Node child = node.getFirstChild();

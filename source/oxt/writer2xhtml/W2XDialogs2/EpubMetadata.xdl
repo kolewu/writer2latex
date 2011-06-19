@@ -76,7 +76,7 @@
    <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.UNO:DateUpClick" script:language="UNO"/>
   </dlg:button>
   <dlg:button dlg:id="DateDownButton" dlg:tab-index="17" dlg:left="145" dlg:top="152" dlg:width="25" dlg:height="12" dlg:value="Down">
-    <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.UNO:DateDownClick" script:language="UNO"/>
+   <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.UNO:DateDownClick" script:language="UNO"/>
   </dlg:button>
  </dlg:bulletinboard>
 </dlg:window>

@@ -41,7 +41,7 @@ import writer2latex.util.Misc;
 
 public class XhtmlConfig extends writer2latex.base.ConfigBase {
     // Implement configuration methods
-    protected int getOptionCount() { return 55; }
+    protected int getOptionCount() { return 56; }
     protected String getDefaultConfigPath() { return "/writer2latex/xhtml/config/"; }
 	
     // Override setOption: To be backwards compatible, we must accept options
@@ -136,19 +136,20 @@ public class XhtmlConfig extends writer2latex.base.ConfigBase {
     private static final int PAGE_BREAK_SPLIT = 39;
     private static final int SPLIT_AFTER = 40;
     private static final int IMAGE_SPLIT = 41;
-    private static final int CALC_SPLIT = 42;
-    private static final int DISPLAY_HIDDEN_SHEETS = 43;
-    private static final int DISPLAY_HIDDEN_ROWS_COLS = 44;
-    private static final int DISPLAY_FILTERED_ROWS_COLS = 45;
-    private static final int APPLY_PRINT_RANGES = 46;
-    private static final int USE_TITLE_AS_HEADING = 47;
-    private static final int USE_SHEET_NAMES_AS_HEADINGS = 48;
-    private static final int XSLT_PATH = 49;
-    private static final int SAVE_IMAGES_IN_SUBDIR = 50;
-    private static final int UPLINK = 51;
-    private static final int DIRECTORY_ICON = 52;
-    private static final int DOCUMENT_ICON = 53;
-    private static final int ZEN_HACK = 54; // temporary hack for ePub Zen Garden styles
+    private static final int COVER_IMAGE = 42;
+    private static final int CALC_SPLIT = 43;
+    private static final int DISPLAY_HIDDEN_SHEETS = 44;
+    private static final int DISPLAY_HIDDEN_ROWS_COLS = 45;
+    private static final int DISPLAY_FILTERED_ROWS_COLS = 46;
+    private static final int APPLY_PRINT_RANGES = 47;
+    private static final int USE_TITLE_AS_HEADING = 48;
+    private static final int USE_SHEET_NAMES_AS_HEADINGS = 49;
+    private static final int XSLT_PATH = 50;
+    private static final int SAVE_IMAGES_IN_SUBDIR = 51;
+    private static final int UPLINK = 52;
+    private static final int DIRECTORY_ICON = 53;
+    private static final int DOCUMENT_ICON = 54;
+    private static final int ZEN_HACK = 55; // temporary hack for ePub Zen Garden styles
 
     protected ComplexOption xheading = addComplexOption("heading-map");
     protected ComplexOption xpar = addComplexOption("paragraph-map");
@@ -258,6 +259,7 @@ public class XhtmlConfig extends writer2latex.base.ConfigBase {
         	}
         };
         options[IMAGE_SPLIT] = new Option("image_split","none");
+        options[COVER_IMAGE] = new BooleanOption("cover_image","false");
         options[CALC_SPLIT] = new BooleanOption("calc_split","false");
         options[DISPLAY_HIDDEN_SHEETS] = new BooleanOption("display_hidden_sheets", "false");
         options[DISPLAY_HIDDEN_ROWS_COLS] = new BooleanOption("display_hidden_rows_cols","false");
@@ -383,6 +385,7 @@ public class XhtmlConfig extends writer2latex.base.ConfigBase {
     public int pageBreakSplit() { return ((IntegerOption) options[PAGE_BREAK_SPLIT]).getValue(); }
     public int splitAfter() { return ((IntegerOption) options[SPLIT_AFTER]).getValue(); }
     public String imageSplit() { return options[IMAGE_SPLIT].getString(); }
+    public boolean coverImage() { return ((BooleanOption) options[COVER_IMAGE]).getValue(); }
     public boolean xhtmlCalcSplit() { return ((BooleanOption) options[CALC_SPLIT]).getValue(); }
     public boolean xhtmlDisplayHiddenSheets() { return ((BooleanOption) options[DISPLAY_HIDDEN_SHEETS]).getValue(); }
     public boolean displayHiddenRowsCols() { return ((BooleanOption) options[DISPLAY_HIDDEN_ROWS_COLS]).getValue(); }

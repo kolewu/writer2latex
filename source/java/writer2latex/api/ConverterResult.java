@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2010 by Henrik Just
+ *  Copyright: 2002-2011 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-04-13)
+ *  Version 1.2 (2011-06-19)
  *
  */
  
@@ -104,6 +104,14 @@ public interface ConverterResult {
      *  @return the entry or null if a bibliography does not exist
      */
     public ContentEntry getBibliographyFile();
+    
+    /** Get the entry which contains the cover image
+     * 
+     *  @return the entry or null if a cover image does not exist
+     */
+    public ContentEntry getCoverImageFile();
+    
+
     
     /** Write all files of the <code>ConverterResult</code> to a directory.
      *  Subdirectories are created as required by the individual

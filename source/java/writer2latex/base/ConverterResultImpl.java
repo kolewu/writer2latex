@@ -16,11 +16,11 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 *  MA  02111-1307  USA
 *
-*  Copyright: 2002-2010 by Henrik Just
+*  Copyright: 2002-2011 by Henrik Just
 *
 *  All Rights Reserved.
 * 
-*  Version 1.2 (2010-04-13)
+*  Version 1.2 (2011-06-19)
 *
 */ 
 
@@ -53,6 +53,7 @@ public class ConverterResultImpl implements ConverterResult {
 	private ContentEntry lotFile;
 	private ContentEntry indexFile;
 	private ContentEntry bibliographyFile;
+	private ContentEntry coverImageFile;
 	
 	private MetaData metaData = null;
 	
@@ -77,6 +78,7 @@ public class ConverterResultImpl implements ConverterResult {
         lotFile = null;
         indexFile = null;
         bibliographyFile = null;
+        coverImageFile = null;
         metaData = null;
         nMasterCount = 0;
 	}
@@ -207,6 +209,18 @@ public class ConverterResultImpl implements ConverterResult {
     
     public ContentEntry getBibliographyFile() {
     	return bibliographyFile;
+    }
+    
+    /** Define the entry which contains the cover image
+     * 
+     * @param entry the entry
+     */
+    public void setCoverImageFile(ContentEntry entry) {
+    	coverImageFile = entry;
+    }
+    
+    public ContentEntry getCoverImageFile() {
+    	return coverImageFile;
     }
     
     /** Set the meta data of this <code>ConverterResult</code> 

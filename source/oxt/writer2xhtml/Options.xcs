@@ -75,6 +75,7 @@
             <prop oor:name="PageBreakSplit" oor:type="xs:short" />
             <prop oor:name="UseImageSplit" oor:type="xs:boolean" />
             <prop oor:name="ImageSplit" oor:type="xs:int" />
+            <prop oor:name="CoverImage" oor:type="xs:boolean" />
             <prop oor:name="UseSplitAfter" oor:type="xs:boolean" />
             <prop oor:name="SplitAfter" oor:type="xs:int" />
             <!-- Table of contents -->

@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-06-07)
+ *  Version 1.2 (2011-06-19)
  *
  */
 
@@ -216,6 +216,10 @@ public class Converter extends ConverterBase {
     protected void setIndexFile(String sTarget) {
     	converterResult.setIndexFile(new ContentEntryImpl(l10n.get(L10n.INDEX),1,htmlDoc,sTarget));
     	nAlphabeticalIndex = nOutFileIndex;
+    }
+    
+    protected void setCoverImageFile(String sTarget) {
+    	converterResult.setCoverImageFile(new ContentEntryImpl("Cover image",0,htmlDoc,sTarget));
     }
 	
     protected Element createElement(String s) { return htmlDOM.createElement(s); }

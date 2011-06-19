@@ -189,6 +189,9 @@ public class TextConverter extends ConverterHelper {
                 hnode = form;
             }
         }
+        
+        // Add cover image
+        hnode = getDrawCv().insertCoverImage(hnode);
 
         // Convert content
         hnode = (Element)traverseBlockText(onode,hnode);

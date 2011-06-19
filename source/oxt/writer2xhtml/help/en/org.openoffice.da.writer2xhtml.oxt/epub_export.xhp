@@ -139,15 +139,19 @@
        	<paragraph role="heading" level="3" xml-lang="en-US">Export optional document properties</paragraph>
    	    <paragraph role="paragraph" xml-lang="en-US">If you select this option, all the document properties (File – Properties)
        	are exported, otherwise only the title is exported.</paragraph>
-       	<paragraph role="paragraph" xml-lang="en-US">Click <emph>Edit</emph> to open the dialog to edit the document properties.</paragraph>
 
-      	<paragraph role="heading" level="2" xml-lang="en-US">Document division</paragraph>
-   		<paragraph role="paragraph" xml-lang="en-US">Technically an EPUB document consists of several document parts in XHTML format.
-   		In principle you can have only one part, but this is not recommended. For performance reasons and because some EPUB readers have
-   		a limitation on the size of the individual files in the doucment you should select one or more
-   		of the following options to split the document.
-   		</paragraph>
+    	<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:EpubOptionsEditMetadata" id="bm_options_editmetadata"/>
+   		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2xhtml.oxt:EpubOptionsEditMetadata" visibility="hidden">Clik this to edit the document properties, e.g. author, title, date</ahelp></paragraph>
+        <paragraph role="heading" level="3" xml-lang="en-US">Edit document properties</paragraph>
+       	<paragraph role="paragraph" xml-lang="en-US">Click this button to open the dialog to edit the document properties such as
+       	title, author or date.</paragraph>
 
+      	<paragraph role="heading" level="2" xml-lang="en-US">Document division (page breaks)</paragraph>
+   		<paragraph role="paragraph" xml-lang="en-US">These settings lets you insert page breaks at various places in the document.
+   		It is recommended always to use one or more of these settings. One reason for this is that it enhances the readability of
+   		your document. Another reason is technical: Page breaks splits the splits the internal structure into smaller parts.
+   		This improves performance, and also some EPUB readers have a limitation on the size of the individual parts of the
+   		doucment.</paragraph>
 
     	<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:EpubOptionsSplitLevel" id="bm_options_splitlevel"/>
    		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2xhtml.oxt:EpubOptionsSplitLevel" visibility="hidden">Select the heading level at which spliting should occur, or "None" if you do not want to split at headings</ahelp></paragraph>
@@ -185,14 +189,22 @@
     	<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:EpubOptionsUseImageSplit" id="bm_options_useimagesplit"/>
         <paragraph role="heading" level="3" xml-lang="en-US">Use full screen for large images</paragraph>
    		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2xhtml.oxt:EpubOptionsUseImageSplit" visibility="hidden">Select this option to show large images on full screen rather than embedded in the text</ahelp></paragraph>
-        <paragraph role="paragraph" xml-lang="en-US">Select this option to show large images on full screen rather than embedded
-        in the text.</paragraph>
+        <paragraph role="paragraph" xml-lang="en-US">Images will normally be exported as an integrated part of the text. As EPUB readers
+        may have a relatively small screen, this may not be optimal for large images.
+        Select this option to split the document at large images, which means that they will be displayed on full screen.</paragraph>
 
     	<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:EpubOptionsImageSplit" id="bm_options_imagesplit"/>
         <paragraph role="heading" level="3" xml-lang="en-US">Minimum width</paragraph>
    		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2xhtml.oxt:EpubOptionsUseEpubAutoSplit" visibility="hidden">Enter the minimum width used to identify a large image</ahelp></paragraph>
         <paragraph role="paragraph" xml-lang="en-US">Enter the minimum width for a large image. Only images with at least this relative width
         and an aspect ratio of 3:4 or higher will be export as full screen images.</paragraph>
+
+    	<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:EpubOptionsCoverImage" id="bm_options_coverimage"/>
+        <paragraph role="heading" level="3" xml-lang="en-US">Use first image as cover image</paragraph>
+   		<paragraph role="paragraph" xml-lang="en-US"><ahelp hid="org.openoffice.da.writer2xhtml.oxt:EpubOptionsCoverImage" visibility="hidden">Check this to use the first image found in the document as cover image</ahelp></paragraph>
+        <paragraph role="paragraph" xml-lang="en-US">An EPUB document often include a cover image in analogy with the cover of a book.
+        Check this to use the first image found in the document as cover image. The position
+        of the image in the original document does not matter.</paragraph>
 
     	<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:EpubOptionsUseEpubAutoSplit" id="bm_options_useepubautosplit"/>
         <paragraph role="heading" level="3" xml-lang="en-US">Automatic split of long documents</paragraph>

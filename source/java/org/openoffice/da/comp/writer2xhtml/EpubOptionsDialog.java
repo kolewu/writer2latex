@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-06-16)
+ *  Version 1.2 (2011-06-19)
  *
  */
 
@@ -102,6 +102,7 @@ public class EpubOptionsDialog extends OptionsDialogBase {
         loadListBoxOption(xProps, "PageBreakSplit");
         loadCheckBoxOption(xProps, "UseImageSplit");
         loadNumericOption(xProps, "ImageSplit");
+        loadCheckBoxOption(xProps, "CoverImage");
         loadCheckBoxOption(xProps, "UseSplitAfter");
         loadNumericOption(xProps, "SplitAfter");
         
@@ -175,6 +176,8 @@ public class EpubOptionsDialog extends OptionsDialogBase {
         		helper.put("image_split", "none");
         	}
         }
+        
+        saveCheckBoxOption(xProps, helper, "CoverImage", "cover_image");
 
         boolean bUseSplitAfter = saveCheckBoxOption(xProps, "UseSplitAfter");
         int nSplitAfter = saveNumericOption(xProps, "SplitAfter");
@@ -205,9 +208,6 @@ public class EpubOptionsDialog extends OptionsDialogBase {
         }
         else if (sMethod.equals("UseDefaultFontChange")) {
         	useDefaultFontChange();
-        }
-        else if (sMethod.equals("ImageSizeChange")) {
-        	imageSizeChange();
         }
         else if (sMethod.equals("EditMetadataClick")) {
             editMetadataClick();
@@ -270,6 +270,8 @@ public class EpubOptionsDialog extends OptionsDialogBase {
         setControlEnabled("ImageSplit",!isLocked("image_split") && bUseImageSplit);
         setControlEnabled("ImageSplitPercentLabel",!isLocked("image_split") && bUseImageSplit);
         
+        setControlEnabled("CoverImage", !isLocked("cover_image"));
+        
         boolean bUseSplitAfter = getCheckBoxStateAsBoolean("UseSplitAfter");
         setControlEnabled("UseSplitAfter",!isLocked("split_after"));
         setControlEnabled("SplitAfterLabel",!isLocked("split_after") && bUseSplitAfter);
@@ -298,13 +300,6 @@ public class EpubOptionsDialog extends OptionsDialogBase {
     	}    	
     }
     
-    private void imageSizeChange() {
-    	if (!isLocked("image_split")) {
-    		setControlEnabled("UseImageSplit", getListBoxSelectedItem("ImageSize")==1);
-    		useImageSplitChange();
-    	}
-    }
-    
     private void editMetadataClick() {
         Object dialog;
 		try {
@@ -324,7 +319,7 @@ public class EpubOptionsDialog extends OptionsDialogBase {
     
     private void useImageSplitChange() {
         if (!isLocked("image_split")) {
-            boolean bEnable = getCheckBoxStateAsBoolean("UseImageSplit") && (getListBoxSelectedItem("ImageSize")==1);
+            boolean bEnable = getCheckBoxStateAsBoolean("UseImageSplit");
             setControlEnabled("ImageSplitLabel",bEnable);
             setControlEnabled("ImageSplit",bEnable);
             setControlEnabled("ImageSplitPercentLabel",bEnable);
