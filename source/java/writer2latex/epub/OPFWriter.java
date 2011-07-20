@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  version 1.2 (2011-03-04)
+ *  version 1.2 (2011-07-20)
  *
  */
 
@@ -225,7 +225,24 @@ public class OPFWriter extends NewDOMDocument {
         	manifest.appendChild(item);
         	item.setAttribute("href",Misc.makeHref(file.getFileName()));
         	item.setAttribute("media-type", file.getMIMEType());
-        	if (file.isMasterDocument()) {
+        	// Treat cover as recommended by Threepress consulting (http://blog.threepress.org/2009/11/20/best-practices-in-epub-cover-images/)
+        	if (cr.getCoverFile()!=null && cr.getCoverFile().getFile()==file) {
+        		item.setAttribute("id", "cover");
+        		
+        		Element itemref = contentDOM.createElement("itemref");
+        		itemref.setAttribute("idref", "cover");
+        		itemref.setAttribute("linear", "no"); // maybe problematic
+        		spine.appendChild(itemref);
+        	}
+        	else if (cr.getCoverImageFile()!=null && cr.getCoverImageFile().getFile()==file) {
+        		item.setAttribute("id", "cover-image");
+        		
+        		Element meta = contentDOM.createElement("meta");
+        		meta.setAttribute("name", "cover");
+        		meta.setAttribute("content", "cover-image");
+        		metadata.appendChild(meta);
+        	}
+        	else if (file.isMasterDocument()) {
         		String sId = "text"+(++nMasterCount);
         		item.setAttribute("id", sId);
         		
@@ -246,7 +263,8 @@ public class OPFWriter extends NewDOMDocument {
         
         // The guide may contain references to some fundamental structural components
         Element guide = contentDOM.createElement("guide");
-        pack.appendChild(guide);        
+        pack.appendChild(guide);
+        addGuideReference(contentDOM,guide,"cover",cr.getCoverFile());
        	addGuideReference(contentDOM,guide,"title-page",cr.getTitlePageFile());
        	addGuideReference(contentDOM,guide,"text",cr.getTextFile());
        	addGuideReference(contentDOM,guide,"toc",cr.getTocFile());

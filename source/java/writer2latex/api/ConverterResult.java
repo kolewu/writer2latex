@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-06-19)
+ *  Version 1.2 (2011-07-20)
  *
  */
  
@@ -105,7 +105,13 @@ public interface ConverterResult {
      */
     public ContentEntry getBibliographyFile();
     
-    /** Get the entry which contains the cover image
+    /** Get the entry which contains the cover (which usually will contain a cover image)
+     * 
+     *  @return the entry or null if a cover does not exist
+     */
+    public ContentEntry getCoverFile();
+    
+    /** Get the entry which contains the actual cover image
      * 
      *  @return the entry or null if a cover image does not exist
      */

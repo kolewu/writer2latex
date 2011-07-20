@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-03-05)
+ *  Version 1.2 (2011-07-20)
  *
  */
 
@@ -606,7 +606,8 @@ public class EpubMetadataDialog extends DialogBase {
 		}
 		else { // Display the fall-back author
 			String[] sAuthors = new String[1];
-			sAuthors[0] = xDocumentProperties.getAuthor()+" (default creator)";
+			//sAuthors[0] = xDocumentProperties.getAuthor()+" (default creator)";
+			sAuthors[0] = xDocumentProperties.getModifiedBy()+" (default creator)";
 			setListBoxStringItemList("Authors", sAuthors);
 			setControlEnabled("Authors", false);
 		}

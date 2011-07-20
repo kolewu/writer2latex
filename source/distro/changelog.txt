@@ -2,10 +2,12 @@ Changelog for Writer2LaTeX version 1.0 -> 1.2
 
 ---------- version 1.1.8 ----------
 
-[w2x] New option cover_image with values true and false (default). In EPUB export, if this option is set the true the very
-  first image found in the document is used as cover image
+[w2x] EPUB bugfix: The meta data editor now shows the correct default creator (not the original creator)
 
-[w2x] New option image_split with values "none" or a percentage. In EPUB export, if image_size is "relative", an image
+[w2x] New option cover_image with values true and false (default). In EPUB export, if this option is set the true the very
+  first image found in the document is used as cover image.
+
+[w2x] New option image_split with values "none" or a percentage. In EPUB export an image
   of width greater than or equal to this percentage is placed in a separate file as a full screen image.
   This takes effect only if the aspect ratio is at least 3:4
 

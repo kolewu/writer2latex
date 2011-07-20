@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-06-19)
+ *  Version 1.2 (2011-07-20)
  *
  */
 
@@ -48,6 +48,7 @@ import org.w3c.dom.Text;
 import writer2latex.api.Config;
 import writer2latex.api.ContentEntry;
 import writer2latex.api.ConverterFactory;
+import writer2latex.api.OutputFile;
 //import writer2latex.api.ConverterResult;
 import writer2latex.base.ContentEntryImpl;
 import writer2latex.base.ConverterBase;
@@ -218,8 +219,12 @@ public class Converter extends ConverterBase {
     	nAlphabeticalIndex = nOutFileIndex;
     }
     
-    protected void setCoverImageFile(String sTarget) {
-    	converterResult.setCoverImageFile(new ContentEntryImpl("Cover image",0,htmlDoc,sTarget));
+    protected void setCoverFile(String sTarget) {
+    	converterResult.setCoverFile(new ContentEntryImpl("Cover",0,htmlDoc,sTarget));
+    }
+	
+    protected void setCoverImageFile(OutputFile file, String sTarget) {
+    	converterResult.setCoverImageFile(new ContentEntryImpl("Cover image",0,file,sTarget));
     }
 	
     protected Element createElement(String s) { return htmlDOM.createElement(s); }
@@ -295,9 +300,10 @@ public class Converter extends ConverterBase {
         }
         else {
         	ContentEntry firstHeading = converterResult.getContent().get(0);
-        	// The title page is the first page, unless the first page starts with a heading
-        	if (outFiles.get(0)!=firstHeading.getFile() || firstHeading.getTarget()!=null) {
-        		converterResult.setTitlePageFile(new ContentEntryImpl("Title page", 1, outFiles.get(0), null));
+        	// The title page is the first page after the cover, unless the first page starts with a heading
+        	int nFirstPage = converterResult.getCoverFile()!=null ? 1 : 0;
+        	if (outFiles.get(nFirstPage)!=firstHeading.getFile() || firstHeading.getTarget()!=null) {
+        		converterResult.setTitlePageFile(new ContentEntryImpl("Title page", 1, outFiles.get(nFirstPage), null));
         	}
         	// The text page is the one containing the first heading
         	converterResult.setTextFile(new ContentEntryImpl("Text", 1, firstHeading.getFile(), firstHeading.getTarget()));

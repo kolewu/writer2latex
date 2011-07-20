@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-06-19)
+ *  Version 1.2 (2011-07-20)
  *
  */
  
@@ -238,7 +238,7 @@ public class DrawConverter extends ConverterHelper {
     	if (bCoverImage) {
     		Element cover = ofr.getFirstImage();
     		if (cover!=null) {
-    			converter.setCoverImageFile(null);
+    			converter.setCoverFile(null);
     			bCollectFullscreenFrames = false;
     			handleDrawElement(cover,currentNode,null,FULL_SCREEN);
     			bCollectFullscreenFrames = true;
@@ -462,6 +462,10 @@ public class DrawConverter extends ConverterHelper {
             if (bgd!=null) {
                 converter.addDocument(bgd);
                 sFileName = bgd.getFileName();
+                // If this is the cover image, add it to the converter result 
+            	if (bCoverImage && onode==ofr.getFirstImage()) {
+            		converter.setCoverImageFile(bgd,null);
+            	}        		
             }
         }
 		
@@ -472,7 +476,7 @@ public class DrawConverter extends ConverterHelper {
         String sName = Misc.getAttribute(getFrame(onode),XMLString.DRAW_NAME);
         converter.addTarget(image,sName+"|graphic");
         image.setAttribute("src",sFileName);
-		
+        
         // Add alternative text, using either alt.text, name or file name
         Element desc = Misc.getChildByTagName(frame,XMLString.SVG_DESC);
         if (desc==null) {

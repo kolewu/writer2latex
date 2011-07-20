@@ -20,7 +20,7 @@
 *
 *  All Rights Reserved.
 * 
-*  Version 1.2 (2011-06-19)
+*  Version 1.2 (2011-07-20)
 *
 */ 
 
@@ -53,6 +53,7 @@ public class ConverterResultImpl implements ConverterResult {
 	private ContentEntry lotFile;
 	private ContentEntry indexFile;
 	private ContentEntry bibliographyFile;
+	private ContentEntry coverFile;
 	private ContentEntry coverImageFile;
 	
 	private MetaData metaData = null;
@@ -211,6 +212,18 @@ public class ConverterResultImpl implements ConverterResult {
     	return bibliographyFile;
     }
     
+    /** Define the entry which contains the cover
+     * 
+     * @param entry the entry
+     */
+    public void setCoverFile(ContentEntry entry) {
+    	coverFile = entry;
+    }
+    
+    public ContentEntry getCoverFile() {
+    	return coverFile;
+    }
+
     /** Define the entry which contains the cover image
      * 
      * @param entry the entry
