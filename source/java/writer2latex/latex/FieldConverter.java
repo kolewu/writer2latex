@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-02-01)
+ *  Version 1.2 (2011-07-20)
  *
  */
 
@@ -845,12 +845,12 @@ public class FieldConverter extends ConverterHelper {
                     if (ofr.getTextContent(node).trim().equals(sHref)) {
                         // The link text equals the url
                         ldp.append("\\url{")
-                           .append(oc.isInFootnote() ? escapeHref(Misc.urlDecode(sHref)) : Misc.urlDecode(sHref))
+                           .append(oc.isInFootnote() ? escapeHref(sHref) : sHref)
                            .append("}");
                     }
                     else {
                         ldp.append("\\href{")
-                           .append(oc.isInFootnote() ? escapeHref(Misc.urlDecode(sHref)) : Misc.urlDecode(sHref))
+                           .append(oc.isInFootnote() ? escapeHref(sHref) : sHref)
                            .append("}{");
                         // ignore text style (let hyperref.sty handle the decoration):
                         palette.getInlineCv().traverseInlineText(node,ldp,oc);
