@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2010 by Henrik Just
+ *  Copyright: 2002-2011 by Henrik Just
  *
  *  All Rights Reserved.
  *  
- *  Version 1.2 (2010-10-27)
+ *  Version 1.2 (2011-07-22)
  */
 
  
@@ -77,7 +77,8 @@ public class GraphicConverterImpl1 implements GraphicConverter {
         if (bCrop || bResize) { return false; }
 
         // We can convert vector formats to eps:
-        if (MIMETypes.EPS.equals(sTargetMime) && (MIMETypes.WMF.equals(sSourceMime) || MIMETypes.SVM.equals(sSourceMime))) {
+        if (MIMETypes.EPS.equals(sTargetMime) &&
+        		(MIMETypes.EMF.equals(sSourceMime) || MIMETypes.WMF.equals(sSourceMime) || MIMETypes.SVM.equals(sSourceMime))) {
             return true;
         }
 		
@@ -85,8 +86,8 @@ public class GraphicConverterImpl1 implements GraphicConverter {
         boolean bSupportsSource =
            MIMETypes.PNG.equals(sSourceMime) || MIMETypes.JPEG.equals(sSourceMime) ||
            MIMETypes.GIF.equals(sSourceMime) || MIMETypes.TIFF.equals(sSourceMime) ||
-           MIMETypes.BMP.equals(sSourceMime) || MIMETypes.WMF.equals(sSourceMime) ||
-           MIMETypes.SVM.equals(sSourceMime);
+           MIMETypes.BMP.equals(sSourceMime) || MIMETypes.EMF.equals(sSourceMime) ||
+           MIMETypes.WMF.equals(sSourceMime) || MIMETypes.SVM.equals(sSourceMime);
         boolean bSupportsTarget =
            MIMETypes.PNG.equals(sTargetMime) || MIMETypes.JPEG.equals(sTargetMime) ||
            MIMETypes.GIF.equals(sTargetMime) || MIMETypes.TIFF.equals(sTargetMime) ||
@@ -99,7 +100,7 @@ public class GraphicConverterImpl1 implements GraphicConverter {
         // It seems that the GraphicProvider can only create proper eps if
         // the source is a vector format, hence
         if (MIMETypes.EPS.equals(sTargetMime)) {
-            if (!MIMETypes.WMF.equals(sSourceMime) && !MIMETypes.SVM.equals(sSourceMime)) {
+            if (!MIMETypes.EMF.equals(sSourceMime) && !MIMETypes.WMF.equals(sSourceMime) && !MIMETypes.SVM.equals(sSourceMime)) {
                 return null;
             }
         }

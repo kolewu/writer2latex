@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2008 by Henrik Just
+ *  Copyright: 2002-2011 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.0 (2008-11-24)
+ *  Version 1.2 (2011-07-22)
  *
  */
 
@@ -54,6 +54,7 @@ public final class MIMETypes extends writer2latex.api.MIMETypes {
     public static final byte[] GIF89_SIG = { 0x47, 0x49, 0x46, 0x38, 0x39, 0x61 }; // GIF89a
     public static final byte[] TIFF_SIG = { 0x49, 0x49, 0x2A }; // II*
     public static final byte[] BMP_SIG = { 0x42, 0x4d }; // BM
+    public static final byte[] EMF_SIG = { 1, 0, 0, 0 };
     public static final byte[] WMF_SIG = { (byte) 0xd7, (byte) 0xcd, (byte) 0xc6, (byte) 0x9a };
     public static final byte[] WMF30_SIG = { 1, 0, 9, 0 }; // Old WMF format, not reliable - see below
     public static final byte[] EPS_SIG = { 0x25, 0x21 }; // %!
@@ -72,6 +73,7 @@ public final class MIMETypes extends writer2latex.api.MIMETypes {
     public static final String GIF_EXT = ".gif";
     public static final String TIFF_EXT = ".tif";
     public static final String BMP_EXT = ".bmp";
+    public static final String EMF_EXT = ".emf";
     public static final String WMF_EXT = ".wmf";
     public static final String EPS_EXT = ".eps";
     public static final String SVM_EXT = ".svm";
@@ -92,6 +94,7 @@ public final class MIMETypes extends writer2latex.api.MIMETypes {
         if (isType(blob,GIF89_SIG)) { return GIF; }
         if (isType(blob,TIFF_SIG)) { return TIFF; }
         if (isType(blob,BMP_SIG)) { return BMP; }
+        if (isType(blob,EMF_SIG)) { return EMF; }
         if (isType(blob,WMF_SIG)) { return WMF; }
         if (isType(blob,WMF30_SIG)) { return WMF; } // do not trust this..
         if (isType(blob,EPS_SIG)) { return EPS; }
@@ -106,6 +109,7 @@ public final class MIMETypes extends writer2latex.api.MIMETypes {
         if (GIF.equals(sMIME)) { return GIF_EXT; }
         if (TIFF.equals(sMIME)) { return TIFF_EXT; }
         if (BMP.equals(sMIME)) { return BMP_EXT; }
+        if (EMF.equals(sMIME)) { return EMF_EXT; }
         if (WMF.equals(sMIME)) { return WMF_EXT; }
         if (EPS.equals(sMIME)) { return EPS_EXT; }
         if (SVM.equals(sMIME)) { return SVM_EXT; }
@@ -119,7 +123,7 @@ public final class MIMETypes extends writer2latex.api.MIMETypes {
     }		
 	
     public static boolean isVectorFormat(String sMIME) {
-        return WMF.equals(sMIME) || EPS.equals(sMIME) || SVM.equals(sMIME) || PDF.equals(sMIME);
+        return EMF.equals(sMIME) || WMF.equals(sMIME) || EPS.equals(sMIME) || SVM.equals(sMIME) || PDF.equals(sMIME);
     }
 
 

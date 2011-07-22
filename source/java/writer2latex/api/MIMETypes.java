@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2010 by Henrik Just
+ *  Copyright: 2002-2011 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-03-29)
+ *  Version 1.2 (2011-07-22)
  *
  */
 
@@ -37,6 +37,7 @@ public class MIMETypes {
     public static final String GIF="image/gif";
     public static final String TIFF="image/tiff";
     public static final String BMP="image/bmp";
+    public static final String EMF="image/x-emf";
     public static final String WMF="image/x-wmf";
     public static final String EPS="image/x-eps";
     // MIME type for SVM has changed

@@ -2,6 +2,8 @@ Changelog for Writer2LaTeX version 1.0 -> 1.2
 
 ---------- version 1.1.8 ----------
 
+[all] Added support for images in EMF format (Enhanced Windows Meta Files)
+
 [w2l] Bugfix: No longer decodes URLs in links (hyperref.sty has no problem with sequences like %E4)
 
 [w2x] EPUB bugfix: The meta data editor now shows the correct default creator (not the original creator)
