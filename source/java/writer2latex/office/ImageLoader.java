@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-02-19)
+ *  Version 1.2 (2011-07-22)
  *
  */
 
@@ -132,7 +132,15 @@ public final class ImageLoader {
                 EmbeddedBinaryObject object = (EmbeddedBinaryObject) obj;
                 blob = object.getBinaryData();
                 sMIME = object.getType();
-                sExt = MIMETypes.getFileExtension(sMIME);
+                if (sMIME.length()>0) {
+                    // If the manifest provides a media type, trust that
+                	sExt = MIMETypes.getFileExtension(sMIME);
+                }
+                else {
+                    // Otherwise determine it by byte inspection
+                	sMIME = MIMETypes.getMagicMIMEType(blob);
+                	sExt = MIMETypes.getFileExtension(sMIME);
+                }
             }
             else {
                 // This is a linked image

@@ -2,6 +2,8 @@ Changelog for Writer2LaTeX version 1.0 -> 1.2
 
 ---------- version 1.1.8 ----------
 
+[all] Image files are now extracted with proper file extension, even if the ODF manifest contains no media type
+
 [all] Added support for images in EMF format (Enhanced Windows Meta Files)
 
 [w2l] Bugfix: No longer decodes URLs in links (hyperref.sty has no problem with sequences like %E4)
