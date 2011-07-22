@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-07-20)
+ *  Version 1.2 (2011-07-22)
  *
  */
 
@@ -939,11 +939,12 @@ public class FieldConverter extends ConverterHelper {
         return ", "+sName+"="+palette.getI18n().convert(sValue,false,palette.getMainContext().getLang());
     }
 
-    // For href within footnote, we have to escape the #
+    // For href within footnote, we have to escape the # and % characters
     private String escapeHref(String s) {
         StringBuffer buf = new StringBuffer();
         for (int i=0; i<s.length(); i++) {
             if (s.charAt(i)=='#') { buf.append("\\#"); }
+            if (s.charAt(i)=='%') { buf.append("\\%"); }
             else { buf.append(s.charAt(i)); }
         }
         return buf.toString();
