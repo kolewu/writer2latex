@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-07-22)
+ *  Version 1.2 (2011-07-25)
  *
  */
 
@@ -845,12 +845,12 @@ public class FieldConverter extends ConverterHelper {
                     if (ofr.getTextContent(node).trim().equals(sHref)) {
                         // The link text equals the url
                         ldp.append("\\url{")
-                           .append(oc.isInFootnote() ? escapeHref(sHref) : sHref)
+                           .append(escapeHref(sHref,oc.isInFootnote()))
                            .append("}");
                     }
                     else {
                         ldp.append("\\href{")
-                           .append(oc.isInFootnote() ? escapeHref(sHref) : sHref)
+                           .append(escapeHref(sHref,oc.isInFootnote()))
                            .append("}{");
                         // ignore text style (let hyperref.sty handle the decoration):
                         palette.getInlineCv().traverseInlineText(node,ldp,oc);
@@ -939,12 +939,17 @@ public class FieldConverter extends ConverterHelper {
         return ", "+sName+"="+palette.getI18n().convert(sValue,false,palette.getMainContext().getLang());
     }
 
-    // For href within footnote, we have to escape the # and % characters
-    private String escapeHref(String s) {
+    // For the argument to a href, we have to escape or encode certain characters
+    private String escapeHref(String s, boolean bInFootnote) {
         StringBuffer buf = new StringBuffer();
         for (int i=0; i<s.length(); i++) {
-            if (s.charAt(i)=='#') { buf.append("\\#"); }
-            if (s.charAt(i)=='%') { buf.append("\\%"); }
+            if (bInFootnote && s.charAt(i)=='#') { buf.append("\\#"); }
+            else if (bInFootnote && s.charAt(i)=='%') { buf.append("\\%"); }
+            // The following should not occur in an URL (see RFC1738), but just to be sure we encode them
+            else if (s.charAt(i)=='\\') { buf.append("\\%5C"); }
+            else if (s.charAt(i)=='{') { buf.append("\\%7B"); }
+            else if (s.charAt(i)=='}') { buf.append("\\%7D"); }
+            // hyperref.sty deals safely with other characters
             else { buf.append(s.charAt(i)); }
         }
         return buf.toString();
