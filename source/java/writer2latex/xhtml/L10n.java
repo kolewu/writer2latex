@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2010 by Henrik Just
+ *  Copyright: 2002-2011 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-10-27)
+ *  Version 1.2 (2011-07-25)
  *
  */
 
@@ -224,6 +224,20 @@ public class L10n {
         		case DOCUMENT: return "Dokumentti";
         	}
         }
+        if (sLocale.startsWith("ca")) { // Catalan
+        	switch (nString) {
+        	case UP: return "Amunt";
+        	case FIRST : return "Comen\u00e7ament";
+        	case PREVIOUS : return "Precedent";
+        	case NEXT : return "Seg\u00fcent";
+        	case LAST: return "Darrer";
+        	case CONTENTS : return "Contingut";
+        	case INDEX : return "\u00cdndex";
+        	case HOME : return "Arrel";
+        	case DIRECTORY: return "Directori";
+        	case DOCUMENT: return "Document";
+        	}
+        }        
         if (sLocale.startsWith("ru")) { // Russian
             switch (nString) {
             	case UP: return "\u0412\u0432\u0435\u0440\u0445";

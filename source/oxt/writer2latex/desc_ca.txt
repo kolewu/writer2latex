@@ -1,0 +1,1 @@
+Writer2LaTeX forneix a Writer filtres d'exportació per LaTeX i BibTeX

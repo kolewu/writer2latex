@@ -19,6 +19,7 @@
   <display-name>
     <name lang="da">Writer2xhtml eksportfiltre</name>
     <name lang="en">Writer2xhtml export filters</name>
+    <name lang="ca">Filtres d'exportació per al writer2xhtml</name>
     <name lang="de">Writer2xhtml Exportfilter</name>
     <name lang="nl">Writer2xhtml exportfilters</name>
     <name lang="nn">Writer2xhtml eksportfilter</name>
@@ -44,6 +45,7 @@
   <extension-description>
     <src xlink:href="desc_da.txt" lang="da" />
     <src xlink:href="desc_en.txt" lang="en" />
+    <src xlink:href="desc_ca.txt" lang="ca" />
     <src xlink:href="desc_de.txt" lang="de" />
     <src xlink:href="desc_nl.txt" lang="nl" />
     <src xlink:href="desc_nn.txt" lang="nn" />
