@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-07-22)
+ *  Version 1.2 (2011-08-05)
  *
  */
 
@@ -50,6 +50,7 @@ public final class MIMETypes extends writer2latex.api.MIMETypes {
 	// Magic signatures for some binary files
     public static final byte[] PNG_SIG = { (byte) 0x89, 0x50, 0x4e, 0x47 }; // .PNG
     public static final byte[] JPEG_SIG = { (byte) 0xff, (byte) 0xd8, (byte) 0xff, (byte) 0xe0 };
+    public static final byte[] JPEG_EXIF_SIG = { (byte) 0xff, (byte) 0xd8, (byte) 0xff, (byte) 0xe1 };
     public static final byte[] GIF87_SIG = { 0x47, 0x49, 0x46, 0x38, 0x37, 0x61 }; // GIF87a
     public static final byte[] GIF89_SIG = { 0x47, 0x49, 0x46, 0x38, 0x39, 0x61 }; // GIF89a
     public static final byte[] TIFF_SIG = { 0x49, 0x49, 0x2A }; // II*
@@ -90,6 +91,7 @@ public final class MIMETypes extends writer2latex.api.MIMETypes {
     public static final String getMagicMIMEType(byte[] blob) {
         if (isType(blob,PNG_SIG)) { return PNG; }
         if (isType(blob,JPEG_SIG)) { return JPEG; }
+        if (isType(blob,JPEG_EXIF_SIG)) { return JPEG; }
         if (isType(blob,GIF87_SIG)) { return GIF; }
         if (isType(blob,GIF89_SIG)) { return GIF; }
         if (isType(blob,TIFF_SIG)) { return TIFF; }
