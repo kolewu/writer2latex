@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-07-20)
+ *  Version 1.2 (2011-08-05)
  *
  */
 
@@ -328,7 +328,6 @@ public class Converter extends ConverterBase {
 
         // Add included style sheet, if any - and we are creating OPS content
         if (bOPS && styleSheet!=null) {
-        	// TODO: Move to subfolder
         	converterResult.addDocument(styleSheet);
         	for (ResourceDocument doc : resources) {
         		converterResult.addDocument(doc);
@@ -336,7 +335,7 @@ public class Converter extends ConverterBase {
         }
         
         // Export styles (XHTML)
-        if (!isOPS()) {
+        if (!isOPS() && !config.separateStylesheet()) {
         	for (int i=0; i<=nOutFileIndex; i++) {
         		Element head = outFiles.get(i).getHeadNode();
         		if (head!=null) {
@@ -472,11 +471,18 @@ public class Converter extends ConverterBase {
             }
         }
         
-        // Export styles (EPUB)
-        if (isOPS() && config.xhtmlFormatting()>XhtmlConfig.IGNORE_STYLES) {
-        	CssDocument cssDoc = new CssDocument(EPUB_STYLESHEET);
-        	cssDoc.read(styleCv.exportStyles(false));
-        	converterResult.addDocument(cssDoc);
+        // Export styles
+        if (config.xhtmlFormatting()>XhtmlConfig.IGNORE_STYLES) {
+        	if (isOPS()) { // EPUB
+        		CssDocument cssDoc = new CssDocument(EPUB_STYLESHEET);
+        		cssDoc.read(styleCv.exportStyles(false));
+        		converterResult.addDocument(cssDoc);
+        	}
+        	else if (config.separateStylesheet()) { // XHTML
+        		CssDocument cssDoc = new CssDocument(sTargetFileName+"-styles.css");
+        		cssDoc.read(styleCv.exportStyles(false));
+        		converterResult.addDocument(cssDoc);
+        	}
         }
     }
 	
@@ -697,6 +703,16 @@ public class Converter extends ConverterBase {
         		head.appendChild(htmlStyle);
         	}
         	
+        	// Add link to generated stylesheet if producing normal XHTML and the user wants separate css
+        	if (!bOPS && config.separateStylesheet() && config.xhtmlFormatting()>XhtmlConfig.IGNORE_STYLES) {
+        		Element htmlStyle = htmlDOM.createElement("link");
+        		htmlStyle.setAttribute("rel","stylesheet");
+        		htmlStyle.setAttribute("type","text/css");
+        		htmlStyle.setAttribute("media","all");
+        		htmlStyle.setAttribute("href",sTargetFileName+"-styles.css");
+        		head.appendChild(htmlStyle);
+        	}
+
         	// Add link to included style sheet if producing OPS content
         	if (bOPS && styleSheet!=null) {
         		Element sty = htmlDOM.createElement("link");
@@ -716,7 +732,6 @@ public class Converter extends ConverterBase {
         		htmlStyle.setAttribute("href",EPUB_STYLESHEET);
         		head.appendChild(htmlStyle);
         	}
-        	// Note: For XHTML, generated styles are exported to the doc at the end.
 
         }
         
