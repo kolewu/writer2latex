@@ -1,5 +1,7 @@
 Changelog for Writer2LaTeX version 1.0 -> 1.2
 
+---------- version 1.1.9 ----------
+
 ---------- version 1.1.8 ----------
 
 [all] Added support for JPEG images with EXIF data
