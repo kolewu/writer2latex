@@ -2,6 +2,8 @@ Changelog for Writer2LaTeX version 1.0 -> 1.2
 
 ---------- version 1.1.9 ----------
 
+[w2l] Fixed bugs on the "Text and Math" options page (controls were not updated correctly leading to erratic behavior)
+
 [w2l] Added support for the font "Greek"
 
 ---------- version 1.1.8 ----------

@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2010 by Henrik Just
+ *  Copyright: 2002-2011 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-12-21)
+ *  Version 1.2 (2011-09-20)
  *
  */ 
  
@@ -179,7 +179,6 @@ public final class ConfigurationDialog extends ConfigurationDialogBase implement
         	// Save heading map to config
         	config.getComplexOption("heading-map").clear();
         	int nMaxLevel = dlg.getListBoxSelectedItem("MaxLevel");
-        	System.out.println("Using current max level of "+nMaxLevel);
     		for (int i=1; i<=nMaxLevel; i++) {
     			String sLevel = Integer.toString(i);
     			config.getComplexOption("heading-map").copy(sLevel,headingMap.get(sLevel));
@@ -283,7 +282,6 @@ public final class ConfigurationDialog extends ConfigurationDialogBase implement
         private void updateHeadingMap(DialogAccess dlg) {
         	// Save the current writer level in our cache
         	if (nCurrentWriterLevel>-1) {
-        		System.out.println("Updating current definition for writer level "+nCurrentWriterLevel+ " from ui");
         		Map<String,String> attr = new HashMap<String,String>();
         		attr.put("name", dlg.getComboBoxText("LaTeXName"));
         		attr.put("level", dlg.getComboBoxText("LaTeXLevel"));
@@ -616,7 +614,7 @@ public final class ConfigurationDialog extends ConfigurationDialogBase implement
         	checkBoxFromConfig(dlg,"UseLastpage", "use_lastpage");
         	checkBoxFromConfig(dlg,"UseEndnotes", "use_endnotes");
 
-        	// Trigger change events (this is not done by the setters above)
+        	// Trigger change events
 			exportGeometryChange(dlg);
 			exportHeaderAndFooterChange(dlg);
     	}
@@ -827,8 +825,9 @@ public final class ConfigurationDialog extends ConfigurationDialogBase implement
     		mathSymbols.copyAll(config.getComplexOption("math-symbol-map"));
     		sCurrentMathSymbol = null;
         	dlg.setListBoxStringItemList("MathSymbolName", Misc.sortStringSet(mathSymbols.keySet()));
-        	// This triggers an onchange event
         	dlg.setListBoxSelectedItem("MathSymbolName", (short)Math.min(0,mathSymbols.keySet().size()-1));
+        	// Trigger change event (on some versions of OOo this is automatic due to a bug)
+        	mathSymbolNameChange(dlg);
 
         	// Get string replace from config
         	if (stringReplace!=null) { stringReplace.clear(); }
@@ -836,8 +835,9 @@ public final class ConfigurationDialog extends ConfigurationDialogBase implement
     		stringReplace.copyAll(config.getComplexOption("string-replace"));
     		sCurrentText = null;
         	dlg.setListBoxStringItemList("TextInput", Misc.sortStringSet(stringReplace.keySet()));
-        	// This triggers an onchange event
         	dlg.setListBoxSelectedItem("TextInput", (short)Math.min(0,stringReplace.keySet().size()-1));
+        	// Trigger change event (on some versions of OOo this is automatic due to a bug)
+        	textInputChange(dlg);
         	    	
         	// Get other options from config
         	checkBoxFromConfig(dlg,"UseOoomath","use_ooomath");
@@ -894,16 +894,19 @@ public final class ConfigurationDialog extends ConfigurationDialogBase implement
     	}
     	
     	private void newSymbolClick(DialogAccess dlg) {
-    		// This triggers an onchange event
         	appendItem(dlg,"MathSymbolName",customSymbolNameProvider.getNames());
+        	// Trigger change event (on some versions of OOo this is automatic due to a bug)
+        	mathSymbolNameChange(dlg);
     	}
     	
     	private void deleteSymbolClick(DialogAccess dlg) {
     		String sMathSymbol = sCurrentMathSymbol; 
-    		// This triggers an onchange event
         	if (deleteCurrentItem(dlg,"MathSymbolName")) {
         		mathSymbols.remove(sMathSymbol);
+        		sCurrentMathSymbol=null; // invalidate current symbol
         	}    		
+        	// Trigger change event (on some versions of OOo this is automatic due to a bug)
+        	mathSymbolNameChange(dlg);
     	}
     	
     	private void updateSymbol(DialogAccess dlg) {
@@ -947,16 +950,19 @@ public final class ConfigurationDialog extends ConfigurationDialogBase implement
     	}
     	
     	private void newTextClick(DialogAccess dlg) {
-    		// This triggers an onchange event
         	appendItem(dlg, "TextInput", new HashSet<String>());
+        	// Trigger change event (on some versions of OOo this is automatic due to a bug)
+        	textInputChange(dlg);
     	}
     	
     	private void deleteTextClick(DialogAccess dlg) {
-    		String sText = sCurrentText; 
-    		// This triggers an onchange event
+    		String sText = sCurrentText;
     		if (deleteCurrentItem(dlg, "TextInput")) {
         		stringReplace.remove(sText);
+        		sCurrentText = null; // Invalidate current string replace
         	}
+        	// Trigger change event (on some versions of OOo this is automatic due to a bug)
+    		textInputChange(dlg);
     	}
     	
     	private void updateText(DialogAccess dlg) {
