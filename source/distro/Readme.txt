@@ -1,5 +1,5 @@
-Writer2LaTeX version 1.1.9 (alpha test release)
-===============================================
+Writer2LaTeX version 1.1.9 (beta test release)
+==============================================
 
 This is the distribution of Writer2LaTeX version 1.1.9
 

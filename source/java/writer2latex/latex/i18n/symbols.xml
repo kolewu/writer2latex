@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- This is a datafile used by Writer2LaTeX
-     Version 1.2 (2010-05-11)
+     Version 1.2 (2011-09-13)
 
 	 The definitions for greek characters are contributed by interzone, info@interzone.gr
      and extended by Johannis Likos. Additional bugfixes by Alexej Kryukov
@@ -3796,6 +3796,203 @@ definitions to the range 00-FF.
     <symbol char="F078" text="\ensuremath{^{^{\infty}}}" />
     <symbol char="F07a" text="\v{z}" />
 </special-symbol-set>
+
+<!-- support for the greek font "Greek" -->
+<special-symbol-set name="Greek" fontenc="any">
+  <symbol char="0021" text="$\searrow$" math="\searrow " /> <!-- cannot simply map to 2199; this will not override text def. -->
+  <symbol char="0022" eq-char="03E0" /> <!-- correct? -->
+  <symbol char="0023" eq-char="03DD" /> <!-- correct? -->
+  <symbol char="0024" eq-char="03DB" />
+  <symbol char="0025" eq-char="03D9" />
+  <symbol char="0026" eq-char="03DA" /> <!-- correct? -->
+  <symbol char="002B" eq-char="203B" />
+  <symbol char="002F" eq-char="0374" />
+  <symbol char="003A" eq-char="0387" />
+  <symbol char="003B" eq-char="037E" />
+  <symbol char="0040" eq-char="00A8" />
+  <symbol char="0041" eq-char="0391" />
+  <symbol char="0042" eq-char="0392" />
+  <symbol char="0043" eq-char="03A7" />
+  <symbol char="0044" eq-char="0394" />
+  <symbol char="0045" eq-char="0395" />
+  <symbol char="0046" eq-char="03A6" />
+  <symbol char="0047" eq-char="0393" />
+  <symbol char="0048" eq-char="0397" />
+  <symbol char="0049" eq-char="0399" />
+  <symbol char="004A" eq-char="1FF3" />
+  <symbol char="004B" eq-char="039A" />
+  <symbol char="004C" eq-char="039B" />
+  <symbol char="004D" eq-char="039C" />
+  <symbol char="004E" eq-char="039D" />
+  <symbol char="004F" eq-char="039F" />
+  <symbol char="0050" eq-char="03A0" />
+  <symbol char="0051" eq-char="0398" />
+  <symbol char="0052" eq-char="03A1" />
+  <symbol char="0053" eq-char="03A3" />
+  <symbol char="0054" eq-char="03A4" />
+  <symbol char="0055" eq-char="03A5" />
+  <symbol char="0056" eq-char="1FC3" />
+  <symbol char="0057" eq-char="03A9" />
+  <symbol char="0058" eq-char="039E" />
+  <symbol char="0059" eq-char="03A8" />
+  <symbol char="005A" eq-char="0396" />
+  <symbol char="0060" eq-char="1FFE" />
+  <symbol char="0061" eq-char="03B1" />
+  <symbol char="0062" eq-char="03B2" />
+  <symbol char="0063" eq-char="03C7" />
+  <symbol char="0064" eq-char="03B4" />
+  <symbol char="0065" eq-char="03B5" />
+  <symbol char="0066" eq-char="03C6" />
+  <symbol char="0067" eq-char="03B3" />
+  <symbol char="0068" eq-char="03B7" />
+  <symbol char="0069" eq-char="03B9" />
+  <symbol char="006A" eq-char="03C2" />
+  <symbol char="006B" eq-char="03BA" />
+  <symbol char="006C" eq-char="03BB" />
+  <symbol char="006D" eq-char="03BC" />
+  <symbol char="006E" eq-char="03BD" />
+  <symbol char="006F" eq-char="03BF" />
+  <symbol char="0070" eq-char="03C0" />
+  <symbol char="0071" eq-char="03B8" />
+  <symbol char="0072" eq-char="03C1" />
+  <symbol char="0073" eq-char="03C3" />
+  <symbol char="0074" eq-char="03C4" />
+  <symbol char="0075" eq-char="03C5" />
+  <symbol char="0076" eq-char="1FB3" />
+  <symbol char="0077" eq-char="03C9" />
+  <symbol char="0078" eq-char="03BE" />
+  <symbol char="0079" eq-char="03C8" />
+  <symbol char="007A" eq-char="03B6" />
+  <symbol char="008D" eq-char="1F30" /> <!-- "tie" over? -->
+  <symbol char="008E" eq-char="03CA" />
+  <symbol char="008F" eq-char="1FD3" />
+  <symbol char="0090" eq-char="1FD2" />
+  <symbol char="009D" eq-char="1F72" />
+  <symbol char="009E" eq-char="1F13" />
+  <symbol char="00A0" eq-char="1FED" /> <!-- OBS -->
+  <symbol char="00A1" eq-char="1F01" />
+  <symbol char="00A2" eq-char="1F00" />
+  <symbol char="00A3" eq-char="03AC" />
+  <symbol char="00A4" eq-char="1F05" />
+  <symbol char="00A5" eq-char="1F04" />
+  <symbol char="00A6" eq-char="1F70" />
+  <symbol char="00A7" eq-char="1F03" />
+  <symbol char="00A8" eq-char="1F02" />
+  <symbol char="00A9" eq-char="03B1" /> <!-- "tie" over? -->
+  <symbol char="00AA" eq-char="1F01" /> <!-- "tie" over? -->
+  <symbol char="00AB" eq-char="1F00" /> <!-- "tie" over? -->
+  <symbol char="00AC" eq-char="1F81" />
+  <symbol char="00AD" eq-char="1F80" /> <!-- OBS -->
+  <symbol char="00AE" eq-char="1FB4" />
+  <symbol char="00AF" eq-char="1F85" />
+  <symbol char="00B0" eq-char="1F84" />
+  <symbol char="00B1" eq-char="1FB2" />
+  <symbol char="00B2" eq-char="1F83" />
+  <symbol char="00B3" eq-char="1F82" />
+  <symbol char="00B4" eq-char="1FB3" /> <!-- "tie" over? -->
+  <symbol char="00B5" eq-char="1F81" /> <!-- "tie" over? -->
+  <symbol char="00B6" eq-char="1F80" /> <!-- "tie" over? -->
+  <symbol char="00B8" eq-char="1FE4" />
+  <symbol char="00B9" eq-char="1F21" />
+  <symbol char="00BA" eq-char="1F20" />
+  <symbol char="00BB" eq-char="03AE" />
+  <symbol char="00BC" eq-char="1F25" />
+  <symbol char="00BD" eq-char="1F24" />
+  <symbol char="00BE" eq-char="1F74" />
+  <symbol char="00BF" eq-char="1F23" />
+  <symbol char="00C0" eq-char="1F22" />
+  <symbol char="00C1" eq-char="03B7" /> <!-- "tie" over? -->
+  <symbol char="00C2" eq-char="1F21" /> <!-- "tie" over? -->
+  <symbol char="00C3" eq-char="1F20" /> <!-- "tie" over? -->
+  <symbol char="00C4" eq-char="1FBE" /> <!-- OBS -->
+  <symbol char="00C5" eq-char="1F91" />
+  <symbol char="00C6" eq-char="1F90" />
+  <symbol char="00C7" eq-char="1FC4" />
+  <symbol char="00C8" eq-char="1F95" />
+  <symbol char="00C9" eq-char="1F94" />
+  <symbol char="00CA" eq-char="1FC2" />
+  <symbol char="00CB" eq-char="1F93" />
+  <symbol char="00CC" eq-char="1F92" />
+  <symbol char="00CD" eq-char="1FC3" /> <!-- "tie" over? -->
+  <symbol char="00CE" eq-char="1F91" /> <!-- "tie" over? -->
+  <symbol char="00CF" eq-char="1F90" /> <!-- "tie" over? -->
+  <symbol char="00D0" eq-char="1F41" />
+  <symbol char="00D1" eq-char="1F40" />
+  <symbol char="00D2" eq-char="1F79" />
+  <symbol char="00D3" eq-char="1F45" />
+  <symbol char="00D4" eq-char="1F44" />
+  <symbol char="00D5" eq-char="1F78" />
+  <symbol char="00D6" eq-char="1F43" />
+  <symbol char="00D7" eq-char="1F42" />
+  <symbol char="00D8" eq-char="1F51" />
+  <symbol char="00D9" eq-char="1F50" />
+  <symbol char="00DA" eq-char="1F7B" />
+  <symbol char="00DB" eq-char="1F55" />
+  <symbol char="00DC" eq-char="1F54" />
+  <symbol char="00DD" eq-char="1F7A" />
+  <symbol char="00DE" eq-char="1F53" />
+  <symbol char="00DF" eq-char="1F52" />
+  <symbol char="00E0" eq-char="03C5" /> <!-- "tie" over? -->
+  <symbol char="00E1" eq-char="1F51" /> <!-- "tie" over? -->
+  <symbol char="00E2" eq-char="1F50" /> <!-- "tie" over? -->
+  <symbol char="00E3" eq-char="03CB" />
+  <symbol char="00E4" eq-char="1FE3" />
+  <symbol char="00E5" eq-char="1FE2" />
+  <symbol char="00E6" eq-char="1F61" />
+  <symbol char="00E7" eq-char="1F60" />
+  <symbol char="00E8" eq-char="03CE" />
+  <symbol char="00E9" eq-char="1F65" />
+  <symbol char="00EA" eq-char="1F64" />
+  <symbol char="00EB" eq-char="1F7C" />
+  <symbol char="00EC" eq-char="1F63" />
+  <symbol char="00ED" eq-char="1F62" />
+  <symbol char="00EE" eq-char="03C9" /> <!-- "tie" over? -->
+  <symbol char="00EF" eq-char="1F61" /> <!-- "tie" over? -->
+  <symbol char="00F0" eq-char="1F60" />   <!-- "tie" over? -->
+  <symbol char="00F1" eq-char="1FA1" />
+  <symbol char="00F2" eq-char="1FA0" />
+  <symbol char="00F3" eq-char="1FF4" />
+  <symbol char="00F4" eq-char="1FA5" />
+  <symbol char="00F5" eq-char="1FA4" />
+  <symbol char="00F6" eq-char="1FF2" />
+  <symbol char="00F7" eq-char="1FA3" />
+  <symbol char="00F8" eq-char="1FA2" />
+  <symbol char="00F9" eq-char="1FF3" /> <!-- "tie" over? -->
+  <symbol char="00FA" eq-char="1FA1" /> <!-- "tie" over? -->
+  <symbol char="00FB" eq-char="1FA0" /> <!-- "tie" over? -->
+  <symbol char="00FC" eq-char="03B5" /> <!-- "tie" over? -->
+  <symbol char="00FD" eq-char="03BF" /> <!-- "tie" over? -->
+  <symbol char="00FE" eq-char="007C" />
+  <symbol char="00FF" eq-char="007C" />
+  <symbol char="0152" eq-char="1F31" /> <!-- "tie" over? -->
+  <symbol char="0153" eq-char="1F14" />
+  <symbol char="0160" eq-char="1F32" />
+  <symbol char="0161" eq-char="03AD" />
+  <symbol char="0178" eq-char="1F12" />
+  <symbol char="0192" eq-char="1F31" />
+  <symbol char="02C6" eq-char="1F76" />
+  <symbol char="02DC" eq-char="1F11" />
+  <symbol char="2013" eq-char="1FCD" />
+  <symbol char="2014" eq-char="1FEE" />
+  <!--<symbol char="2018" eq-char="003F" />-->
+  <!--<symbol char="2019" eq-char="003F" />-->
+  <symbol char="201A" eq-char="0375" />
+  <symbol char="201B" eq-char="1FEF" />
+  <symbol char="201C" eq-char="1FDE" />
+  <symbol char="201D" eq-char="1FCE" />
+  <symbol char="201E" eq-char="1F30" /> 
+  <symbol char="2020" eq-char="1F35" />
+  <symbol char="2021" eq-char="1F34" />
+  <symbol char="2022" eq-char="1FDE" />
+  <symbol char="2026" eq-char="03AF" />
+  <symbol char="2030" eq-char="1F33" />
+  <symbol char="2039" eq-char="03B9" /> <!-- "tie" over? -->
+  <symbol char="203A" eq-char="1F15" />
+  <symbol char="2122" eq-char="1F10" />
+  <symbol char="2212" eq-char="1F80" />
+  <symbol char="2219" eq-char="1FE5" />
+</special-symbol-set>
+
   
 </symbols>
 
