@@ -2,6 +2,11 @@ Changelog for Writer2LaTeX version 1.0 -> 1.2
 
 ---------- version 1.1.9 ----------
 
+[w2l] The StarMath now avoids more redundant braces
+
+[w2l] The StarMath converter is now a little more tolerant on errors like missing operands for a binary operator
+  (import from MS Word may create such errors)
+
 [w2x] EPUB change: Missing heading levels are now treated more consistent in the toc. E.g. the sequence of heading levels
   2-2-1-3-3-2 is now exported as toc levels 1-1-1-2-2-2 (before it was 1-2-1-2-3-2)
 

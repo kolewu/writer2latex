@@ -16,9 +16,9 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2009 by Henrik Just
+ *  Copyright: 2002-2012 by Henrik Just
  *  
- *  Version 1.2 (2009-09-24)
+ *  Version 1.2 (2012-02-22)
  *
  *  All Rights Reserved.
  */
@@ -1103,33 +1103,30 @@ public final class StarMathConverter implements writer2latex.api.StarMathConvert
     }
     
     private String product(float fSize, Token eAlign){
-        String sProduct=power(fSize,eAlign,true);
-        sProduct=sProduct.substring(1,sProduct.length()-1);
-        // a small hack to avoid double {}: Require {}, then remove them
-        // and add them below if they are needed.
+        String sProduct=power(fSize,eAlign);
         while (tokenInGroup(TGroup.PRODUCT)){
             if (curToken.eType==Token.OVER){
                  nextToken();
-                 sProduct="\\frac{"+sProduct+"}"+power(fSize,eAlign,true);
+                 sProduct="\\frac{"+sProduct+"}{"+power(fSize,eAlign)+"}";
             } else if (curToken.eType==Token.BOPER){
                  nextToken();    
-                 sProduct+=special()+power(fSize,eAlign,false);
+                 sProduct+=special()+power(fSize,eAlign);
             } else if (curToken.eType==Token.OVERBRACE){
                  nextToken();    
-                 sProduct="\\overbrace{"+sProduct+"}^"+power(fSize,eAlign,true);
+                 sProduct="\\overbrace{"+sProduct+"}^{"+power(fSize,eAlign)+"}";
             } else if (curToken.eType==Token.UNDERBRACE){    
                  nextToken();    
-                 sProduct="\\underbrace{"+sProduct+"}_"+power(fSize,eAlign,true);
+                 sProduct="\\underbrace{"+sProduct+"}_{"+power(fSize,eAlign)+"}";
             } else  if (curToken.eType==Token.WIDESLASH){
                  bWideslash=true;    
                  nextToken();    
-                 sProduct="\\wideslash{"+sProduct+"}"+power(fSize,eAlign,true);
+                 sProduct="\\wideslash{"+sProduct+"}{"+power(fSize,eAlign)+"}";
             } else if (curToken.eType==Token.WIDEBACKSLASH){    
                  bWidebslash=true;    
                  nextToken();   
-                 sProduct="\\widebslash{"+sProduct+"}"+power(fSize,eAlign,true);
+                 sProduct="\\widebslash{"+sProduct+"}{"+power(fSize,eAlign)+"}";
             } else {
-                 sProduct+=opsubsup(fSize,eAlign)+power(fSize,eAlign,false);
+                 sProduct+=opsubsup(fSize,eAlign)+power(fSize,eAlign);
             }
         }
         return sProduct;
@@ -1155,12 +1152,12 @@ public final class StarMathConverter implements writer2latex.api.StarMathConvert
             nextToken();
             if (eScriptType==Token.FROM) sCsub="{"+relation(fSize,eAlign)+"}";
             else if (eScriptType==Token.TO) sCsup="{"+relation(fSize,eAlign)+"}";
-            else if (eScriptType==Token.LSUB) sLsub=term(fSize,eAlign,true);
-            else if (eScriptType==Token.LSUP) sLsup=term(fSize,eAlign,true);
-            else if (eScriptType==Token.CSUB) sCsub=term(fSize,eAlign,true);
-            else if (eScriptType==Token.CSUP) sCsup=term(fSize,eAlign,true);
-            else if (eScriptType==Token.RSUB) sRsub=term(fSize,eAlign,true);
-            else if (eScriptType==Token.RSUP) sRsup=term(fSize,eAlign,true);
+            else if (eScriptType==Token.LSUB) sLsub="{"+term(fSize,eAlign)+"}";
+            else if (eScriptType==Token.LSUP) sLsup="{"+term(fSize,eAlign)+"}";
+            else if (eScriptType==Token.CSUB) sCsub="{"+term(fSize,eAlign)+"}";
+            else if (eScriptType==Token.CSUP) sCsup="{"+term(fSize,eAlign)+"}";
+            else if (eScriptType==Token.RSUB) sRsub="{"+term(fSize,eAlign)+"}";
+            else if (eScriptType==Token.RSUP) sRsup="{"+term(fSize,eAlign)+"}";
         }
         if (sLsub==null && sLsup==null && sCsub==null && sCsup==null && sRsub==null && sRsup==null){
             return sBody;
@@ -1210,19 +1207,8 @@ public final class StarMathConverter implements writer2latex.api.StarMathConvert
         return subsup(fSize,eAlign,sOperator,TGroup.POWER);
     }
     
-    private String power(float fSize, Token eAlign,boolean bNeedGroup){
-        // bNeedGroup is true, if the power needs to be enclosed in braces
-        // Since we don't want to add unnecessary braces the responsibility
-        // is delegated to power - we need to look ahead to determine if {}
-        // should be added.
-        boolean bTermIsGroup=curToken.eType==Token.LGROUP;
-        String sTerm=term(fSize,eAlign);
-        if (bNeedGroup && (!bTermIsGroup || tokenInGroup(TGroup.POWER))){
-            return "{"+subsup(fSize,eAlign,sTerm,TGroup.POWER)+"}";
-        }
-        else {
-            return subsup(fSize,eAlign,sTerm,TGroup.POWER);
-        }
+    private String power(float fSize, Token eAlign){
+        return subsup(fSize,eAlign,term(fSize,eAlign),TGroup.POWER);
     }
     
     private String blank(){
@@ -1234,22 +1220,7 @@ public final class StarMathConverter implements writer2latex.api.StarMathConvert
         return bufBlank.toString();
     }
     
-    private String term(float fSize, Token eAlign, boolean bNeedGroup){
-        // Special version of term used to avoid double {{grouping}}
-        // if bNeedGroup=true we must return {term} in braces
-        if (bNeedGroup && !(curToken.eType==Token.LGROUP)){
-            return "{"+term(fSize,eAlign)+"}";
-        }
-        /*else if (!bNeedGroup && curToken.eType==Token.LGROUP){
-            String sTerm=term(fSize,eAlign);
-            return sTerm.substring(1,sTerm.length()-2); // renove unwanted {}
-        }*/
-        else {
-            return term(fSize,eAlign);
-        }
-    }
-    
-    private String term(float fSize, Token eAlign){
+    private String term(float fSize, Token eAlign) {
         String sContent;
         if (curToken.eType==Token.ESCAPE)
             return escape();
@@ -1261,9 +1232,9 @@ public final class StarMathConverter implements writer2latex.api.StarMathConvert
                 sContent=""; // empty group
             if (curToken.eType==Token.RGROUP) 
                 nextToken();
-            // otherwise there is an error in the formula
-            // we close the group anyway to make us TeX'able.
-            return "{"+sContent+"}";
+            // otherwise there is an error in the formula, ignore this
+            // note that we do not keep the grouping; we add grouping where LaTeX needs it instead
+          	return sContent;
         }
         else if (curToken.eType==Token.LEFT)
             return scalebrace(fSize,eAlign);
@@ -1307,8 +1278,16 @@ public final class StarMathConverter implements writer2latex.api.StarMathConvert
         else if (tokenInGroup(TGroup.FUNCTION))
             return function();
         else { // error in formula
+        	if (tokenInGroup(TGroup.RELATION) || tokenInGroup(TGroup.SUM) || tokenInGroup(TGroup.PRODUCT)) {
+        		// Try to repair: At least these groups are mostly symbols that are quite acceptable as terms in LaTeX
+        		sContent=curToken.sLaTeX;
+        		if (sContent.length()==0) { sContent="?"; }
+        	}
+        	else {
+        		sContent="?";
+        	}
             nextToken();
-            return "?";
+            return sContent;
         }
     }
     
@@ -1338,10 +1317,10 @@ public final class StarMathConverter implements writer2latex.api.StarMathConvert
         String sOperator=oper();
         if (tokenInGroup(TGroup.LIMIT) || tokenInGroup(TGroup.POWER)){
             // Note: TGroup.LIMIT and TGroup.POWER are always in eGroup1, so this is OK:
-            return subsup(fSize,eAlign,sOperator,curToken.eGroup1)+power(fSize,eAlign,false);
+            return subsup(fSize,eAlign,sOperator,curToken.eGroup1)+power(fSize,eAlign);
         }
         else {
-            return sOperator+power(fSize,eAlign,false);
+            return sOperator+power(fSize,eAlign);
         }
     }
     
@@ -1366,26 +1345,26 @@ public final class StarMathConverter implements writer2latex.api.StarMathConvert
     private String unoper(float fSize, Token eAlign){
         if (curToken.eType==Token.ABS){
             nextToken();
-            return "\\left|"+power(fSize,eAlign,false)+"\\right|";
+            return "\\left|"+power(fSize,eAlign)+"\\right|";
         }
         else if (curToken.eType==Token.SQRT){
             nextToken();
-            return "\\sqrt"+power(fSize,eAlign,true);
+            return "\\sqrt{"+power(fSize,eAlign)+"}";
         }
         else if (curToken.eType==Token.NROOT){
             nextToken();
-            return "\\sqrt["+power(fSize,eAlign,false)+"]"+power(fSize,eAlign,true);
+            return "\\sqrt["+power(fSize,eAlign)+"]{"+power(fSize,eAlign)+"}";
         }
         else if (curToken.eType==Token.UOPER){
             nextToken();
-            return special()+power(fSize,eAlign,false);
+            return special()+power(fSize,eAlign);
         }
         else if (curToken.eType==Token.FACT){
             String sOperator=opsubsup(fSize,eAlign);
-            return power(fSize,eAlign,false)+sOperator;
+            return power(fSize,eAlign)+sOperator;
         }
         else { // must be PLUS, MINUS, PLUSMINUS, MINUSPLUS or NEG
-            return opsubsup(fSize,eAlign)+power(fSize,eAlign,false);
+            return opsubsup(fSize,eAlign)+power(fSize,eAlign);
         }
     }
     
@@ -1408,7 +1387,7 @@ public final class StarMathConverter implements writer2latex.api.StarMathConvert
                 sAttribute=curToken.sLaTeX; // the color name
                 nextToken();
                 if (bUseColor) {
-                    return "\\textcolor{"+sAttribute+"}{"+term(fSize,eAlign)+"}";
+                    return "\\textcolor{"+sAttribute+"}"+"{"+term(fSize,eAlign)+"}";
                     // note: despite the name, \textcolor also works in math mode!
                 }
                 else {
