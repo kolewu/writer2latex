@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2010 by Henrik Just
+ *  Copyright: 2002-2012 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-11-21)
+ *  Version 1.2 (2012-02-22)
  *
  */
 
@@ -273,11 +273,8 @@ public class NoteConverter extends ConverterHelper {
 
                     palette.getInfo().addDebugInfo(child,ldp);
                     
-                    if (nodeName.equals(XMLString.TEXT_H)) {
-                        palette.getHeadingCv().handleHeading(child,ldp,oc);
-                    }
-
-                    if (nodeName.equals(XMLString.TEXT_P)) {
+                    // Headings inside footnotes are considere a mistake and exported as ordinary paragraphs
+                    if (nodeName.equals(XMLString.TEXT_H) || nodeName.equals(XMLString.TEXT_P)) {
                     	StyleWithProperties style = ofr.getParStyle(node.getAttribute(XMLString.TEXT_STYLE_NAME));
                     	oc.resetFormattingFromStyle(style);
                         palette.getInlineCv().traverseInlineText(child,ldp,oc);
