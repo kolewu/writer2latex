@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2001-2010 by Henrik Just
+ *  Copyright: 2001-2012 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  version 1.2 (2010-07-02)
+ *  version 1.2 (2012-02-22)
  *
  */
 
@@ -106,6 +106,7 @@ public class NCXWriter extends NewDOMDocument {
         
         Element currentContainer = ncx;
         int nCurrentLevel = 0;
+        int nCurrentEntryLevel = 0; // This may differ from nCurrentLevel if the heading levels "jump" in then document
         int nDepth = 0;
         int nPlayOrder = 0;
         
@@ -121,12 +122,14 @@ public class NCXWriter extends NewDOMDocument {
         		}
         		nCurrentLevel = nEntryLevel;
         	}
-        	else if (nEntryLevel>nCurrentLevel) {
+        	else if (nEntryLevel>nCurrentEntryLevel) {
         		// To lower level (always one step; a jump from e.g. heading 1 to heading 3 in the document
         		// is considered an error)
         		currentContainer = (Element) currentContainer.getLastChild();
         		nCurrentLevel++;
         	}
+        	
+        	nCurrentEntryLevel = nEntryLevel;
         	
         	Element navPoint = contentDOM.createElement("navPoint");
         	navPoint.setAttribute("playOrder", Integer.toString(++nPlayOrder));
