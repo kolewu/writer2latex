@@ -18,7 +18,7 @@
  *
  *  Copyright: 2002-2012 by Henrik Just
  *  
- *  Version 1.2 (2012-02-22)
+ *  Version 1.2 (2012-02-23)
  *
  *  All Rights Reserved.
  */
@@ -1107,24 +1107,24 @@ public final class StarMathConverter implements writer2latex.api.StarMathConvert
         while (tokenInGroup(TGroup.PRODUCT)){
             if (curToken.eType==Token.OVER){
                  nextToken();
-                 sProduct="\\frac{"+sProduct+"}{"+power(fSize,eAlign)+"}";
+                 sProduct="\\frac"+groupsp(sProduct)+group(power(fSize,eAlign));
             } else if (curToken.eType==Token.BOPER){
                  nextToken();    
                  sProduct+=special()+power(fSize,eAlign);
             } else if (curToken.eType==Token.OVERBRACE){
                  nextToken();    
-                 sProduct="\\overbrace{"+sProduct+"}^{"+power(fSize,eAlign)+"}";
+                 sProduct="\\overbrace"+groupsp(sProduct)+"^"+group(power(fSize,eAlign));
             } else if (curToken.eType==Token.UNDERBRACE){    
                  nextToken();    
-                 sProduct="\\underbrace{"+sProduct+"}_{"+power(fSize,eAlign)+"}";
+                 sProduct="\\underbrace"+groupsp(sProduct)+"_"+group(power(fSize,eAlign));
             } else  if (curToken.eType==Token.WIDESLASH){
                  bWideslash=true;    
                  nextToken();    
-                 sProduct="\\wideslash{"+sProduct+"}{"+power(fSize,eAlign)+"}";
+                 sProduct="\\wideslash"+groupsp(sProduct)+group(power(fSize,eAlign));
             } else if (curToken.eType==Token.WIDEBACKSLASH){    
                  bWidebslash=true;    
                  nextToken();   
-                 sProduct="\\widebslash{"+sProduct+"}{"+power(fSize,eAlign)+"}";
+                 sProduct="\\widebslash"+groupsp(sProduct)+group(power(fSize,eAlign));
             } else {
                  sProduct+=opsubsup(fSize,eAlign)+power(fSize,eAlign);
             }
@@ -1134,11 +1134,11 @@ public final class StarMathConverter implements writer2latex.api.StarMathConvert
     }
     
     private String tosub(String s){
-        return s!=null ? "_"+s : "";
+        return s!=null ? "_"+group(s) : "";
     }
     
     private String tosup(String s){
-        return s!=null ? "^"+s : "";
+        return s!=null ? "^"+group(s) : "";
     }
     
     private String subsup(float fSize, Token eAlign,String sBody, TGroup eActiveGroup){
@@ -1150,14 +1150,14 @@ public final class StarMathConverter implements writer2latex.api.StarMathConvert
         while (tokenInGroup(eActiveGroup)){
             eScriptType=curToken.eType;
             nextToken();
-            if (eScriptType==Token.FROM) sCsub="{"+relation(fSize,eAlign)+"}";
-            else if (eScriptType==Token.TO) sCsup="{"+relation(fSize,eAlign)+"}";
-            else if (eScriptType==Token.LSUB) sLsub="{"+term(fSize,eAlign)+"}";
-            else if (eScriptType==Token.LSUP) sLsup="{"+term(fSize,eAlign)+"}";
-            else if (eScriptType==Token.CSUB) sCsub="{"+term(fSize,eAlign)+"}";
-            else if (eScriptType==Token.CSUP) sCsup="{"+term(fSize,eAlign)+"}";
-            else if (eScriptType==Token.RSUB) sRsub="{"+term(fSize,eAlign)+"}";
-            else if (eScriptType==Token.RSUP) sRsup="{"+term(fSize,eAlign)+"}";
+            if (eScriptType==Token.FROM) sCsub=relation(fSize,eAlign);
+            else if (eScriptType==Token.TO) sCsup=relation(fSize,eAlign);
+            else if (eScriptType==Token.LSUB) sLsub=term(fSize,eAlign);
+            else if (eScriptType==Token.LSUP) sLsup=term(fSize,eAlign);
+            else if (eScriptType==Token.CSUB) sCsub=term(fSize,eAlign);
+            else if (eScriptType==Token.CSUP) sCsup=term(fSize,eAlign);
+            else if (eScriptType==Token.RSUB) sRsub=term(fSize,eAlign);
+            else if (eScriptType==Token.RSUP) sRsup=term(fSize,eAlign);
         }
         if (sLsub==null && sLsup==null && sCsub==null && sCsup==null && sRsub==null && sRsup==null){
             return sBody;
@@ -1182,20 +1182,20 @@ public final class StarMathConverter implements writer2latex.api.StarMathConvert
             else if (sLsub==null && sLsup==null && sRsub==null && sRsup==null){
                 // scripts above/below
                 if (sCsub==null){
-                    return "\\overset"+sCsup+"{"+sBody+"}";
+                    return "\\overset"+groupsp(sCsup)+"{"+sBody+"}";
                 }
                 else if (sCsup==null){
-                    return "\\underset"+sCsub+"{"+sBody+"}";
+                    return "\\underset"+groupsp(sCsub)+"{"+sBody+"}";
                 }
                 else {
-                    return "\\overset"+sCsup+"{\\underset"+sCsub+"{"+sBody+"}}";
+                    return "\\overset"+groupsp(sCsup)+"{\\underset"+groupsp(sCsub)+"{"+sBody+"}}";
                 }
             }
             else {// general case: use \multiscripts
                 bMultiscripts=true;
                 if (sCsub==null) {sCsub="{}";}
                 if (sCsup==null) {sCsup="{}";}
-                return "\\multiscripts{"+tosub(sLsub)+tosup(sLsup)+"}"+sCsub+sCsup
+                return "\\multiscripts{"+tosub(sLsub)+tosup(sLsup)+"}"+group(sCsub)+group(sCsup)
                 +"{"+sBody+"}{"+tosub(sRsub)+tosup(sRsup)+"}";
             }
         }
@@ -1243,7 +1243,7 @@ public final class StarMathConverter implements writer2latex.api.StarMathConvert
         else if (curToken.eType==Token.TEXT){
             sContent=curToken.sLaTeX;
             nextToken();
-            return "\\text{"+sContent+"}";
+            return "\\text"+groupsp(sContent);
         }
         else if (curToken.eType==Token.CHARACTER || curToken.eType==Token.NUMBER
                  || tokenInGroup(TGroup.STANDALONE)){
@@ -1349,11 +1349,11 @@ public final class StarMathConverter implements writer2latex.api.StarMathConvert
         }
         else if (curToken.eType==Token.SQRT){
             nextToken();
-            return "\\sqrt{"+power(fSize,eAlign)+"}";
+            return "\\sqrt"+groupsp(power(fSize,eAlign));
         }
         else if (curToken.eType==Token.NROOT){
             nextToken();
-            return "\\sqrt["+power(fSize,eAlign)+"]{"+power(fSize,eAlign)+"}";
+            return "\\sqrt["+power(fSize,eAlign)+"]"+group(power(fSize,eAlign));
         }
         else if (curToken.eType==Token.UOPER){
             nextToken();
@@ -1375,7 +1375,7 @@ public final class StarMathConverter implements writer2latex.api.StarMathConvert
             if (tokenInGroup(TGroup.FONT)){
                 sAttribute=curToken.sLaTeX;
                 nextToken();
-                return sAttribute+"{"+term(fSize,eAlign)+"}";
+                return sAttribute+groupsp(term(fSize,eAlign));
             }
             else { // error in formula
                 return "?";
@@ -1387,7 +1387,7 @@ public final class StarMathConverter implements writer2latex.api.StarMathConvert
                 sAttribute=curToken.sLaTeX; // the color name
                 nextToken();
                 if (bUseColor) {
-                    return "\\textcolor{"+sAttribute+"}"+"{"+term(fSize,eAlign)+"}";
+                    return "\\textcolor{"+sAttribute+"}"+group(term(fSize,eAlign));
                     // note: despite the name, \textcolor also works in math mode!
                 }
                 else {
@@ -1445,7 +1445,7 @@ public final class StarMathConverter implements writer2latex.api.StarMathConvert
             else if (curToken.eType == Token.ITALIC) { bNormalsubformula=true; }
             sAttribute=curToken.sLaTeX;
             nextToken();
-            return sAttribute+"{"+term(fSize,eAlign)+"}";
+            return sAttribute+groupsp(term(fSize,eAlign));
         }
     }
     
@@ -1545,7 +1545,7 @@ public final class StarMathConverter implements writer2latex.api.StarMathConvert
     
     private String binom(float fSize, Token eAlign){
         nextToken();
-        return "\\genfrac{}{}{0pt}{0}{"+sum(fSize,eAlign)+"}{"+sum(fSize,eAlign)+"}";
+        return "\\genfrac{}{}{0pt}{0}"+group(sum(fSize,eAlign))+group(sum(fSize,eAlign));
     }
     
     private String stack(float fSize, Token eAlign){
@@ -1589,6 +1589,26 @@ public final class StarMathConverter implements writer2latex.api.StarMathConvert
         return sSpecial;         
     }
     
+    // Group a LaTeX string unless it consists of exactly one character
+    private String group(String sLaTeX) {
+    	if (sLaTeX.length()!=1) {
+    		return "{"+sLaTeX+"}";
+    	}
+    	else {
+    		return sLaTeX;
+    	}
+    }
+    
+    // Group a LaTeX string unless it consists of exactly one character
+    // In the latter case, prepend a space character (because this string follows a command sequence) 
+    private String groupsp(String sLaTeX) {
+    	if (sLaTeX.length()!=1) {
+    		return "{"+sLaTeX+"}";
+    	}
+    	else {
+    		return " "+sLaTeX;
+    	}
+    }
     
     ////////////////////////////////////////////////
     // Finally, the converter itself
