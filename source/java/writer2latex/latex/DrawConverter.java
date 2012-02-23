@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2010 by Henrik Just
+ *  Copyright: 2002-2012 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-10-09)
+ *  Version 1.2 (2012-02-23)
  *
  */
  
@@ -157,10 +157,13 @@ public class DrawConverter extends ConverterHelper {
                             if (formula==null) {
                             	formula = Misc.getChildByTagName(formuladoc,XMLString.MATH_MATH);
                             }
-                            ldp.append(" $")
-                               .append(palette.getMathmlCv().convert(settings,formula))
-                               .append("$");
-                            if (Character.isLetterOrDigit(OfficeReader.getNextChar(node))) { ldp.append(" "); }
+                            String sLaTeX = palette.getMathmlCv().convert(settings,formula);
+                            if (!" ".equals(sLaTeX)) { // ignore empty formulas
+                            	ldp.append(" $")
+                            	   .append(sLaTeX)
+                            	   .append("$");
+                                if (Character.isLetterOrDigit(OfficeReader.getNextChar(node))) { ldp.append(" "); }
+                            }
                         }
                         catch (org.xml.sax.SAXException e) {
                             e.printStackTrace();

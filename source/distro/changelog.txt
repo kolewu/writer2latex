@@ -2,7 +2,9 @@ Changelog for Writer2LaTeX version 1.0 -> 1.2
 
 ---------- version 1.1.9 ----------
 
-[w2l] The StarMath now avoids more redundant braces
+[w2l] Properly detect and ignore empty formulas (avoiding any occurrences of $ $ in the document)
+
+[w2l] The StarMath converter now avoids redundant braces
 
 [w2l] The StarMath converter is now a little more tolerant on errors like missing operands for a binary operator
   (import from MS Word may create such errors)

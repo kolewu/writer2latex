@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2010 by Henrik Just
+ *  Copyright: 2002-2012 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-04-29)
+ *  Version 1.2 (2012-02-23)
  *
  */
 
@@ -103,7 +103,13 @@ public final class MathmlConverter extends ConverterHelper {
         // TODO: Investigate if Vasil I. Yaroshevich's MathML->LaTeX
         // XSL transformation could be used here. (Potential problem:
         // OOo uses MathML 1.01, not MathML 2)
-        return "\\text{Warning: No StarMath annotation}";
+		if (formula.hasChildNodes()) {
+			return "\\text{Warning: No StarMath annotation}";
+		}
+		else { // empty formula
+			return " ";
+		}
+			
     }
 	
     // Data for display equations
@@ -163,22 +169,25 @@ public final class MathmlConverter extends ConverterHelper {
     }
     
     private void handleDisplayEquation(Element equation, Element sequence, LaTeXDocumentPortion ldp) {
-        if (sequence!=null) {
-            // Numbered equation
-            ldp.append("\\begin{equation}");
-            palette.getFieldCv().handleSequenceLabel(sequence,ldp);
-            ldp.nl()
-               .append(convert(null,equation)).nl()
-               .append("\\end{equation}").nl();
-            if (bAddParAfterDisplay) { ldp.nl(); }
-        }
-        else {
-            // Unnumbered equation
-            ldp.append("\\begin{equation*}").nl()
-               .append(convert(null,equation)).nl()
-               .append("\\end{equation*}").nl();
-            if (bAddParAfterDisplay) { ldp.nl(); }
-        }    	
+    	String sLaTeX = convert(null,equation);
+    	if (!" ".equals(sLaTeX)) { // ignore empty formulas
+    		if (sequence!=null) {
+    			// Numbered equation
+    			ldp.append("\\begin{equation}");
+    			palette.getFieldCv().handleSequenceLabel(sequence,ldp);
+    			ldp.nl()
+    			.append(sLaTeX).nl()
+    			.append("\\end{equation}").nl();
+    			if (bAddParAfterDisplay) { ldp.nl(); }
+    		}
+    		else {
+    			// Unnumbered equation
+    			ldp.append("\\begin{equation*}").nl()
+    			.append(sLaTeX).nl()
+    			.append("\\end{equation*}").nl();
+    			if (bAddParAfterDisplay) { ldp.nl(); }
+    		}    	
+    	}
     }
 	
     private boolean parseDisplayEquation(Node node) {
