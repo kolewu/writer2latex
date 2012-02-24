@@ -18,7 +18,7 @@
  *
  *  Copyright: 2002-2012 by Henrik Just
  *  
- *  Version 1.2 (2012-02-23)
+ *  Version 1.2 (2012-02-24)
  *
  *  All Rights Reserved.
  */
@@ -26,6 +26,9 @@
 package writer2latex.latex;
 
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import writer2latex.util.*;
 import writer2latex.latex.i18n.ClassicI18n;
 import writer2latex.latex.i18n.I18n;
@@ -705,6 +708,9 @@ public final class StarMathConverter implements writer2latex.api.StarMathConvert
     //private Float fBaseSize; // base size for the formula (usually 12pt)
 	private I18n i18n;
 	
+	// Regular expression for numbers
+	Pattern numberPattern;
+	
     // Flags to track need for ooomath.sty definitions
     private boolean bDefeq = false;
     private boolean bLambdabar = false;
@@ -721,6 +727,11 @@ public final class StarMathConverter implements writer2latex.api.StarMathConvert
     private boolean bNormalsubformula = false;
     private boolean bMultiscripts = false;
     private boolean bMathoverstrike = false;
+    
+	// Match a number (or the empty string)
+    private void createNumberPattern() {
+    	numberPattern = Pattern.compile("^[0-9]*\\.?[0-9]*$");
+    }
 	
     // Constructor for stand alone StarMath converter
     public StarMathConverter() {
@@ -728,6 +739,7 @@ public final class StarMathConverter implements writer2latex.api.StarMathConvert
         i18n = new ClassicI18n(config);
         configSymbols = config.getMathSymbols();
         bUseColor = config.useColor();
+        createNumberPattern();
     }
 
 	StarMathConverter(I18n i18n, LaTeXConfig config){
@@ -735,6 +747,7 @@ public final class StarMathConverter implements writer2latex.api.StarMathConvert
         this.i18n = i18n;
         configSymbols = config.getMathSymbols();
         bUseColor = config.useColor();
+        createNumberPattern();
     }
 
     public void appendDeclarations(LaTeXDocumentPortion pack, LaTeXDocumentPortion decl) {
@@ -1243,7 +1256,12 @@ public final class StarMathConverter implements writer2latex.api.StarMathConvert
         else if (curToken.eType==Token.TEXT){
             sContent=curToken.sLaTeX;
             nextToken();
-            return "\\text"+groupsp(sContent);
+            if (!numberPattern.matcher(sContent).matches()) {
+            	return "\\text"+groupsp(sContent);
+            }
+            else { // In the special case that the text is simply a number, using \text is superflous
+            	return sContent;
+            }
         }
         else if (curToken.eType==Token.CHARACTER || curToken.eType==Token.NUMBER
                  || tokenInGroup(TGroup.STANDALONE)){
