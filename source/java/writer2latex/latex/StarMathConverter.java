@@ -26,7 +26,6 @@
 package writer2latex.latex;
 
 import java.util.Map;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import writer2latex.util.*;

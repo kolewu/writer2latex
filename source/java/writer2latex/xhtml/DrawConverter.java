@@ -242,6 +242,14 @@ public class DrawConverter extends ConverterHelper {
     			bCollectFullscreenFrames = false;
     			handleDrawElement(cover,currentNode,null,FULL_SCREEN);
     			bCollectFullscreenFrames = true;
+    			// Add margin:0 to body
+    			Element head = Misc.getChildByTagName(hnode.getOwnerDocument().getDocumentElement(),"head");
+    			if (head!=null) {
+    				Element style = converter.createElement("style");
+    				head.appendChild(style);
+    				style.setAttribute("type", "text/css");
+    				style.appendChild(converter.createTextNode("body { margin:0 }"));
+    			}
     			currentNode = getTextCv().doMaybeSplit(hnode, 0);    	
     		}
     	}
