@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2011 by Henrik Just
+ *  Copyright: 2002-2012 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-05-07) 
+ *  Version 1.2 (2012-02-26) 
  *
  */
 
@@ -238,10 +238,7 @@ public final class ConverterPalette extends ConverterBase {
             // According to the spec, the date has the format YYYY-MM-DDThh:mm:ss
             String sDate = metaData.getDate();
             if (sDate!=null) {
-            	if (sDate.length()==19 && sDate.charAt(10)=='T') {
-            		sDate = sDate.substring(0,10);
-            	}
-            	createMeta("date",sDate,declarations);
+            	createMeta("date",Misc.dateOnly(sDate),declarations);
             }
         }
 		

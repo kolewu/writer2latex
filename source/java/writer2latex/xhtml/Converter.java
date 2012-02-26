@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2011 by Henrik Just
+ *  Copyright: 2002-2012 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-08-05)
+ *  Version 1.2 (2012-02-26)
  *
  */
 
@@ -718,7 +718,6 @@ public class Converter extends ConverterBase {
         		Element sty = htmlDOM.createElement("link");
         		sty.setAttribute("rel", "stylesheet");
         		sty.setAttribute("type", "text/css");
-        		sty.setAttribute("media", "all");
         		sty.setAttribute("href", EPUB_CUSTOM_STYLESHEET);
         		head.appendChild(sty);
         	}
@@ -728,7 +727,6 @@ public class Converter extends ConverterBase {
         		Element htmlStyle = htmlDOM.createElement("link");
         		htmlStyle.setAttribute("rel","stylesheet");
         		htmlStyle.setAttribute("type","text/css");
-        		htmlStyle.setAttribute("media","all");
         		htmlStyle.setAttribute("href",EPUB_STYLESHEET);
         		head.appendChild(htmlStyle);
         	}

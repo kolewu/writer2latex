@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2001-2011 by Henrik Just
+ *  Copyright: 2001-2012 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  version 1.2 (2011-07-20)
+ *  version 1.2 (2012-02-26)
  *
  */
 
@@ -204,7 +204,7 @@ public class OPFWriter extends NewDOMDocument {
     	}
     	if (!bHasDate && cr.getMetaData().getDate().length()>0) {
     		// TODO: Support meta:creation-date?
-    		appendElement(contentDOM, metadata, "dc:date", cr.getMetaData().getDate());
+    		appendElement(contentDOM, metadata, "dc:date", Misc.dateOnly(cr.getMetaData().getDate()));
     	}
         
         // Manifest must contain references to all the files in the XHTML converter result

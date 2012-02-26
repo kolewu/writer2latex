@@ -2,6 +2,10 @@ Changelog for Writer2LaTeX version 1.0 -> 1.2
 
 ---------- version 1.1.9 ----------
 
+[w2x] Export date only for dc:date attribute in EPUB meta data (not date+time)
+
+[w2x] Leave out media attribute for style sheets in EPUB export (prevented validation with FlightCrew)
+
 [w2x] The file containing the cover image in EPUB export is now created with a body margin of zero 
 
 [w2l] The StarMath converter now leaves out the \text command if the argument is a plain number 

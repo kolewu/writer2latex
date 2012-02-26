@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2011 by Henrik Just
+ *  Copyright: 2002-2012 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-03-29)
+ *  Version 1.2 (2012-02-26)
  *
  */
 
@@ -58,6 +58,20 @@ public class Misc{
         int[] newArray = new int[2*n];
         for (int i=0; i<n; i++) { newArray[i] = array[i]; }
         return newArray;
+    }
+    
+    // Truncate a date+time to the date only
+    public static final String dateOnly(String sDate) {
+    	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+   		Date date = null;
+    	try {
+			date = sdf.parse(sDate);
+		} catch (ParseException e) {
+			// If the date cannot be parsed according to the given pattern, return the original string
+			return sDate;
+		}
+		// Return using a default format for the given locale
+		return sDate.substring(0,10);   		    	
     }
     
     public static final String formatDate(String sDate, String sLanguage, String sCountry) {
