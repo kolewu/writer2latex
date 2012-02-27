@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2011 by Henrik Just
+ *  Copyright: 2002-2012 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-05-06)
+ *  Version 1.2 (2012-02-27)
  * 
  */
 
@@ -134,11 +134,16 @@ public class XeTeXI18n extends I18n {
      *  @return the LaTeX string
      */
     public String convert(String s, boolean bMathMode, String sLang){
-    	// TODO: Do we need anything special for math mode?
     	StringBuffer buf = new StringBuffer();
     	int nLen = s.length();
         char c;
-        if (bUsePolyglossia) {
+        if (bMathMode) {
+        	// No string replace or writing direction in math mode
+        	for (int i=0; i<nLen; i++) {
+        		convert(s.charAt(i),buf);
+        	}        	
+        }
+        else if (bUsePolyglossia) {
         	int i = 0;
         	while (i<nLen) {
         		ReplacementTrieNode node = stringReplace.get(s,i,nLen);

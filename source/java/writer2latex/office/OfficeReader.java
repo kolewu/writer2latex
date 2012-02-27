@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2011 by Henrik Just
+ *  Copyright: 2002-2012 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-06-16)
+ *  Version 1.2 (2012-02-27)
  *
  */
 
@@ -296,9 +296,10 @@ public class OfficeReader {
     private HashSet<String> bookmarkRef = new HashSet<String>();
     private HashSet<String> sequenceRef = new HashSet<String>();
 	
-    // Reference marks and bookmarks contained in headings
+    // Reference marks and bookmarks contained in headings or lists
     private HashSet<String> referenceHeading = new HashSet<String>();
     private HashSet<String> bookmarkHeading = new HashSet<String>();
+    private HashSet<String> bookmarkList = new HashSet<String>();
 	
     // All internal hyperlinks
     private HashSet<String> links = new HashSet<String>();
@@ -639,6 +640,14 @@ public class OfficeReader {
      */
     public boolean bookmarkInHeading(String sName) {
         return bookmarkHeading.contains(sName);
+    }
+    
+    /** Is this bookmark contained in a list?
+     *  @param sName the name of the bookmark
+     *  @return true if so
+     */
+    public boolean bookmarkInList(String sName) {
+    	return bookmarkList.contains(sName);
     }
 
     /** <p>Is there a reference to this bookmark?
@@ -1085,19 +1094,19 @@ public class OfficeReader {
             else if ("endnote".equals(sClass)) { collectRefName(endnoteRef,node); }
         }
         else if (sName.equals(XMLString.TEXT_REFERENCE_MARK)) {
-            collectMarkInHeading(referenceHeading,node);
+            collectMarkByPosition(referenceHeading,null,node);
         }
         else if (sName.equals(XMLString.TEXT_REFERENCE_MARK_START)) {
-            collectMarkInHeading(referenceHeading,node);
+            collectMarkByPosition(referenceHeading,null,node);
         }
         else if (sName.equals(XMLString.TEXT_REFERENCE_REF)) {
             collectRefName(referenceRef,node);
         }
         else if (sName.equals(XMLString.TEXT_BOOKMARK)) {
-            collectMarkInHeading(bookmarkHeading,node);
+            collectMarkByPosition(bookmarkHeading,bookmarkList,node);
         }
         else if (sName.equals(XMLString.TEXT_BOOKMARK_START)) {
-            collectMarkInHeading(bookmarkHeading,node);
+            collectMarkByPosition(bookmarkHeading,bookmarkList,node);
         }
         else if (sName.equals(XMLString.TEXT_BOOKMARK_REF)) {
             collectRefName(bookmarkRef,node);
@@ -1173,12 +1182,20 @@ public class OfficeReader {
         }
     }
 	
-    private void collectMarkInHeading(HashSet<String> marks, Element node) {
+    private void collectMarkByPosition(HashSet<String> headingmarks, HashSet<String> listmarks, Element node) {
         String sName = node.getAttribute(XMLString.TEXT_NAME);
         if (sName!=null && sName.length()>0) {
             Element par = getParagraph(node);
-            if (XMLString.TEXT_H.equals(par.getTagName())) {
-                marks.add(sName);
+            if (XMLString.TEXT_H.equals(par.getTagName())) { // Mark contained in a heading
+                headingmarks.add(sName);
+            }
+            else if (listmarks!=null && XMLString.TEXT_P.equals(par.getTagName())) {
+            	Element parent = (Element) par.getParentNode();
+            	if (XMLString.TEXT_LIST_ITEM.equals(parent.getTagName())) { // Mark contained in a list
+            		// Note: text:list-header is not relevant here (no number to refer to!)
+            		// TODO: Collect style name and level (necessary to add text before/after)
+            		listmarks.add(sName);
+            	}
             }
         }
     }

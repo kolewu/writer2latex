@@ -2,6 +2,10 @@ Changelog for Writer2LaTeX version 1.0 -> 1.2
 
 ---------- version 1.1.9 ----------
 
+[w2l] Added support for cross references to list items
+
+[w2l] Do not use string replace or writing direction in math mode for XeTeX backend
+
 [w2x] Export date only for dc:date attribute in EPUB meta data (not date+time)
 
 [w2x] Leave out media attribute for style sheets in EPUB export (prevented validation with FlightCrew)

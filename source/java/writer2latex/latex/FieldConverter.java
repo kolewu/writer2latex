@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2011 by Henrik Just
+ *  Copyright: 2002-2012 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-07-25)
+ *  Version 1.2 (2012-02-27)
  *
  */
 
@@ -787,6 +787,10 @@ public class FieldConverter extends ConverterHelper {
         else if ("chapter".equals(sFormat) && ofr.bookmarkInHeading(sName)) {
             // This is safe if the bookmark is contained in a heading
             ldp.append("\\ref{bkm:"+bookmarknames.getExportName(sName)+"}");
+        }
+        else if (("number".equals(sFormat) || "number-no-superior".equals(sFormat) || "number-all-superior".equals(sFormat)) &&
+        		ofr.bookmarkInList(sName)) {
+        	ldp.append("\\ref{bkm:"+bookmarknames.getExportName(sName)+"}");
         }
         else { // use current value
             palette.getInlineCv().traversePCDATA(node,ldp,oc);
