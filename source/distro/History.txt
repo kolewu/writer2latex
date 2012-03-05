@@ -1,6 +1,39 @@
 Version history for Writer2LaTeX
 ================================
 
+Version 1.1.9 beta (March 2012)
+  - Filters:
+       - Added user interface to edit custom configuration
+       - Added help files
+       - New Writer4LaTeX extension supporting the use of Writer as a frontend to LaTeX     
+  - LaTeX:
+       - Support XeTeX and polyglossia.sty
+       - Support for xepersian.sty
+       - Support Zotero, JabRef and natbib.sty
+       - Improved support for cross references
+       - Support unnumbered headings
+       - Support first/last foot for multipage tables
+       - Cleaner export of formulas (avoiding redundant braces)
+       - Support for new StarMath constructs
+       - Support the "numbered formula" AutoText in Writer
+  - XHTML:
+       - Support conversion to EPUB format
+       - Support conversion to XHTML 1.1 (without MathML)
+       - The style sheet can now be created in a separate file
+       - New option to export images using relative width
+       - Improved support for footnotes and endnotes
+       - Improved support for list formatting
+       - Support split by page breaks
+       - Support optional export of hidden text
+       - Formulas can now be exported as images
+       - Added option to avoid pretty printing of the xhtml source
+  - General:
+       - New methods to load custom templates and style sheets in the converter API
+       - Support for complex options in the converter API
+       - New method in the converter API to access the metadata of the converted document
+       - The converter API now provides pointers to headings and other important places in the converted document
+       - The converter API now provides better identification of files that are part of the main document flow
+       - New attributes Resouces, ResourceURL in filter API    
 Version 1.0 (September 2009)
   -Filters:
       - Changed to oxt format and separated into Writer2LaTeX and Writer2xhtml extensions
