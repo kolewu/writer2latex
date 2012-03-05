@@ -18,7 +18,7 @@
  *
  *  Copyright: 2002-2012 by Henrik Just
  *  
- *  Version 1.2 (2012-02-27)
+ *  Version 1.2 (2012-03-05)
  *
  *  All Rights Reserved.
  */
@@ -321,6 +321,15 @@ class Token{
     public static final Token LDBRACKET=new Token();
     public static final Token RDBRACKET=new Token();
     public static final Token UNKNOWN=new Token();
+    public static final Token NOSPACE=new Token();
+    public static final Token PREC=new Token();
+    public static final Token NPREC=new Token();
+    public static final Token SUCC=new Token();
+    public static final Token NSUCC=new Token();
+    public static final Token PRECCURLYEQ=new Token();
+    public static final Token SUCCCURLYEQ=new Token();
+    public static final Token PRECSIM=new Token();
+    public static final Token SUCCSIM=new Token();
 }
 
 // enumerate Token groups
@@ -591,7 +600,17 @@ class SmTokenTable{
          new SmTokenTableEntry( "wideslash", Token.WIDESLASH, "", TGroup.PRODUCT, 0 ),
          new SmTokenTableEntry( "widevec", Token.WIDEVEC, "\\overrightarrow", TGroup.ATTRIBUT, 5),
          new SmTokenTableEntry( "wp" , Token.WP, "\\wp ", TGroup.STANDALONE, 5),
-         new SmTokenTableEntry( "yellow", Token.YELLOW, "yellow", TGroup.COLOR, 0)};
+         new SmTokenTableEntry( "yellow", Token.YELLOW, "yellow", TGroup.COLOR, 0),    
+    	new SmTokenTableEntry( "nospace", Token.NOSPACE, "", TGroup.ATTRIBUT, 0),
+    	// nospace is flagged as standalone in parse.cxx for some reason, but is really treated like an attribute
+    	new SmTokenTableEntry( "prec", Token.PREC, "\\prec ", TGroup.RELATION, 0),
+    	new SmTokenTableEntry( "nprec", Token.NPREC, "\\nprec ", TGroup.RELATION, 0),
+    	new SmTokenTableEntry( "succ", Token.SUCC, "\\succ ", TGroup.RELATION, 0),
+    	new SmTokenTableEntry( "nsucc", Token.NSUCC, "\\nsucc ", TGroup.RELATION, 0),
+    	new SmTokenTableEntry( "preccurlyeq", Token.PRECCURLYEQ, "\\preccurlyeq ", TGroup.RELATION, 0),
+    	new SmTokenTableEntry( "succcurlyeq", Token.SUCCCURLYEQ, "\\succcurlyeq ", TGroup.RELATION, 0),
+    	new SmTokenTableEntry( "precsim", Token.PRECSIM, "\\precsim ", TGroup.RELATION, 0),
+    	new SmTokenTableEntry( "succsim", Token.SUCCSIM, "\\succsim ", TGroup.RELATION, 0)};
        
     static final SmTokenTableEntry[] symbols=
         {new SmTokenTableEntry("ALPHA",Token.SPECIAL,"A",5),
