@@ -2,9 +2,16 @@ Changelog for Writer2LaTeX version 1.0 -> 1.2
 
 ---------- version 1.1.9 ----------
 
-[w2l] Added support for cross references to list items
+[w2x] The minimum year in the date dialog (EPUB export) has been changed from 1900 to 1800
 
-[w2l] Do not use string replace or writing direction in math mode for XeTeX backend
+[w2x] Bugfix: Do not create an empty footnotes page if footnotes are exported as endnotes, and the document contains no footnotess
+
+[w2l] Bugfix: Now converts the content of prefix or suffix of a list item correctly
+
+[w2l] Added support for the bookmark reference types "number", "number-no-superior" and "number-all-superior" (all treated like \ref)
+  for bookmarks in headings and numbered lists
+
+[w2l] Bugfix: Do not use string replace or writing direction in math mode for XeTeX backend
 
 [w2x] Export date only for dc:date attribute in EPUB meta data (not date+time)
 

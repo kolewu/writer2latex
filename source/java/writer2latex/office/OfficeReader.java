@@ -20,15 +20,19 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2012-02-27)
+ *  Version 1.2 (2012-03-05)
  *
  */
 
 package writer2latex.office;
 
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -276,33 +280,34 @@ public class OfficeReader {
     //private String sFirstMasterPageName = null;
 	
     // All indexes
-    private Hashtable<Element, Object> indexes = new Hashtable<Element, Object>();
-    private HashSet<String> indexSourceStyles = new HashSet<String>();
-    private HashSet<String> figureSequenceNames = new HashSet<String>();
-    private HashSet<String> tableSequenceNames = new HashSet<String>();
+    private Map<Element, Object> indexes = new Hashtable<Element, Object>();
+    private Set<String> indexSourceStyles = new HashSet<String>();
+    private Set<String> figureSequenceNames = new HashSet<String>();
+    private Set<String> tableSequenceNames = new HashSet<String>();
     private String sAutoFigureSequenceName = null;
     private String sAutoTableSequenceName = null;
 	
     // Map paragraphs to sequence names (caption helper)
-    private Hashtable<Element, String> sequenceNames = new Hashtable<Element, String>();
+    private Map<Element, String> sequenceNames = new Hashtable<Element, String>();
 	
     // Map sequence reference names to sequence names
-    private Hashtable<String, String> seqrefNames = new Hashtable<String, String>();
+    private Map<String, String> seqrefNames = new Hashtable<String, String>();
 	
     // All references
-    private HashSet<String> footnoteRef = new HashSet<String>();
-    private HashSet<String> endnoteRef = new HashSet<String>();
-    private HashSet<String> referenceRef = new HashSet<String>();
-    private HashSet<String> bookmarkRef = new HashSet<String>();
-    private HashSet<String> sequenceRef = new HashSet<String>();
+    private Set<String> footnoteRef = new HashSet<String>();
+    private Set<String> endnoteRef = new HashSet<String>();
+    private Set<String> referenceRef = new HashSet<String>();
+    private Set<String> bookmarkRef = new HashSet<String>();
+    private Set<String> sequenceRef = new HashSet<String>();
 	
     // Reference marks and bookmarks contained in headings or lists
-    private HashSet<String> referenceHeading = new HashSet<String>();
-    private HashSet<String> bookmarkHeading = new HashSet<String>();
-    private HashSet<String> bookmarkList = new HashSet<String>();
+    private Map<String,Integer> referenceHeading = new HashMap<String,Integer>();
+    private Map<String,Integer> bookmarkHeading = new HashMap<String,Integer>();
+    private Map<String,String> bookmarkList = new HashMap<String,String>();
+    private Map<String,Integer> bookmarkListLevel = new HashMap<String,Integer>();
 	
     // All internal hyperlinks
-    private HashSet<String> links = new HashSet<String>();
+    private Set<String> links = new HashSet<String>();
 	
     // Forms
     private FormsReader forms = new FormsReader();
@@ -623,7 +628,7 @@ public class OfficeReader {
      *  @return true if so
      */
     public boolean referenceMarkInHeading(String sName) {
-        return referenceHeading.contains(sName);
+        return referenceHeading.containsKey(sName);
     }
 
     /** Is there a reference to this reference mark?
@@ -639,7 +644,15 @@ public class OfficeReader {
      *  @return true if so
      */
     public boolean bookmarkInHeading(String sName) {
-        return bookmarkHeading.contains(sName);
+        return bookmarkHeading.containsKey(sName);
+    }
+    
+    /** Get the level of the heading associated with this bookmark
+     *  @param sName the name of the bookmark 
+     *  @return the level or 0 if the bookmark does not exist
+     */
+    public int getBookmarkHeadingLevel(String sName) {
+        return bookmarkHeading.get(sName);
     }
     
     /** Is this bookmark contained in a list?
@@ -647,7 +660,33 @@ public class OfficeReader {
      *  @return true if so
      */
     public boolean bookmarkInList(String sName) {
-    	return bookmarkList.contains(sName);
+    	return bookmarkList.containsKey(sName);
+    }
+    
+    /** Get the list style name associated with a bookmark in a list
+     *  @param sName the name of the bookmark
+     *  @return the list style name or null if the bookmark does not exist or the list does not have a style name
+     */
+    public String getBookmarkListStyle(String sName) {
+    	if (bookmarkList.containsKey(sName)) {
+    		return bookmarkList.get(sName);
+    	}
+    	else {
+    		return null;
+    	}
+    }
+
+    /** Get the list level associated with a bookmark in a list
+     *  @param sName the name of the bookmark
+     *  @return the level or 0 if the bookmark does not exist
+     */
+    public int getBookmarkListLevel(String sName) {
+    	if (bookmarkListLevel.containsKey(sName)) {
+    		return bookmarkListLevel.get(sName);
+    	}
+    	else {
+    		return 0;
+    	}
     }
 
     /** <p>Is there a reference to this bookmark?
@@ -1020,7 +1059,7 @@ public class OfficeReader {
                 }
             }                
 
-            traverseContent(body);
+            traverseContent(body,null,0,-1);
 
             if (sAutoFigureSequenceName!=null) {
                 addFigureSequenceName(sAutoFigureSequenceName);
@@ -1043,10 +1082,11 @@ public class OfficeReader {
         return getParagraph(parent);
     }
 	
-    private void traverseContent(Element node) {
+    private void traverseContent(Element node, String sListStyleName, int nListLevel, int nParLevel) {
         // Handle this node first
         String sName = node.getTagName();
         if (sName.equals(XMLString.TEXT_P)) {
+        	nParLevel=0;
             //collectMasterPage(getParStyle(node.getAttribute(XMLString.TEXT_STYLE_NAME)));
         }
         else if (sName.equals(XMLString.TEXT_H)) {
@@ -1057,6 +1097,7 @@ public class OfficeReader {
         	else {
         		nLevel = Misc.getPosInteger(node.getAttribute(XMLString.TEXT_LEVEL),1);
         	}
+        	nParLevel = nLevel;
             StyleWithProperties style = getParStyle(node.getAttribute(XMLString.TEXT_STYLE_NAME));
             //collectMasterPage(style);
             if (1<=nLevel && nLevel<=10 && heading[nLevel]==null) {
@@ -1067,6 +1108,20 @@ public class OfficeReader {
                     heading[nLevel] = style;
                 }
             }
+        }
+        else if (sName.equals(XMLString.TEXT_LIST) || 
+        		 sName.equals(XMLString.TEXT_ORDERED_LIST) || sName.equals(XMLString.TEXT_UNORDERED_LIST)) {
+        	nListLevel++;
+        	String sStyleName = Misc.getAttribute(node, XMLString.TEXT_STYLE_NAME);
+        	if (sStyleName!=null) sListStyleName = sStyleName;
+        }
+        else if (sName.equals(XMLString.TEXT_NOTE) ||
+        		 sName.equals(XMLString.TEXT_FOOTNOTE) || sName.equals(XMLString.TEXT_ENDNOTE) ||
+        		 sName.equals(XMLString.TABLE_TABLE)) {
+        	// Various block elements; all resetting the list and par level
+        	sListStyleName=null;
+        	nListLevel=0;
+        	nParLevel=-1;
         }
         else if (sName.equals(XMLString.TEXT_SEQUENCE)) {
             String sSeqName = Misc.getAttribute(node,XMLString.TEXT_NAME);
@@ -1094,19 +1149,19 @@ public class OfficeReader {
             else if ("endnote".equals(sClass)) { collectRefName(endnoteRef,node); }
         }
         else if (sName.equals(XMLString.TEXT_REFERENCE_MARK)) {
-            collectMarkByPosition(referenceHeading,null,node);
+            collectMarkByPosition(referenceHeading,null,null,node,sListStyleName,nListLevel,nParLevel);
         }
         else if (sName.equals(XMLString.TEXT_REFERENCE_MARK_START)) {
-            collectMarkByPosition(referenceHeading,null,node);
+            collectMarkByPosition(referenceHeading,null,null,node,sListStyleName,nListLevel,nParLevel);
         }
         else if (sName.equals(XMLString.TEXT_REFERENCE_REF)) {
             collectRefName(referenceRef,node);
         }
         else if (sName.equals(XMLString.TEXT_BOOKMARK)) {
-            collectMarkByPosition(bookmarkHeading,bookmarkList,node);
+            collectMarkByPosition(bookmarkHeading,bookmarkList,bookmarkListLevel,node,sListStyleName,nListLevel,nParLevel);
         }
         else if (sName.equals(XMLString.TEXT_BOOKMARK_START)) {
-            collectMarkByPosition(bookmarkHeading,bookmarkList,node);
+            collectMarkByPosition(bookmarkHeading,bookmarkList,bookmarkListLevel,node,sListStyleName,nListLevel,nParLevel);
         }
         else if (sName.equals(XMLString.TEXT_BOOKMARK_REF)) {
             collectRefName(bookmarkRef,node);
@@ -1152,7 +1207,7 @@ public class OfficeReader {
         Node child = node.getFirstChild();
         while (child!=null) {
             if (child.getNodeType()==Node.ELEMENT_NODE) {
-                traverseContent((Element) child);
+                traverseContent((Element) child, sListStyleName, nListLevel, nParLevel);
             }
             child = child.getNextSibling();
         }
@@ -1175,27 +1230,24 @@ public class OfficeReader {
        
     }
 	
-    private void collectRefName(HashSet<String> ref, Element node) {
+    private void collectRefName(Set<String> ref, Element node) {
         String sRefName = node.getAttribute(XMLString.TEXT_REF_NAME);
         if (sRefName!=null && sRefName.length()>0) {
             ref.add(sRefName);
         }
     }
 	
-    private void collectMarkByPosition(HashSet<String> headingmarks, HashSet<String> listmarks, Element node) {
+    private void collectMarkByPosition(Map<String,Integer> headingmarklevels, Map<String,String> listmarknames,
+    		Map<String,Integer> listmarklevels, Element node,
+    		String sListStyleName, int nListLevel, int nParLevel) {
         String sName = node.getAttribute(XMLString.TEXT_NAME);
         if (sName!=null && sName.length()>0) {
-            Element par = getParagraph(node);
-            if (XMLString.TEXT_H.equals(par.getTagName())) { // Mark contained in a heading
-                headingmarks.add(sName);
+            if (nParLevel>0) { // Mark contained in a heading
+                headingmarklevels.put(sName,nParLevel);
             }
-            else if (listmarks!=null && XMLString.TEXT_P.equals(par.getTagName())) {
-            	Element parent = (Element) par.getParentNode();
-            	if (XMLString.TEXT_LIST_ITEM.equals(parent.getTagName())) { // Mark contained in a list
-            		// Note: text:list-header is not relevant here (no number to refer to!)
-            		// TODO: Collect style name and level (necessary to add text before/after)
-            		listmarks.add(sName);
-            	}
+            else if (listmarknames!=null && nListLevel>0) {
+            		listmarknames.put(sName,sListStyleName);
+            		listmarklevels.put(sName, nListLevel);
             }
         }
     }

@@ -18,7 +18,7 @@
  *
  *  Copyright: 2002-2012 by Henrik Just
  *  
- *  Version 1.2 (2012-02-24)
+ *  Version 1.2 (2012-02-27)
  *
  *  All Rights Reserved.
  */
@@ -1119,7 +1119,7 @@ public final class StarMathConverter implements writer2latex.api.StarMathConvert
         while (tokenInGroup(TGroup.PRODUCT)){
             if (curToken.eType==Token.OVER){
                  nextToken();
-                 sProduct="\\frac"+groupsp(sProduct)+group(power(fSize,eAlign));
+                 sProduct="\\frac"+groupsp(sProduct)+groupsp(power(fSize,eAlign));
             } else if (curToken.eType==Token.BOPER){
                  nextToken();    
                  sProduct+=special()+power(fSize,eAlign);

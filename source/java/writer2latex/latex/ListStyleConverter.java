@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2011 by Henrik Just
+ *  Copyright: 2002-2012 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-03-22)
+ *  Version 1.2 (2012-03-05)
  *
  */
 
@@ -391,9 +391,9 @@ public class ListStyleConverter extends StyleConverter {
 				String sSuffix = style.getLevelProperty(i,XMLString.STYLE_NUM_SUFFIX);
 				// Apply style
 				ldp.append(baText.getBefore());
-				if (sPrefix!=null) { ldp.append(sPrefix); }
+				if (sPrefix!=null) { ldp.append(palette.getI18n().convert(sPrefix,false,"en")); }
 				ldp.append("\\the").append(sName[i]);
-				if (sSuffix!=null) { ldp.append(sSuffix); }
+				if (sSuffix!=null) { ldp.append(palette.getI18n().convert(sSuffix,false,"en")); }
 				ldp.append(baText.getAfter());
 			}
 			else if (style.isBullet(i)) {

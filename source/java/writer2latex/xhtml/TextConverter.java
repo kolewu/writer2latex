@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2011 by Henrik Just
+ *  Copyright: 2002-2012 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-06-16)
+ *  Version 1.2 (2012-03-05)
  *
  */
 
@@ -1748,33 +1748,35 @@ public class TextConverter extends ConverterHelper {
     private void insertFootnotes(Node hnode, boolean bFinal) {
         int n = footnotes.size();
         
-        if (n>0 && bFootnotesAtPage) { // Add footnote rule
-        	Element rule = converter.createElement("hr");
-        	StyleInfo info = new StyleInfo();
-        	getPageSc().applyFootnoteRuleStyle(info);
-        	getPageSc().applyStyle(info, rule);
-        	hnode.appendChild(rule);
-        }
-        else if (bFinal && !bFootnotesAtPage) { // New page if required for footnotes as endnotes
-        	if (nSplit>0) { hnode = converter.nextOutFile(); }
-        	insertNoteHeading(hnode, config.getFootnotesHeading(), "footnotes");        	
-        }
-        
-        if (bFinal || bFootnotesAtPage) { // Insert the footnotes
-        	for (int i=0; i<n; i++) {
-        		Node footnote = footnotes.get(i);
-        		String sId = Misc.getAttribute(footnote,XMLString.TEXT_ID); 
-        		Node citation = Misc.getChildByTagName(footnote,XMLString.TEXT_FOOTNOTE_CITATION);
-        		if (citation==null) { // try oasis
-        			citation = Misc.getChildByTagName(footnote,XMLString.TEXT_NOTE_CITATION);
-        		}
-        		Node body = Misc.getChildByTagName(footnote,XMLString.TEXT_FOOTNOTE_BODY);
-        		if (body==null) { // try oasis
-        			body = Misc.getChildByTagName(footnote,XMLString.TEXT_NOTE_BODY);
-        		}
-        		traverseNoteBody(sId,sFntCitStyle,citation,body,hnode,ofr.getFootnotesConfiguration());
+        if (n>0) {
+        	if (bFootnotesAtPage) { // Add footnote rule
+        		Element rule = converter.createElement("hr");
+        		StyleInfo info = new StyleInfo();
+        		getPageSc().applyFootnoteRuleStyle(info);
+        		getPageSc().applyStyle(info, rule);
+        		hnode.appendChild(rule);
         	}
-        	footnotes.clear();
+        	else if (bFinal) { // New page if required for footnotes as endnotes
+        		if (nSplit>0) { hnode = converter.nextOutFile(); }
+        		insertNoteHeading(hnode, config.getFootnotesHeading(), "footnotes");        	
+        	}
+
+        	if (bFinal || bFootnotesAtPage) { // Insert the footnotes
+        		for (int i=0; i<n; i++) {
+        			Node footnote = footnotes.get(i);
+        			String sId = Misc.getAttribute(footnote,XMLString.TEXT_ID); 
+        			Node citation = Misc.getChildByTagName(footnote,XMLString.TEXT_FOOTNOTE_CITATION);
+        			if (citation==null) { // try oasis
+        				citation = Misc.getChildByTagName(footnote,XMLString.TEXT_NOTE_CITATION);
+        			}
+        			Node body = Misc.getChildByTagName(footnote,XMLString.TEXT_FOOTNOTE_BODY);
+        			if (body==null) { // try oasis
+        				body = Misc.getChildByTagName(footnote,XMLString.TEXT_NOTE_BODY);
+        			}
+        			traverseNoteBody(sId,sFntCitStyle,citation,body,hnode,ofr.getFootnotesConfiguration());
+        		}
+        		footnotes.clear();
+        	}
         }
     }
 

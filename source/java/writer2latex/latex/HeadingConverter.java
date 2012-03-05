@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2011 by Henrik Just
+ *  Copyright: 2002-2012 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-03-29)
+ *  Version 1.2 (2012-03-05)
  *
  */
 
@@ -356,9 +356,9 @@ public class HeadingConverter extends ConverterHelper {
                         ldp.append("\\protect\\makebox[").append(sLabelWidth).append("][").append(sAlignmentChar).append("]{");
                     }
 			        ldp.append(baText.getBefore())
-                       .append(sPrefix!=null ? sPrefix : "")
+                       .append(sPrefix!=null ? palette.getI18n().convert(sPrefix,false,"en") : "")
                        .append("#1")
-                       .append(sSuffix!=null ? sSuffix : "")
+                       .append(sSuffix!=null ? palette.getI18n().convert(sSuffix,false,"en") : "")
                        .append(sSpaceChar)
                        .append(baText.getAfter());
                     if (!bOnlyNum && sLabelWidth!=null) {

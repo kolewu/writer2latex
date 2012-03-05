@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2012-02-27)
+ *  Version 1.2 (2012-03-05)
  *
  */
 
@@ -40,6 +40,7 @@ import org.w3c.dom.Node;
 
 import writer2latex.latex.util.Context; 
 import writer2latex.latex.util.HeadingMap;
+import writer2latex.office.ListStyle;
 import writer2latex.office.OfficeReader;
 import writer2latex.office.XMLString;
 import writer2latex.util.CSVList;
@@ -789,8 +790,31 @@ public class FieldConverter extends ConverterHelper {
             ldp.append("\\ref{bkm:"+bookmarknames.getExportName(sName)+"}");
         }
         else if (("number".equals(sFormat) || "number-no-superior".equals(sFormat) || "number-all-superior".equals(sFormat)) &&
-        		ofr.bookmarkInList(sName)) {
-        	ldp.append("\\ref{bkm:"+bookmarknames.getExportName(sName)+"}");
+        		(ofr.bookmarkInHeading(sName) || ofr.bookmarkInList(sName))) {
+        	ListStyle style=null;
+        	int nLevel = 0;
+        	String sPrefix=null;
+        	String sSuffix=null;
+        	// Only convert the prefix and suffix if it is converted at the reference target
+        	if (ofr.bookmarkInHeading(sName)) {
+        		if (config.formatting()>=LaTeXConfig.CONVERT_MOST) {
+        			style = ofr.getOutlineStyle();
+        		}
+        		nLevel = ofr.getBookmarkHeadingLevel(sName);
+        	}
+        	else {
+        		if (config.formatting()>=LaTeXConfig.CONVERT_BASIC) {
+        			style = ofr.getListStyle(ofr.getBookmarkListStyle(sName));
+        		}
+        		nLevel = ofr.getBookmarkListLevel(sName);
+        	}
+        	if (style!=null) {
+            	sPrefix = style.getLevelProperty(nLevel, XMLString.STYLE_NUM_PREFIX);
+            	sSuffix = style.getLevelProperty(nLevel, XMLString.STYLE_NUM_SUFFIX);
+        	}
+        	if (sPrefix!=null) ldp.append(palette.getI18n().convert(sPrefix,false,oc.getLang()));
+        	ldp.append("\\ref{bkm:").append(bookmarknames.getExportName(sName)).append("}");
+        	if (sSuffix!=null) ldp.append(palette.getI18n().convert(sSuffix,false,oc.getLang()));
         }
         else { // use current value
             palette.getInlineCv().traversePCDATA(node,ldp,oc);
