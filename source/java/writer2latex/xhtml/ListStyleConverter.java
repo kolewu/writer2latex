@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2010 by Henrik Just
+ *  Copyright: 2002-2012 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-05-05)
+ *  Version 1.2 (2012-03-07)
  *
  */
 
@@ -64,7 +64,9 @@ public class ListStyleConverter extends StyleConverterHelper {
             else {
                 String sDisplayName = style.getDisplayName();
                 if (styleMap.contains(sDisplayName)) {
-                    info.sTagName = styleMap.getElement(sDisplayName);
+                	if (styleMap.getElement(sDisplayName).length()>0) {
+                		info.sTagName = styleMap.getElement(sDisplayName);
+                	}
                     if (!"(none)".equals(styleMap.getCss(sDisplayName))) {
                         info.sClass = styleMap.getCss(sDisplayName);
                     }

@@ -16,11 +16,11 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 *  MA  02111-1307  USA
 *
-*  Copyright: 2002-2011 by Henrik Just
+*  Copyright: 2002-2012 by Henrik Just
 *
 *  All Rights Reserved.
 * 
-*  Version 1.2 (2011-06-06)
+*  Version 1.2 (2012-03-07)
 *
 */ 
 
@@ -688,6 +688,7 @@ public abstract class ConfigurationDialogBase extends WeakBase implements XConta
 				if (sNewName!=null) {
 					styleMap[nCurrentFamily].put(sNewName, new HashMap<String,String>());
 					clearControls(dlg);
+					styleNameChange(dlg);
 				}
 				updateStyleControls(dlg);
 			}
@@ -698,6 +699,7 @@ public abstract class ConfigurationDialogBase extends WeakBase implements XConta
 				String sStyleName = sCurrentStyleName;
 				if (deleteCurrentItem(dlg,"StyleName")) {
 					styleMap[nCurrentFamily].remove(sStyleName);
+					sCurrentStyleName=null;
 					styleNameChange(dlg);
 				}
 				updateStyleControls(dlg);

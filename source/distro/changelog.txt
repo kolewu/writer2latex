@@ -2,6 +2,10 @@ Changelog for Writer2LaTeX version 1.0 -> 1.2
 
 ---------- version 1.1.9 ----------
 
+[w2x] Bugfix: Ignore empty element attribute in style maps
+
+[all] Fixed bugs in some of the filter configuration dialogs
+
 [w2l] Added support for the new StarMath keywords nospace (ignored) and prec, nprec, succ, nsucc, preccurlyeq, succcurlyeq,
   precsim, succsim (converted)   
 

@@ -16,11 +16,11 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 *  MA  02111-1307  USA
 *
-*  Copyright: 2002-2011 by Henrik Just
+*  Copyright: 2002-2012 by Henrik Just
 *
 *  All Rights Reserved.
 * 
-*  Version 1.2 (2011-06-11)
+*  Version 1.2 (2012-03-07)
 *
 */ 
 

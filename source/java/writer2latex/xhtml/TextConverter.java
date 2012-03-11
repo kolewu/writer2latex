@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2012-03-05)
+ *  Version 1.2 (2012-03-07)
  *
  */
 
@@ -2076,15 +2076,18 @@ public class TextConverter extends ConverterHelper {
 	
     /* apply hard formatting attribute style maps */
     private Element applyAttribute(Element node, String sAttr, boolean bApply) {
-        if (!bApply) { return node; }
-        XhtmlStyleMap xattr = config.getXAttrStyleMap();
-        if (!xattr.contains(sAttr)) { return node; }
-        Element attr = converter.createElement(xattr.getElement(sAttr));
-        if (!"(none)".equals(xattr.getCss(sAttr))) {
-            attr.setAttribute("class",xattr.getCss(sAttr));
-        }
-        node.appendChild(attr);
-        return attr;
+    	if (bApply) {
+    		XhtmlStyleMap xattr = config.getXAttrStyleMap();
+    		if (xattr.contains(sAttr) && xattr.getElement(sAttr).length()>0) { 
+    			Element attr = converter.createElement(xattr.getElement(sAttr));
+    			if (!"(none)".equals(xattr.getCss(sAttr))) {
+    				attr.setAttribute("class",xattr.getCss(sAttr));
+    			}
+    			node.appendChild(attr);
+    			return attr;
+    		}
+    	}
+    	return node;
     }
 	
     /* Create a styled paragraph node */

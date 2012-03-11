@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2011 by Henrik Just
+ *  Copyright: 2002-2012 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-09-20)
+ *  Version 1.2 (2012-03-07)
  *
  */ 
  
@@ -164,6 +164,8 @@ public final class ConfigurationDialog extends ConfigurationDialogBase implement
         	}
         	dlg.setListBoxSelectedItem("MaxLevel", nMaxLevel);
         	
+        	maxLevelChange(dlg);
+        	
         	// Get other controls from config
         	checkBoxFromConfig(dlg,"UseTitlesec","use_titlesec");
 
@@ -235,6 +237,8 @@ public final class ConfigurationDialog extends ConfigurationDialogBase implement
         		}
         		dlg.setListBoxSelectedItem("WriterLevel", nNewWriterLevel);
         	}
+        	
+        	writerLevelChange(dlg);
 
         	// All controls should be disabled if the maximum level is zero
         	boolean bUpdate = dlg.getListBoxSelectedItem("MaxLevel")>0;
