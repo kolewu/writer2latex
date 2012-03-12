@@ -1,6 +1,6 @@
 Changelog for Writer2LaTeX version 1.0 -> 1.2
 
----------- version 1.1.9 ----------
+---------- version 1.2 beta ----------
 
 [w2x] Bugfix: Ignore empty element attribute in style maps
 

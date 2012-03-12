@@ -20,7 +20,7 @@
 *
 *  All Rights Reserved.
 * 
-*  Version 1.2 (2012-03-07)
+*  Version 1.2 (2012-03-11)
 *
 */ 
 
@@ -443,9 +443,12 @@ public abstract class ConfigurationDialogBase extends WeakBase implements XConta
 							while ((sLine = reader.readLine())!=null) {
 								buf.append(sLine).append('\n');
 							}
+							reader.close();
+							is.close();
 						}
 						catch (IOException e) {
 						}
+						xIs.closeInput();
 						return buf.toString();
 					}
 				}
@@ -688,6 +691,7 @@ public abstract class ConfigurationDialogBase extends WeakBase implements XConta
 				if (sNewName!=null) {
 					styleMap[nCurrentFamily].put(sNewName, new HashMap<String,String>());
 					clearControls(dlg);
+					sCurrentStyleName=null;
 					styleNameChange(dlg);
 				}
 				updateStyleControls(dlg);

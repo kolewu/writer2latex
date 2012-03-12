@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2012-03-07)
+ *  Version 1.2 (2012-03-12)
  *
  */ 
  
@@ -496,7 +496,7 @@ public final class ConfigurationDialog extends ConfigurationDialogBase implement
     // This page handles the options use_color, use_soul, use_ulem and use_hyperref
     // In addition it handles style maps for formatting attributes
     private class CharactersHandler extends AttributePageHandler {
-    	private final String[] sLaTeXAttributeNames = { "bold", "italic", "small-caps", "superscript", "subscipt" };
+    	private final String[] sLaTeXAttributeNames = { "bold", "italic", "small-caps", "superscript", "subscript" };
         
         protected CharactersHandler() {
         	super();
