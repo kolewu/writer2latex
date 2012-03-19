@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2009 by Henrik Just
+ *  Copyright: 2002-2012 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2009-09-24)
+ *  Version 1.4 (2012-03-19)
  *
  */
 
@@ -46,7 +46,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.DOMImplementation;
 
 import writer2latex.api.ComplexOption;
-import writer2latex.xmerge.NewDOMDocument;
+import writer2latex.xmerge.DOMDocument;
 
 public abstract class ConfigBase implements writer2latex.api.Config {
 	
@@ -112,7 +112,7 @@ public abstract class ConfigBase implements writer2latex.api.Config {
      *  @param is the input stream to read the configuration from
      */
     public void read(InputStream is) throws IOException {
-        NewDOMDocument doc = new NewDOMDocument("config",".xml");
+        DOMDocument doc = new DOMDocument("config",".xml");
         doc.read(is); // may throw an IOException
         Document dom = doc.getContentDOM();
         if (dom==null) {
@@ -147,7 +147,7 @@ public abstract class ConfigBase implements writer2latex.api.Config {
     protected abstract void readInner(Element elm);
 
     public void write(OutputStream os) throws IOException {
-        NewDOMDocument doc = new NewDOMDocument("config",".xml");
+        DOMDocument doc = new DOMDocument("config",".xml");
         Document dom = null;
         try {
             DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();

@@ -37,7 +37,7 @@
  ************************************************************************/
  
 // This version is adapted for Writer2LaTeX
-// Version 1.0 (2008-11-23)
+// Version 1.4 (2012-03-19)
 
 package writer2latex.xmerge;
 
@@ -49,9 +49,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 //import org.xml.sax.EntityResolver;
 //import org.xml.sax.InputSource;
@@ -128,10 +125,10 @@ public class EmbeddedXMLObject extends EmbeddedObject {
      *
      * @param   content     DOM representation of the object's content.
      */
-    public void setContentDOM(Document content) {
+    /*public void setContentDOM(Document content) {
         contentDOM = content;
         hasChanged = true;
-    }
+    }*/
     
     
     /**
@@ -157,10 +154,10 @@ public class EmbeddedXMLObject extends EmbeddedObject {
      *
      * @param   settings     DOM representation of the object's settings.
      */
-    public void setSettingsDOM(Document settings) {
+    /*public void setSettingsDOM(Document settings) {
         settingsDOM = settings;
         hasChanged = true;
-    }
+    }*/
 
     
     /**
@@ -186,10 +183,10 @@ public class EmbeddedXMLObject extends EmbeddedObject {
      *
      * @param   styles     DOM representation of the object's styles.
      */
-    public void setStylesDOM(Document styles) {
+    /*public void setStylesDOM(Document styles) {
         stylesDOM = styles;
         hasChanged = true;
-    }
+    }*/
 
     
     /**
@@ -238,75 +235,5 @@ public class EmbeddedXMLObject extends EmbeddedObject {
     }
     
     
-    /** 
-     * Package private method for writing the data of the EmbeddedObject to a
-     * SX? file.
-     *
-     * @param   zip     An <code>OfficeZip</code> instance representing the file
-     *                  the data is to be written to.
-     */
-    void write(OfficeZip zip) throws IOException {
-        if (hasChanged == true) {
-            if (contentDOM != null) {
-                zip.setNamedBytes(new String(objName + "/content.xml"), 
-                                        OfficeDocument.docToBytes(contentDOM));
-            }
-            if (settingsDOM != null) {
-                zip.setNamedBytes(new String(objName + "/settings.xml"),
-                                        OfficeDocument.docToBytes(settingsDOM));
-            }
-            if (stylesDOM != null) {
-                zip.setNamedBytes(new String(objName + "/styles.xml"),
-                                        OfficeDocument.docToBytes(stylesDOM));
-            }
-        }
-    }
-    
-    /** 
-     * Package private method that constructs the manifest.xml entries for this
-     * embedded object.
-     *
-     * @param  manifestDoc    <code>Document</code> containing the manifest entries.
-     */
-    void writeManifestData(Document manifestDoc) throws DOMException {
-        Node root = manifestDoc.getDocumentElement();
-        
-        if (contentDOM != null) {
-            Element contentNode = manifestDoc.createElement(OfficeConstants.TAG_MANIFEST_FILE);
-            
-            contentNode.setAttribute(OfficeConstants.ATTRIBUTE_MANIFEST_FILE_TYPE, "text/xml");
-            contentNode.setAttribute(OfficeConstants.ATTRIBUTE_MANIFEST_FILE_PATH,    
-                                        new String(objName + "/content.xml"));
-            
-            root.appendChild(contentNode);
-        }
-        
-        if (settingsDOM != null) {
-            Element settingsNode = manifestDoc.createElement(OfficeConstants.TAG_MANIFEST_FILE);
-            
-            settingsNode.setAttribute(OfficeConstants.ATTRIBUTE_MANIFEST_FILE_TYPE, "text/xml");
-            settingsNode.setAttribute(OfficeConstants.ATTRIBUTE_MANIFEST_FILE_PATH,
-                                        new String(objName + "/settings.xml"));
-            
-            root.appendChild(settingsNode);
-        }
-        
-        if (stylesDOM != null) {
-            Element stylesNode = manifestDoc.createElement(OfficeConstants.TAG_MANIFEST_FILE);
-            
-            stylesNode.setAttribute(OfficeConstants.ATTRIBUTE_MANIFEST_FILE_TYPE, "text/xml");
-            stylesNode.setAttribute(OfficeConstants.ATTRIBUTE_MANIFEST_FILE_PATH, 
-                                        new String(objName + "/styles.xml"));
-        }
-            
-        
-        Element objectNode = manifestDoc.createElement(OfficeConstants.TAG_MANIFEST_FILE);
-        
-        objectNode.setAttribute(OfficeConstants.ATTRIBUTE_MANIFEST_FILE_TYPE, objType);
-        objectNode.setAttribute(OfficeConstants.ATTRIBUTE_MANIFEST_FILE_PATH,
-                                    new String(objName + "/"));
-        
-        root.appendChild(objectNode);
-    }
-    
+   
 }

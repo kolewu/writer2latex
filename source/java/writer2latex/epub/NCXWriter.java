@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  version 1.2 (2012-02-22)
+ *  version 1.4 (2012-03-19)
  *
  */
 
@@ -40,12 +40,12 @@ import org.w3c.dom.Element;
 import writer2latex.api.ContentEntry;
 import writer2latex.api.ConverterResult;
 import writer2latex.util.Misc;
-import writer2latex.xmerge.NewDOMDocument;
+import writer2latex.xmerge.DOMDocument;
 
 /** This class creates the required NXC file for an EPUB document
  *  (see http://www.idpf.org/2007/opf/OPF_2.0_final_spec.html#Section2.4).
  */
-public class NCXWriter extends NewDOMDocument {
+public class NCXWriter extends DOMDocument {
 	
 	public NCXWriter(ConverterResult cr, String sUUID) {
 		super("book", "ncx");

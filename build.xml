@@ -2,7 +2,7 @@
   ############################################################################
   # This is the Ant build file for writer2latex
   # Original: Sep 2004 (mgn)
-  # version 1.4 (2012-03-13)
+  # version 1.4 (2012-03-16)
   ############################################################################
 -->
 <project name="w2l" default="help" basedir=".">
@@ -76,6 +76,7 @@
         <copy todir="${classes}">
             <fileset dir="${src}">
                 <include name="**/*.xml"/>
+                <include name="**/*.properties"/>
             </fileset>
         </copy>
     </target>
@@ -91,6 +92,7 @@
                     <exclude name="**/*Test.class"/>
                     <exclude name="**/AllTests.class"/>
 		    		<include name="**/*.xml"/>
+		    		<include name="**/*.properties"/>
                 	<include name="**/*.class"/>
                     <!-- do not include OOo components in standalone library -->
                 	<exclude name="org/openoffice/**/*"/>
@@ -166,6 +168,7 @@
                 	<include name="writer2latex/util/**/*.class"/>
                 	<include name="writer2latex/xhtml/**/*.class"/>
                 	<include name="writer2latex/xhtml/**/*.xml"/>
+                	<include name="writer2latex/xhtml/**/*.properties"/>
                 	<include name="writer2latex/xmerge/**/*.class"/>
                 	<!-- include the portions of w2l necessary to convert formulas -->
                 	<include name="writer2latex/latex/StarMathConverter.class"/>

@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2001-2010 by Henrik Just
+ *  Copyright: 2001-2012 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  version 1.2 (2010-03-29)
+ *  version 1.4 (2012-03-19)
  *
  */
 
@@ -35,12 +35,12 @@ import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
 import org.w3c.dom.Element;
 
-import writer2latex.xmerge.NewDOMDocument;
+import writer2latex.xmerge.DOMDocument;
 
 /** This class creates the required META-INF/container.xml file for an EPUB package 
  *  (see http://www.idpf.org/ocf/ocf1.0/download/ocf10.htm).
  */
-public class ContainerWriter extends NewDOMDocument {
+public class ContainerWriter extends DOMDocument {
 	
 	public ContainerWriter() {
 		super("container", "xml");

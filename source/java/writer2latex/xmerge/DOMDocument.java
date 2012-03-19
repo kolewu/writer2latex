@@ -37,26 +37,24 @@
  ************************************************************************/
  
 // This version is adapted for writer2latex
-// Version 1.2 (2010-03-15)
+// Version 1.4 (2012-03-19)
 
 package writer2latex.xmerge;
 
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-//import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
-//import java.io.ByteArrayInputStream;
-//import java.io.IOException;
-
+import java.io.OutputStreamWriter;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 //import org.xml.sax.SAXParseException;
 
@@ -221,133 +219,106 @@ public class DOMDocument
         }
     }
     
-  
     /**
      *  Write out content to the supplied <code>OutputStream</code>.
-     *
+     *  (with pretty printing)
      *  @param  os  XML <code>OutputStream</code>.
-     *
      *  @throws  IOException  If any I/O error occurs.
      */
     public void write(OutputStream os) throws IOException {
-
-        // set bytes for writing to output stream
-        byte contentBytes[] = docToBytes(contentDoc);
-       
-        os.write(contentBytes);
+        OutputStreamWriter osw = new OutputStreamWriter(os,"UTF-8");
+        osw.write("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n");
+        write(getContentDOM().getDocumentElement(),0,osw);
+        osw.flush();
+        osw.close();
     }
 
-
-    /**
-     *  <p>Write out a <code>org.w3c.dom.Document</code> object into a
-     *  <code>byte</code> array.</p>
-     *
-     *  <p>TODO: remove dependency on com.sun.xml.tree.XmlDocument
-     *  package!</p>
-     *
-     *  @param  Document  DOM <code>Document</code> object.
-     *
-     *  @return  <code>byte</code> array of DOM <code>Document</code>
-     *           object.
-     *
-     *  @throws  IOException  If any I/O error occurs.
-     */
-    private byte[] docToBytes(Document doc)
-        throws IOException {
-
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-        java.lang.reflect.Constructor con;
-        java.lang.reflect.Method meth;
-        
-        String domImpl = doc.getClass().getName();
-        
-        /*
-         * We may have multiple XML parsers in the Classpath.
-         * Depending on which one is first, the actual type of
-         * doc may vary.  Need a way to find out which API is being
-         * used and use an appropriate serialization method.
-         */
-        try {
-            // First of all try for JAXP 1.0
-            if (domImpl.equals("com.sun.xml.tree.XmlDocument")) {
-                Class jaxpDoc = Class.forName("com.sun.xml.tree.XmlDocument");
-            
-                // The method is in the XMLDocument class itself, not a helper
-                meth = jaxpDoc.getMethod("write", 
-                            new Class[] { Class.forName("java.io.OutputStream") } );
-                                     
-                meth.invoke(doc, new Object [] { baos } );
-            }
-	    else if (domImpl.equals("org.apache.crimson.tree.XmlDocument"))
-	    {
-		 Class crimsonDoc = Class.forName("org.apache.crimson.tree.XmlDocument");
-		 // The method is in the XMLDocument class itself, not a helper
-                meth = crimsonDoc.getMethod("write", 
-                            new Class[] { Class.forName("java.io.OutputStream") } );
-                                     
-                meth.invoke(doc, new Object [] { baos } );  
-	    }
-            else if (domImpl.equals("org.apache.xerces.dom.DocumentImpl") 
-            || domImpl.equals("org.apache.xerces.dom.DeferredDocumentImpl")) {
-                // Try for Xerces
-                Class xercesSer = 
-                        Class.forName("org.apache.xml.serialize.XMLSerializer");
-                
-                // Get the OutputStream constructor
-                // May want to use the OutputFormat parameter at some stage too
-                con = xercesSer.getConstructor(new Class [] 
-                        { Class.forName("java.io.OutputStream"),
-                          Class.forName("org.apache.xml.serialize.OutputFormat") } );
-                              
-                
-                // Get the serialize method
-                meth = xercesSer.getMethod("serialize", 
-                            new Class [] { Class.forName("org.w3c.dom.Document") } );                                           
-                                           
-                          
-                // Get an instance
-                Object serializer = con.newInstance(new Object [] { baos, null } );
-                
-                
-                // Now call serialize to write the document
-                meth.invoke(serializer, new Object [] { doc } );
-            }
-            else if (domImpl.equals("gnu.xml.dom.DomDocument")) {
-
-                Class gnuSer = Class.forName("gnu.xml.dom.ls.DomLSSerializer");
-
-                // Get the serialize method
-                meth = gnuSer.getMethod("serialize",
-                            new Class [] { Class.forName("org.w3c.dom.Node"),
-                            Class.forName("java.io.OutputStream") } );
-
-                // Get an instance
-                Object serializer = gnuSer.newInstance();
-
-                // Now call serialize to write the document
-                meth.invoke(serializer, new Object [] { doc, baos } );
-            }
-            else {
-                // We dont have another parser  
-                throw new IOException("No appropriate API (JAXP/Xerces) to serialize XML document: " + domImpl);
-            }
+    // Write nodes; we only need element, text and comment nodes
+    private void write(Node node, int nLevel, OutputStreamWriter osw) throws IOException {
+        short nType = node.getNodeType();
+        switch (nType) {
+            case Node.ELEMENT_NODE:
+                if (node.hasChildNodes()) {
+                    // Block pretty print from this node?
+                    NodeList list = node.getChildNodes();
+                    int nLen = list.getLength();
+                    boolean bBlockPrettyPrint = false;
+                    if (nLevel>=0) {
+                        for (int i = 0; i < nLen; i++) {
+                            bBlockPrettyPrint |= list.item(i).getNodeType()==Node.TEXT_NODE;
+                        }
+                    }
+                    // Print start tag
+                    if (nLevel>=0) { writeSpaces(nLevel,osw); }
+                    osw.write("<"+node.getNodeName());
+                    writeAttributes(node,osw);
+                    osw.write(">");
+                    if (nLevel>=0 && !bBlockPrettyPrint) { osw.write("\n"); }
+                    // Print children
+                    for (int i = 0; i < nLen; i++) {
+                        int nNextLevel;
+                        if (bBlockPrettyPrint || nLevel<0) { nNextLevel=-1; }
+                        else { nNextLevel=nLevel+1; }
+                        write(list.item(i),nNextLevel,osw);
+                    }
+                    // Print end tag
+                    if (nLevel>=0 && !bBlockPrettyPrint) { writeSpaces(nLevel,osw); }
+                    osw.write("</"+node.getNodeName()+">");
+                    if (nLevel>=0) { osw.write("\n"); }
+                }
+                else { // empty element
+                    if (nLevel>=0) { writeSpaces(nLevel,osw); }
+                    osw.write("<"+node.getNodeName());
+                    writeAttributes(node,osw);
+                    osw.write(" />");
+                    if (nLevel>=0) { osw.write("\n"); }
+                }
+                break;
+            case Node.TEXT_NODE:
+                write(node.getNodeValue(),osw);
+                break;
+            case Node.COMMENT_NODE:
+                if (nLevel>=0) { writeSpaces(nLevel,osw); }
+                osw.write("<!-- ");
+                write(node.getNodeValue(),osw);
+                osw.write(" -->");
+                if (nLevel>=0) { osw.write("\n"); }
         }
-        catch (ClassNotFoundException cnfe) {
-            throw new IOException(cnfe.toString());
+    }
+	
+    private void writeAttributes(Node node, OutputStreamWriter osw) throws IOException {
+        NamedNodeMap attr = node.getAttributes();
+        int nLen = attr.getLength();
+        for (int i=0; i<nLen; i++) {
+            Node item = attr.item(i);
+            osw.write(" ");
+            write(item.getNodeName(),osw);
+            osw.write("=\"");
+            write(item.getNodeValue(),osw);
+            osw.write("\"");
         }
-        catch (Exception e) {
-            // We may get some other errors, but the bottom line is that
-            // the steps being executed no longer work
-            throw new IOException(e.toString());
-        }
-
-        byte bytes[] = baos.toByteArray();
-
-        return bytes;
     }
 
-
+    private void writeSpaces(int nCount, OutputStreamWriter osw) throws IOException {
+        for (int i=0; i<nCount; i++) { osw.write("  "); }
+    }
+	
+    private void write(String s, OutputStreamWriter osw) throws IOException {
+        int nLen = s.length();
+        char c;
+        for (int i=0; i<nLen; i++) {
+            c = s.charAt(i);
+            switch (c) {
+                case ('<'): osw.write("&lt;"); break;
+                case ('>'): osw.write("&gt;"); break;
+                case ('&'): osw.write("&amp;"); break;
+                case ('"'): osw.write("&quot;"); break;
+                case ('\''): osw.write( "&apos;"); break;
+                default: osw.write(c);
+            }
+        }
+    }
+    
     /**
      *  Initializes a new DOM <code>Document</code> with the content
      *  containing minimum XML tags.

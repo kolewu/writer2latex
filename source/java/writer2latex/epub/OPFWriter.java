@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  version 1.2 (2012-02-26)
+ *  version 1.4 (2012-03-19)
  *
  */
 
@@ -44,11 +44,11 @@ import writer2latex.api.ContentEntry;
 import writer2latex.api.ConverterResult;
 import writer2latex.api.OutputFile;
 import writer2latex.util.Misc;
-import writer2latex.xmerge.NewDOMDocument;
+import writer2latex.xmerge.DOMDocument;
 
 /** This class writes an OPF-file for an EPUB document (see http://www.idpf.org/2007/opf/OPF_2.0_final_spec.html).
  */
-public class OPFWriter extends NewDOMDocument {
+public class OPFWriter extends DOMDocument {
 	private String sUID=null;
 
 	public OPFWriter(ConverterResult cr) {

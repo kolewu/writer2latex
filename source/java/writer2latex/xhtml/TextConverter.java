@@ -40,6 +40,7 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Element;
 
 import writer2latex.util.Misc;
+import writer2latex.xhtml.l10n.L10n;
 import writer2latex.office.FontDeclaration;
 import writer2latex.office.OfficeStyle;
 import writer2latex.office.XMLString;

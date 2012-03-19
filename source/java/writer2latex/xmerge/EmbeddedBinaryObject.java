@@ -38,14 +38,9 @@
  ************************************************************************/
 
 // This version is adapted for Writer2LaTeX
-// Version 1.0 (2008-11-22)
+// Version 1.4 (2012-03-19)
 
 package writer2latex.xmerge;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Element;
-//import org.w3c.dom.Node;
 
 
 /**
@@ -105,39 +100,10 @@ public class EmbeddedBinaryObject extends EmbeddedObject {
      *
      * @param   data    A <code>byte</code> array containing data for the object.
      */
-    public void setBinaryData(byte[] data) {
+    /*public void setBinaryData(byte[] data) {
         objData = data;
         hasChanged = true;
-    }
-    
-    /** 
-     * Package private method for writing the data of the EmbeddedObject to a
-     * SX? file.
-     *
-     * @param   zip     An <code>OfficeZip</code> instance representing the file
-     *                  the data is to be written to.
-     */
-    void write(OfficeZip zip) {
-        if (hasChanged) {
-            zip.setNamedBytes(objName, objData);
-        }
-    }
-    
-    
-    /** 
-     * Package private method that constructs the manifest.xml entries for this
-     * embedded object.
-     *
-     * @return  Document    <code>Document</code> containing the manifest entries.
-     */
-    void writeManifestData(Document manifestDoc) throws DOMException {        
-        Element objNode = manifestDoc.createElement(OfficeConstants.TAG_MANIFEST_FILE);
-        
-        objNode.setAttribute(OfficeConstants.ATTRIBUTE_MANIFEST_FILE_TYPE, objType);
-        objNode.setAttribute(OfficeConstants.ATTRIBUTE_MANIFEST_FILE_PATH,  objName);
-        
-        manifestDoc.getDocumentElement().appendChild(objNode);
-    }
+    }*/
     
 }
 

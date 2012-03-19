@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.4 (2012-03-13)
+ *  Version 1.4 (2012-03-19)
  *
  */
  
@@ -33,7 +33,7 @@ public class ConverterFactory {
 
     // Version information
     private static final String VERSION = "1.3.1";
-    private static final String DATE = "2012-03-13";
+    private static final String DATE = "2012-03-19";
 	
     /** Return the Writer2LaTeX version in the form
      *  (major version).(minor version).(patch level)<br/>

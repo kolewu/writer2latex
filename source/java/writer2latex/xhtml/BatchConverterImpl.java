@@ -37,6 +37,7 @@ import org.w3c.dom.Element;
 import writer2latex.api.IndexPageEntry;
 import writer2latex.api.OutputFile;
 import writer2latex.base.BatchConverterBase;
+import writer2latex.xhtml.l10n.L10n;
 
 /**
  * Implementation of <code>writer2latex.api.BatchConverter</code> for

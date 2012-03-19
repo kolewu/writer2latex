@@ -37,28 +37,22 @@
  ************************************************************************/
 
 // This version is adapted for Writer2LaTeX
-// Version 1.0 (2008-11-22)
+// Version 1.4 (2012-03-19)
  
 package writer2latex.xmerge;
 
 import java.util.List;
-import java.util.ListIterator;
 import java.util.LinkedList;
 import java.util.zip.ZipInputStream;
-import java.util.zip.ZipOutputStream;
 import java.util.zip.ZipEntry;
-import java.util.zip.CRC32;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.IOException;
 import java.io.ByteArrayOutputStream;
-
-//import org.openoffice.xmerge.util.Debug;
 
 /**
  *  Class used by {@link
  *  org.openoffice.xmerge.converter.OfficeDocument
- *  OfficeDocument} to handle reading and writing
+ *  OfficeDocument} to handle reading
  *  from a ZIP file, as well as storing ZIP entries.
  *
  *  @author   Herbie Ong
@@ -113,9 +107,6 @@ class OfficeZip {
         while ((ze = zis.getNextEntry()) != null) {
 
             String name = ze.getName();
-            //System.out.println("Found "+name);
-
-            // Debug.log(Debug.TRACE, "reading entry: " + name);
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
@@ -241,31 +232,6 @@ class OfficeZip {
     
     
     /**
-     * This method sets the bytes for the named entry.  It searches for a 
-     * matching entry in the LinkedList.  If no entry is found, a new one is 
-     * created.
-     *
-     * Writing of data is defferred to setEntryBytes().  
-     *
-     * @param   name    The name of the entry to search for.
-     * @param   bytes   The new data to write.
-     */
-    void setNamedBytes(String name, byte[] bytes) {
-        for (int i = 0; i < entryList.size(); i++) {
-            Entry e = entryList.get(i);
-            
-            if (e.zipEntry.getName().equals(name)) {
-                setEntryBytes(i, bytes, name);
-                return;
-            }
-        }
-        
-        // If we're here, no entry was found.  Call setEntryBytes with an index
-        // of -1 to insert a new entry.
-        setEntryBytes(-1, bytes, name);
-    }
-
-    /**
      *  Used by the <code>getContentXMLBytes</code> method and the
      *  <code>getStyleXMLBytes</code> method to return the
      *  <code>byte</code> array from the corresponding
@@ -287,171 +253,6 @@ class OfficeZip {
             bytes = entry.bytes;
         }
         return bytes;
-    }
-
-
-    /**
-     *  Set or replace the <code>byte</code> array for the
-     *  CONTENTXML file.
-     *
-     *  @param  bytes  <code>byte</code> array for the
-     *                 CONTENTXML file.
-     */
-    void setContentXMLBytes(byte bytes[]) {
-
-        contentIndex = setEntryBytes(contentIndex, bytes, CONTENTXML);
-    }
-
-
-    /**
-     *  Set or replace the <code>byte</code> array for the
-     *  STYLEXML file.
-     *
-     *  @param  bytes  <code>byte</code> array for the
-     *                 STYLEXML file.
-     */
-    void setStyleXMLBytes(byte bytes[]) {
-
-        styleIndex = setEntryBytes(styleIndex, bytes, STYLEXML);
-    }
-
-
-      /**
-     *  Set or replace the <code>byte</code> array for the
-     *  METAXML file.
-     *
-     *  @param  bytes  <code>byte</code> array for the
-     *                 METAXML file.
-     */
-    void setMetaXMLBytes(byte bytes[]) {
-
-        metaIndex = setEntryBytes(metaIndex, bytes, METAXML);
-    }
-
-
-      /**
-     *  Set or replace the <code>byte</code> array for the
-     *  SETTINGSXML file.
-     *
-     *  @param  bytes  <code>byte</code> array for the
-     *                 SETTINGSXML file.
-     */
-    void setSettingsXMLBytes(byte bytes[]) {
-
-        settingsIndex = setEntryBytes(settingsIndex, bytes, SETTINGSXML);
-    }
-
-    
-    /**
-     * Set or replace the <code>byte</code> array for the MANIFESTXML file.
-     * 
-     * @param   bytes   <code>byte</code> array for the MANIFESTXML file.
-     */
-    void setManifestXMLBytes(byte bytes[]) {
-        manifestIndex = setEntryBytes(manifestIndex, bytes, MANIFESTXML);
-    }
-    
-    /**
-     *  <p>Used by the <code>setContentXMLBytes</code> method and
-     *  the <code>setStyleXMLBytes</code> to either replace an
-     *  existing <code>Entry</code>, or create a new entry in
-     *  <code>entryList</code>.</p>
-     *
-     *  <p>If there is an <code>Entry</code> object within
-     *  entryList that corresponds to the index, replace the
-     *  <code>ZipEntry</code> info.</p>
-     *
-     *  @param  index  Index of <code>Entry</code> to modify.
-     *  @param  bytes  <code>Entry</code> value.
-     *  @param  name   Name of <code>Entry</code>.
-     *
-     *  @return Index of value added or modified in entryList
-     */
-    private int setEntryBytes(int index, byte bytes[], String name) {
-
-        if (index > -1) {
-
-            // replace existing entry in entryList
-
-            Entry entry = entryList.get(index);
-            name = entry.zipEntry.getName();
-            int method = entry.zipEntry.getMethod();
-
-            ZipEntry ze = createZipEntry(name, bytes, method);
-
-            entry.zipEntry = ze;
-            entry.bytes= bytes;
-
-        } else {
-
-            // add a new entry into entryList
-            ZipEntry ze = createZipEntry(name, bytes, ZipEntry.DEFLATED);
-            Entry entry = new Entry(ze, bytes);
-            entryList.add(entry);
-            index = entryList.size() - 1;
-        }
-
-        return index;
-    }
-
-
-    /**
-     *  Write out the ZIP entries into the <code>OutputStream</code>
-     *  object.
-     *
-     *  @param  os  <code>OutputStream</code> object to write ZIP.
-     *
-     *  @throws  IOException  If any ZIP I/O error occurs.
-     */
-    void write(OutputStream os) throws IOException {
-
-        // Debug.log(Debug.TRACE, "Writing out the following entries into zip.");
-
-        ZipOutputStream zos = new ZipOutputStream(os);
-
-        ListIterator<Entry> iterator = entryList.listIterator();
-
-        while (iterator.hasNext()) {
-
-            Entry entry = iterator.next();
-            ZipEntry ze = entry.zipEntry;
-
-            //String name = ze.getName();
-
-            // Debug.log(Debug.TRACE, "... " + name);
-
-            zos.putNextEntry(ze);
-            zos.write(entry.bytes);
-        }
-
-        zos.close();
-    }
-
-
-    /**
-     *  Creates a <code>ZipEntry</code> object based on the given params.
-     *
-     *  @param  name    Name for the <code>ZipEntry</code>.
-     *  @param  bytes   <code>byte</code> array for <code>ZipEntry</code>.
-     *  @param  method  ZIP method to be used for <code>ZipEntry</code>.
-     *
-     *  @return  A <code>ZipEntry</code> object.
-     */
-    private ZipEntry createZipEntry(String name, byte bytes[], int method) {
-
-        ZipEntry ze = new ZipEntry(name);
-
-        ze.setMethod(method);
-        ze.setSize(bytes.length);
-
-        CRC32 crc = new CRC32();
-        crc.reset();
-        crc.update(bytes);
-        ze.setCrc(crc.getValue());
-
-        ze.setTime(System.currentTimeMillis());
-
-        return ze;
     }
 
     /**

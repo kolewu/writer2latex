@@ -60,6 +60,7 @@ import writer2latex.office.StyleWithProperties;
 import writer2latex.office.XMLString;
 import writer2latex.util.ExportNameCollection;
 import writer2latex.util.Misc;
+import writer2latex.xhtml.l10n.L10n;
 
 /**
  * <p>This class converts an OpenDocument file to an XHTML(+MathML) or EPUB document.</p>
