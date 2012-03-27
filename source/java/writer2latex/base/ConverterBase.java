@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2011 by Henrik Just
+ *  Copyright: 2002-2012 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-02-19)
+ *  Version 1.4 (2012-03-23)
  *
  */
 
@@ -35,11 +35,11 @@ import writer2latex.api.GraphicConverter;
 import writer2latex.api.Converter;
 import writer2latex.api.ConverterResult;
 import writer2latex.api.OutputFile;
+import writer2latex.office.EmbeddedObject;
 import writer2latex.office.ImageLoader;
 import writer2latex.office.MetaData;
+import writer2latex.office.OfficeDocument;
 import writer2latex.office.OfficeReader;
-import writer2latex.xmerge.EmbeddedObject;
-import writer2latex.xmerge.OfficeDocument;
 
 /**<p>Abstract base implementation of <code>writer2latex.api.Converter</code></p>
  */
@@ -93,8 +93,19 @@ public abstract class ConverterBase implements Converter {
 
     public ConverterResult convert(InputStream is, String sTargetFileName) throws IOException {
         // Read document
-        odDoc = new OfficeDocument("InFile");
+        odDoc = new OfficeDocument();
         odDoc.read(is);
+        return convert(sTargetFileName);
+    }
+    
+    public ConverterResult convert(org.w3c.dom.Document dom, String sTargetFileName) throws IOException {
+    	// Read document
+    	odDoc = new OfficeDocument();
+    	odDoc.read(dom);
+    	return convert(sTargetFileName);
+    }
+    
+    private ConverterResult convert(String sTargetFileName) throws IOException {
         ofr = new OfficeReader(odDoc,false);
         metaData = new MetaData(odDoc);
         imageLoader = new ImageLoader(odDoc,true);

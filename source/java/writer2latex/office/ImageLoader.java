@@ -40,9 +40,6 @@ import writer2latex.api.GraphicConverter;
 import writer2latex.util.Base64;
 import writer2latex.util.Misc;
 import writer2latex.xmerge.BinaryGraphicsDocument;
-import writer2latex.xmerge.EmbeddedObject;
-import writer2latex.xmerge.EmbeddedBinaryObject;
-import writer2latex.xmerge.OfficeDocument;
 
 //import writer2latex.util.*;
 

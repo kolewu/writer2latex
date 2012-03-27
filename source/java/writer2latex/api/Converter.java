@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2011 by Henrik Just
+ *  Copyright: 2002-2012 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-06-05)
+ *  Version 1.4 (2012-03-21)
  *
  */
  
@@ -137,5 +137,17 @@ public interface Converter {
      */
     public ConverterResult convert(File source, String sTargetFileName)
         throws FileNotFoundException, IOException;
+    
+    /** Convert a document
+     * 
+     * @param dom a DOM tree representing the document as flat XML
+     * @param sTargetFileName the file name to use for the converted document
+     *  (if the converted document is a compound document consisting consisting
+     *  of several files, this name will be used for the master document)
+     * @return a <code>ConverterResult</code> containing the converted document
+     * @throws IOException if some exception occurs while reading the document
+     */
+    public ConverterResult convert(org.w3c.dom.Document dom, String sTargetFileName)
+    	throws IOException;
 
 }

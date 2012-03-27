@@ -34,13 +34,13 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 //import writer2latex.latex.i18n.I18n;
+import writer2latex.office.EmbeddedObject;
+import writer2latex.office.EmbeddedXMLObject;
 import writer2latex.office.MIMETypes;
 import writer2latex.office.OfficeReader;
 import writer2latex.office.TableReader;
 import writer2latex.office.XMLString;
 import writer2latex.util.Misc;
-import writer2latex.xmerge.EmbeddedObject;
-import writer2latex.xmerge.EmbeddedXMLObject;
 
 /**
  *  This class converts mathml nodes to LaTeX.

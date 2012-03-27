@@ -36,7 +36,6 @@ import org.w3c.dom.NodeList;
 import writer2latex.util.*;
 //import writer2latex.office.*;
 
-import writer2latex.xmerge.OfficeDocument;
 
 /**
  *  <p>This class represents the metadata of an OOo Writer document.</p>

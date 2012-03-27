@@ -33,12 +33,12 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 //import org.w3c.dom.Node;
 
-import writer2latex.xmerge.EmbeddedObject;
-import writer2latex.xmerge.EmbeddedXMLObject;
 
 import writer2latex.latex.util.BeforeAfter;
 import writer2latex.latex.util.Context;
 //import writer2latex.office.ImageLoader;
+import writer2latex.office.EmbeddedObject;
+import writer2latex.office.EmbeddedXMLObject;
 import writer2latex.office.MIMETypes;
 import writer2latex.office.OfficeReader;
 import writer2latex.office.StyleWithProperties;

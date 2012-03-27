@@ -37,7 +37,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Document;
-import writer2latex.xmerge.OfficeDocument;
 import writer2latex.util.Misc;
 
 /** <p> This class reads and collects global information about an OOo document.
