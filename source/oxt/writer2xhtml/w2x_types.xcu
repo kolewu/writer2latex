@@ -3,6 +3,18 @@
 
    <node oor:name="Types">
 
+	<node oor:name="writer_xhtml5_File" oor:op="replace" oor:finalized="true" oor:mandatory="true">
+		<prop oor:name="DetectService"/>
+		<prop oor:name="URLPattern"/>
+		<prop oor:name="Extensions"><value>html</value></prop>
+		<prop oor:name="MediaType"/>
+		<prop oor:name="Preferred"><value>false</value></prop>
+		<prop oor:name="UIName">
+			<value>HTML 5</value>
+		</prop>
+		<prop oor:name="ClipboardFormat"/>
+	</node>
+
 	<node oor:name="writer_xhtml10_File" oor:op="replace" oor:finalized="true" oor:mandatory="true">
 		<prop oor:name="DetectService"/>
 		<prop oor:name="URLPattern"/>

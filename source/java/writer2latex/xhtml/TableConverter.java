@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2011 by Henrik Just
+ *  Copyright: 2002-2012 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-04-20)
+ *  Version 1.4 (2012-03-28)
  *
  */
 
@@ -204,20 +204,28 @@ public class TableConverter extends ConverterHelper {
         // Mozilla (like OOo) includes them.
         // If the first row contains colspan we have to add <col> anyway
         if (!config.xhtmlIgnoreTableDimensions()) {
-            if (view.getRelTableWidth()!=null) {
-                for (int nCol=0; nCol<nColCount; nCol++) {
-                    Element col = converter.createElement("col");
-                    hnode.appendChild(col);
-                    col.setAttribute("style","width:"+view.getRelColumnWidth(nCol));
-                }
-            }
-            else if (bFirstRowColSpan) {
-                for (int nCol=0; nCol<nColCount; nCol++) {
-                    Element col = converter.createElement("col");
-                    hnode.appendChild(col);
-                    col.setAttribute("style","width:"+getTableSc().colScale(view.getColumnWidth(nCol)));
-                }
-            }
+        	if (view.getRelTableWidth()!=null || bFirstRowColSpan) {
+        		Element colgroup = hnode;
+        		if (converter.nType==XhtmlDocument.HTML5) {
+        			// Polyglot HTML5 documents must use an explicit colgroup
+        			colgroup = converter.createElement("colgroup");
+        			hnode.appendChild(colgroup);
+        		}
+        		if (view.getRelTableWidth()!=null) {
+        			for (int nCol=0; nCol<nColCount; nCol++) {
+        				Element col = converter.createElement("col");
+        				colgroup.appendChild(col);
+        				col.setAttribute("style","width:"+view.getRelColumnWidth(nCol));
+        			}
+        		}
+        		else if (bFirstRowColSpan) {
+        			for (int nCol=0; nCol<nColCount; nCol++) {
+        				Element col = converter.createElement("col");
+        				colgroup.appendChild(col);
+        				col.setAttribute("style","width:"+getTableSc().colScale(view.getColumnWidth(nCol)));
+        			}
+        		}
+        	}
         }
 
         // Indentify head
@@ -227,7 +235,13 @@ public class TableConverter extends ConverterHelper {
         }
         if (nBodyStart==0 || nBodyStart==nRowCount) {
             // all body or all head
-            traverseRows(view,0,nRowCount,hnode);
+        	Element tbody = hnode;
+        	if (converter.nType==XhtmlDocument.HTML5) {
+        		// Polyglot HTML5 documents must use an explicit tbody
+        		tbody = converter.createElement("tbody");
+        		hnode.appendChild(tbody);
+        	}
+            traverseRows(view,0,nRowCount,tbody);
         }
         else {
             // Create thead

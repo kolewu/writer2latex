@@ -15,6 +15,7 @@
         	or <emph>File - Export - XHTML 1.1</emph><br/>
         	or <emph>File - Export - XHTML 1.1 + MathML 2.0</emph><br/>
         	or <emph>File - Export - XHTML 1.1 + MathML 2.0 (xsl)</emph>
+        	or <emph>File - Export - HTML5</emph>
         </section>
         
         <paragraph role="heading" level="2" xml-lang="en-US">Style</paragraph>

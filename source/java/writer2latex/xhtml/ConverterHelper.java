@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2010 by Henrik Just
+ *  Copyright: 2002-2012 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-05-09)
+ *  Version 1.4 (2012-03-30)
  *
  */
 
@@ -77,8 +77,8 @@ public class ConverterHelper {
         }
         if (info.sLang!=null) {
             hnode.setAttribute("xml:lang",info.sLang);
-            if (converter.getType()==XhtmlDocument.XHTML10) {
-                hnode.setAttribute("lang",info.sLang); // HTML4 compatibility
+            if (converter.getType()==XhtmlDocument.XHTML10 || converter.getType()==XhtmlDocument.HTML5) {
+                hnode.setAttribute("lang",info.sLang); // HTML4 compatibility/polyglot HTML5S
             }
         }
         if (info.sDir!=null) {

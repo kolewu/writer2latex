@@ -13,6 +13,7 @@
         <section id="howtoget" xml-lang="en-US">
         	Choose <emph>File - Export - XHTML 1.0 strict</emph><br/>
         	or <emph>File - Export - XHTML 1.1</emph>
+        	or <emph>File - Export - HTML5</emph>
         </section>
         
     	<bookmark xml-lang="en-US" branch="hid/org.openoffice.da.writer2xhtml.oxt:OptionsCalcConfig" id="bm_optionscalc_config"/>

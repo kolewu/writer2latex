@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.4 (2012-03-27)
+ *  Version 1.4 (2012-03-28)
  *
  */
  
@@ -33,7 +33,7 @@ public class ConverterFactory {
 
     // Version information
     private static final String VERSION = "1.3.1";
-    private static final String DATE = "2012-03-27";
+    private static final String DATE = "2012-03-28";
 	
     /** Return the Writer2LaTeX version in the form
      *  (major version).(minor version).(patch level)<br/>
@@ -61,6 +61,10 @@ public class ConverterFactory {
      *    <li><code>application/xhtml+xml</code> for XHTML+MathML</li>
      *    <li><code>application/xml</code> for XHTML+MathML using stylesheets from w3c's
      *        math working group</li>
+     *    <li><code>text/html5</code> for HTML5 documents
+     *    Note that this is <em>not</em> the recommended media type for HTML5
+     *    (see http://wiki.whatwg.org/), but it is used internally
+     *    by Writer2xhtml to distinguish from HTML5</li>
      *    <li><code>application/epub+zip</code></li> for EPUB format    
      *  </ul>
      *  
@@ -87,6 +91,9 @@ public class ConverterFactory {
         }
         else if (MIMETypes.XHTML_MATHML_XSL.equals(sMIME)) {
             converter = createInstance("writer2latex.xhtml.XhtmlMathMLXSLConverter");
+        }
+        else if (MIMETypes.HTML5.equals(sMIME)) {
+            converter = createInstance("writer2latex.xhtml.Html5Converter");
         }
         else if (MIMETypes.EPUB.equals(sMIME)) {
             converter = createInstance("writer2latex.epub.EPUBConverter");

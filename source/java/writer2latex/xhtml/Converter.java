@@ -20,9 +20,11 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2012-02-26)
+ *  Version 1.4 (2012-03-30)
  *
  */
+
+// TODO: When polyglot markup uses either a textarea or pre element, the text within the element does not begin with a newline. 
 
 package writer2latex.xhtml;
 
@@ -650,12 +652,18 @@ public class Converter extends ConverterBase {
 
         Element head = htmlDoc.getHeadNode();
         if (head!=null) {
-        	// Declare charset (we need this for xhtml because we have no <?xml ... ?>)
+        	// Declare charset (we need this for XHTML 1.0 strict and HTML5 because we have no <?xml ... ?>)
         	if (nType==XhtmlDocument.XHTML10) {
         		Element meta = htmlDOM.createElement("meta");
         		meta.setAttribute("http-equiv","Content-Type");
         		meta.setAttribute("content","text/html; charset="+htmlDoc.getEncoding().toLowerCase());
         		head.appendChild(meta);
+        	}
+        	else if (nType==XhtmlDocument.HTML5) {
+        		// The encoding should be UTF-8, but we still respect the user's setting
+        		Element meta = htmlDOM.createElement("meta");
+        		meta.setAttribute("charset",htmlDoc.getEncoding().toUpperCase());
+        		head.appendChild(meta);        		
         	}
 
         	// Add meta data (for EPUB the meta data belongs to the .opf file)

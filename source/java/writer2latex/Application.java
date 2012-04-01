@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2011 by Henrik Just
+ *  Copyright: 2002-2012 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-06-05) 
+ *  Version 1.4 (2012-03-30) 
  *
  */
  
@@ -53,7 +53,7 @@ import writer2latex.util.Misc;
  * <pre>java -jar writer2latex.jar [options] source [target]</pre>
  * <p>Where the available options are
  * <ul>
- * <li><code>-latex</code>, <code>-bibtex</code>, <code>-xhtml</code>,
+ * <li><code>-latex</code>, <code>-bibtex</code>, <code>-html5</code>, <code>-xhtml</code>,
        <code>-xhtml+mathml</code>, <code>-xhtml+mathml+xsl</code>, <code>-epub</code>
  * <li><code>-recurse</code>
  * <li><code>-ultraclean</code>, <code>-clean</code>, <code>-pdfscreen</code>,
@@ -328,6 +328,7 @@ public final class Application {
         System.out.println("   -xhtml11");
         System.out.println("   -xhtml+mathml");
         System.out.println("   -xhtml+mathml+xsl");
+        System.out.println("   -html5");
         System.out.println("   -epub");
         System.out.println("   -recurse");
         System.out.println("   -template[=]<template file>");
@@ -360,6 +361,7 @@ public final class Application {
             if (sArg.startsWith("-")) { // found an option
                 if ("-latex".equals(sArg)) { sTargetMIME = MIMETypes.LATEX; }
                 else if ("-bibtex".equals(sArg)) { sTargetMIME = MIMETypes.BIBTEX; }
+                else if ("-html5".equals(sArg)) { sTargetMIME = MIMETypes.HTML5; }
                 else if ("-xhtml".equals(sArg)) { sTargetMIME = MIMETypes.XHTML; }
                 else if ("-xhtml11".equals(sArg)) { sTargetMIME = MIMETypes.XHTML11; }
                 else if ("-xhtml+mathml".equals(sArg)) { sTargetMIME = MIMETypes.XHTML_MATHML; }

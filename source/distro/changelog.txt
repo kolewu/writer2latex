@@ -2,6 +2,9 @@ Changelog for Writer2LaTeX version 1.2 -> 1.4
 
 ---------- version 1.3.1 alpha ----------
 
+[w2x] Added support for HTML5 as export type (the ConverterFactory understands the pseudo-MIME type text/html5).
+  The converter creates polyglot HTML5 documents, i.e. documents will be conforming to HTML5 as well as XML standards.
+
 [all] Optimized the parsing of the source document saving some time and space (several intermediate steps and large byte arrays
   are now avoided)
 

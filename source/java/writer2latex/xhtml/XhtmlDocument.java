@@ -16,15 +16,16 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2010 by Henrik Just
+ *  Copyright: 2002-2012 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-10-27)
+ *  Version 1.4 (2012-04-01)
  *
  */
- 
- //TODO: Add named entities outside ISO-latin 1
+
+//TODO: Add named entities outside ISO-latin 1
+//TODO: When polyglot markup uses either a textarea or pre element, the text within the element does not begin with a newline. 
 
 package writer2latex.xhtml;
 
@@ -72,12 +73,16 @@ public class XhtmlDocument extends DOMDocument {
      */
     public static final int XHTML_MATHML_XSL = 3;
     
+    /** Constant to identify HTML5 documents */
+    public static final int HTML5 = 4;
+    
     // Some static data
-    private static final String[] sExtension = { ".html", ".xhtml", ".xhtml", ".xml" };
+    private static final String[] sExtension = { ".html", ".xhtml", ".xhtml", ".xml", ".html" };
 
     private static Set<String> blockPrettyPrint;
     private static Set<String> conditionalBlockPrettyPrint;
     private static Set<String> emptyElements;
+    private static Set<String> emptyHtml5Elements;
     private static String[] entities; // Not convenient to define directly due to a lot of null values
 
     // Type of document
@@ -135,7 +140,24 @@ public class XhtmlDocument extends DOMDocument {
     	emptyElements.add("img");
     	emptyElements.add("area");
     	emptyElements.add("input");
-    	emptyElements.add("col");    
+    	emptyElements.add("col");
+    	
+    	// These elements are empty in HTML5
+    	emptyHtml5Elements = new HashSet<String>();
+    	emptyHtml5Elements.add("base");
+    	emptyHtml5Elements.add("meta");
+    	emptyHtml5Elements.add("link");
+    	emptyHtml5Elements.add("hr");
+    	emptyHtml5Elements.add("br");
+    	emptyHtml5Elements.add("param");
+    	emptyHtml5Elements.add("img");
+    	emptyHtml5Elements.add("area");
+    	emptyHtml5Elements.add("input");
+    	emptyHtml5Elements.add("col");
+    	emptyHtml5Elements.add("command");
+    	emptyHtml5Elements.add("embed");
+    	emptyHtml5Elements.add("keygen");
+    	emptyHtml5Elements.add("source");
     	
     	// Named character entities (currently only those within the ISO latin 1 range)
     	entities = new String[256];
@@ -262,7 +284,7 @@ public class XhtmlDocument extends DOMDocument {
             DocumentBuilder builder = builderFactory.newDocumentBuilder();
             DOMImplementation domImpl = builder.getDOMImplementation();
             String[] sDocType = getDoctypeStrings();
-            DocumentType doctype = domImpl.createDocumentType("html", sDocType[0], sDocType[1]); 
+            DocumentType doctype = domImpl.createDocumentType("html", sDocType[0], sDocType[1]);
             contentDOM = domImpl.createDocument("http://www.w3.org/1999/xhtml","html",doctype);
         }
         catch (Throwable t) {
@@ -287,6 +309,7 @@ public class XhtmlDocument extends DOMDocument {
     	case XHTML11: return MIMETypes.XHTML_MATHML; // TODO: Change the constant names in MIMETypes, this is a bit confusing...
     	case XHTML_MATHML: return MIMETypes.XHTML_MATHML;
     	case XHTML_MATHML_XSL: return MIMETypes.XHTML_MATHML_XSL;
+    	case HTML5: return MIMETypes.HTML5;
     	}
     	return "";
     }
@@ -312,6 +335,7 @@ public class XhtmlDocument extends DOMDocument {
     public Element getFooterNode() { return footerNode; }
 	
     public void createHeaderFooter() {
+    	// TODO: Use semantic elements for HTML5?
         headerNode = getContentDOM().createElement("div");
         headerNode.setAttribute("id",sHeaderId);
         bodyNode.appendChild(headerNode);
@@ -342,7 +366,7 @@ public class XhtmlDocument extends DOMDocument {
     		DocumentBuilder builder = builderFactory.newDocumentBuilder();
     		DOMImplementation domImpl = builder.getDOMImplementation();
             String[] sDocType = getDoctypeStrings();
-            DocumentType doctype = domImpl.createDocumentType("html", sDocType[0], sDocType[1]); 
+            DocumentType doctype = domImpl.createDocumentType("html", sDocType[0], sDocType[1]);
     		newDOM = domImpl.createDocument("http://www.w3.org/1999/xhtml",
     				templateDOM.getDocumentElement().getTagName(),doctype);
     		setContentDOM(newDOM);
@@ -373,7 +397,7 @@ public class XhtmlDocument extends DOMDocument {
     }
     
     private String[] getDoctypeStrings() {
-        // Define publicId and systemId
+        // Define publicId and systemId (null for HTML5)
         String sPublicId = null;
         String sSystemId = null;		
         switch (nType) {
@@ -520,8 +544,9 @@ public class XhtmlDocument extends DOMDocument {
         // Add a BOM if the user desires so
         if (bAddBOM) { osw.write("\uFEFF"); }
 
-        // Omit xml prolog for pure xhtml 1.0 strict documents (to be browser safe)
-        if (nType!=XHTML10) {
+        // Omit XML prolog for pure XHTML 1.0 strict documents (HTML 4 compaitbility)
+        // and for HTML5 documents (polyglot document)
+        if (nType!=XHTML10 && nType!=HTML5) {
             osw.write("<?xml version=\"1.0\" encoding=\""+sEncoding+"\" ?>\n");
         }
         // Either specify doctype or xsl transformation (the user may require
@@ -533,13 +558,18 @@ public class XhtmlDocument extends DOMDocument {
             osw.write("<?xml-stylesheet type=\"text/xsl\" href=\""+sXsltPath+sSlash+"pmathml.xsl\"?>\n");
         }
         else if (!bNoDoctype) {
-        	DocumentType docType = getContentDOM().getDoctype();
-        	if (docType!=null) {
-        		osw.write("<!DOCTYPE html PUBLIC \"");
-        		osw.write(docType.getPublicId());
-        		osw.write("\" \"");
-        		osw.write(docType.getSystemId());
-        		osw.write("\">\n");
+        	if (nType==HTML5) {
+        		osw.write("<!DOCTYPE html>\n");
+        	}
+        	else {
+        		DocumentType docType = getContentDOM().getDoctype();
+        		if (docType!=null) {
+        			osw.write("<!DOCTYPE html PUBLIC \"");
+        			osw.write(docType.getPublicId());
+        			osw.write("\" \"");
+        			osw.write(docType.getSystemId());
+        			osw.write("\">\n");
+        		}
         	}
         }
         Element doc = getContentDOM().getDocumentElement(); 
@@ -578,8 +608,8 @@ public class XhtmlDocument extends DOMDocument {
     	}
     }
 
-    private static boolean isEmpty(String sTagName) {
-        return emptyElements.contains(sTagName);
+    private boolean isEmpty(String sTagName) {
+        return nType==HTML5 ? emptyHtml5Elements.contains(sTagName) : emptyElements.contains(sTagName);
     }
 	
     // Write nodes; we only need element, text and comment nodes
@@ -589,8 +619,9 @@ public class XhtmlDocument extends DOMDocument {
             case Node.ELEMENT_NODE:
                 if (isEmpty(node.getNodeName())) {
                     // This node must be empty, we ignore child nodes
+                	String sNodeName = node.getNodeName();
                     if (nLevel>=0) { writeSpaces(nLevel,osw); }
-                    osw.write("<"+node.getNodeName());
+                    osw.write("<"+sNodeName);
                     writeAttributes(node,osw);
                     osw.write(" />");
                     if (nLevel>=0) { osw.write("\n"); }
@@ -626,7 +657,7 @@ public class XhtmlDocument extends DOMDocument {
                     osw.write("<"+node.getNodeName());
                     writeAttributes(node,osw);
                     // HTML compatibility: use end-tag even if empty
-                    if (nType<=XHTML11) {
+                    if (nType<=XHTML11 || nType==HTML5) {
                         osw.write("></"+node.getNodeName()+">");
                     }
                     else {

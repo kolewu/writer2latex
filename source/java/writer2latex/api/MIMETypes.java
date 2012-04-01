@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2011 by Henrik Just
+ *  Copyright: 2002-2012 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-07-22)
+ *  Version 1.4 (2012-03-27)
  *
  */
 
@@ -45,12 +45,14 @@ public class MIMETypes {
     public static final String SVM="application/x-openoffice-gdimetafile;windows_formatname=\"GDIMetaFile\"";
     public static final String PDF="application/pdf";
 	
-    // Desitination formats
+    // Destination formats
     public static final String XHTML="text/html";
-    /** This is a fake Mime type, for internal use only */
+    /** This is a fake MIME type, for internal use only */
     public static final String XHTML11="application/xhtml11";
     public static final String XHTML_MATHML="application/xhtml+xml";
     public static final String XHTML_MATHML_XSL="application/xml";
+    /** This is a fake MIME type, for internal use only */
+    public static final String HTML5="text/html5";
     public static final String EPUB="application/epub+zip";
     public static final String LATEX="application/x-latex";
     public static final String BIBTEX="application/x-bibtex";
