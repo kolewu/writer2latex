@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2011 by Henrik Just
+ *  Copyright: 2002-2012 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-07-20)
+ *  Version 1.4 (2012-04-03)
  *
  */
  
@@ -44,10 +44,12 @@ package writer2latex.xhtml;
 import java.util.Iterator;
 import java.util.Vector;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 import org.xml.sax.SAXException;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Element;
@@ -56,6 +58,7 @@ import org.w3c.dom.Element;
 
 import writer2latex.util.Misc;
 import writer2latex.util.CSVList;
+import writer2latex.util.SimpleXMLParser;
 import writer2latex.xmerge.BinaryGraphicsDocument;
 import writer2latex.office.EmbeddedObject;
 import writer2latex.office.EmbeddedXMLObject;
@@ -98,6 +101,7 @@ public class DrawConverter extends ConverterHelper {
     private int nImageSize;
     private String sImageSplit;
     private boolean bCoverImage;
+    private boolean bUseSVG;
     
     // Frames in spreadsheet documents are collected here
     private Vector<Element> frames = new Vector<Element>();
@@ -124,6 +128,7 @@ public class DrawConverter extends ConverterHelper {
         nImageSize = config.imageSize();
         sImageSplit = config.imageSplit();
         bCoverImage = config.coverImage();
+        bUseSVG = config.useSVG();
     }
     
     ///////////////////////////////////////////////////////////////////////
@@ -451,6 +456,7 @@ public class DrawConverter extends ConverterHelper {
         }
         
         // Get the image from the ImageLoader
+        BinaryGraphicsDocument bgd = null;
         String sFileName = null;
         String sHref = Misc.getAttribute(onode,XMLString.XLINK_HREF);
         if (sHref!=null && sHref.length()>0 && !ofr.isInPackage(sHref)) {
@@ -466,11 +472,10 @@ public class DrawConverter extends ConverterHelper {
         	}
         }
         else { // embedded or base64 encoded image
-            BinaryGraphicsDocument bgd = converter.getImageLoader().getImage(onode);
+            bgd = converter.getImageLoader().getImage(onode);
             if (bgd!=null) {
-                converter.addDocument(bgd);
                 sFileName = bgd.getFileName();
-                // If this is the cover image, add it to the converter result 
+                // If this is the cover image, add it to the converter result
             	if (bCoverImage && onode==ofr.getFirstImage()) {
             		converter.setCoverImageFile(bgd,null);
             	}        		
@@ -480,30 +485,49 @@ public class DrawConverter extends ConverterHelper {
         if (sFileName==null) { return; } // TODO: Add warning?
         
         // Create the image (sFileName contains the file name)
-        Element image = converter.createElement("img");
-        String sName = Misc.getAttribute(getFrame(onode),XMLString.DRAW_NAME);
-        converter.addTarget(image,sName+"|graphic");
-        image.setAttribute("src",sFileName);
-        
-        // Add alternative text, using either alt.text, name or file name
-        Element desc = Misc.getChildByTagName(frame,XMLString.SVG_DESC);
-        if (desc==null) {
-            desc = Misc.getChildByTagName(frame,XMLString.SVG_TITLE);        	
+        Element imageElement = null;
+        if (converter.nType==XhtmlDocument.HTML5 && bUseSVG && bgd!=null && MIMETypes.SVG.equals(bgd.getMIMEType())) {
+        	// In HTML5 we may embed SVG images directly in the document
+        	byte[] blob = bgd.getData();
+        	try {
+				Document dom = SimpleXMLParser.parse(new ByteArrayInputStream(blob));
+				Element elm = hnodeInline!=null ? hnodeInline : hnodeBlock;
+				imageElement = (Element) elm.getOwnerDocument().importNode(dom.getDocumentElement(), true);
+			} catch (IOException e) {
+				// Will not happen with a byte array
+			} catch (SAXException e) {
+				e.printStackTrace();
+			}
         }
-        String sAltText = desc!=null ? Misc.getPCDATA(desc) : (sName!=null ? sName : sFileName);
-        image.setAttribute("alt",sAltText);
+        else {
+        	// In all other cases, create an img element
+            if (bgd!=null) { converter.addDocument(bgd); }
+        	Element image = converter.createElement("img");
+        	String sName = Misc.getAttribute(getFrame(onode),XMLString.DRAW_NAME);
+        	converter.addTarget(image,sName+"|graphic");
+        	image.setAttribute("src",sFileName);
+        
+        	// Add alternative text, using either alt.text, name or file name
+        	Element desc = Misc.getChildByTagName(frame,XMLString.SVG_DESC);
+        	if (desc==null) {
+        		desc = Misc.getChildByTagName(frame,XMLString.SVG_TITLE);        	
+        	}
+        	String sAltText = desc!=null ? Misc.getPCDATA(desc) : (sName!=null ? sName : sFileName);
+        	image.setAttribute("alt",sAltText);
+        	imageElement = image;
+        }
+        
+    	// Now style it
+    	StyleInfo info = new StyleInfo();
+    	String sStyleName = Misc.getAttribute(frame, XMLString.DRAW_STYLE_NAME);
+    	if (nMode!=FULL_SCREEN) { getFrameSc().applyStyle(sStyleName,info); }
+    	applyImageSize(frame,info.props,nMode,false);
 
-        // Now style it
-        StyleInfo info = new StyleInfo();
-        String sStyleName = Misc.getAttribute(frame, XMLString.DRAW_STYLE_NAME);
-        if (nMode!=FULL_SCREEN) { getFrameSc().applyStyle(sStyleName,info); }
-        applyImageSize(frame,info.props,nMode,false);
+    	// Apply placement
+    	applyPlacement(frame, hnodeBlock, hnodeInline, nMode, imageElement, info);
 
-        // Apply placement
-        applyPlacement(frame, hnodeBlock, hnodeInline, nMode, image, info);
-		
-        applyStyle(info,image);
-        addLink(onode,image);
+    	applyStyle(info,imageElement);
+    	addLink(onode,imageElement);
     }
 
     private void handleDrawTextBox(Element onode, Element hnodeBlock, Element hnodeInline, int nMode) {

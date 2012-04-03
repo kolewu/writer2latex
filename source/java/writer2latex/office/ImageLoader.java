@@ -16,19 +16,16 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2011 by Henrik Just
+ *  Copyright: 2002-2012 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-07-22)
+ *  Version 1.4 (2012-04-03)
  *
  */
 
 package writer2latex.office;
 
-//import java.io.ByteArrayInputStream;
-//import java.io.ByteArrayOutputStream; 
-//import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.HashSet;
@@ -40,8 +37,6 @@ import writer2latex.api.GraphicConverter;
 import writer2latex.util.Base64;
 import writer2latex.util.Misc;
 import writer2latex.xmerge.BinaryGraphicsDocument;
-
-//import writer2latex.util.*;
 
 /**
  *  <p>This class extracts images from an OOo file.
@@ -169,24 +164,24 @@ public final class ImageLoader {
             // is not in an accepted format AND the converter knows how to
             // convert it - try to convert...
             if (gcv!=null && !isAcceptedFormat(sMIME) && sDefaultFormat!=null) {
+            	byte[] newBlob = null;
                 String sTargetMIME = null;
 
                 if (MIMETypes.isVectorFormat(sMIME) && sDefaultVectorFormat!=null &&
                     gcv.supportsConversion(sMIME,sDefaultVectorFormat,false,false)) {
-                    sTargetMIME = sDefaultVectorFormat;
+                	// Try vector format first
+                    newBlob = gcv.convert(blob, sMIME, sTargetMIME=sDefaultVectorFormat);
                 }
                 else if (gcv.supportsConversion(sMIME,sDefaultFormat,false,false)) {
-                    sTargetMIME = sDefaultFormat;
+                	// Then try bitmap format
+                    newBlob = gcv.convert(blob,sMIME,sTargetMIME=sDefaultFormat);
                 }
 
-                if (sTargetMIME!=null) {
-                    byte[] newBlob = gcv.convert(blob,sMIME,sTargetMIME);
-                    if (newBlob!=null) {
-                        // Conversion succesful - create new data
-                        blob = newBlob;
-                        sMIME = sTargetMIME;
-                        sExt = MIMETypes.getFileExtension(sMIME);
-                    }
+                if (newBlob!=null) {
+                	// Conversion successful - create new data
+                	blob = newBlob;
+                	sMIME = sTargetMIME;
+                	sExt = MIMETypes.getFileExtension(sMIME);
                 }
             }
 

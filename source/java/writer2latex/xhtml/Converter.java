@@ -20,11 +20,9 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.4 (2012-03-30)
+ *  Version 1.4 (2012-04-03)
  *
  */
-
-// TODO: When polyglot markup uses either a textarea or pre element, the text within the element does not begin with a newline. 
 
 package writer2latex.xhtml;
 
@@ -51,11 +49,8 @@ import writer2latex.api.Config;
 import writer2latex.api.ContentEntry;
 import writer2latex.api.ConverterFactory;
 import writer2latex.api.OutputFile;
-//import writer2latex.api.ConverterResult;
 import writer2latex.base.ContentEntryImpl;
 import writer2latex.base.ConverterBase;
-//import writer2latex.latex.LaTeXDocumentPortion;
-//import writer2latex.latex.util.Context;
 import writer2latex.office.MIMETypes;
 import writer2latex.office.OfficeReader;
 import writer2latex.office.StyleWithProperties;
@@ -266,6 +261,10 @@ public class Converter extends ConverterBase {
         imageLoader.setDefaultFormat(MIMETypes.PNG);
         imageLoader.addAcceptedFormat(MIMETypes.JPEG);
         imageLoader.addAcceptedFormat(MIMETypes.GIF);
+        
+        if (nType==XhtmlDocument.HTML5 && config.useSVG()) { // HTML supports (inline) SVG as well
+        	imageLoader.setDefaultVectorFormat(MIMETypes.SVG);
+        }
 
         styleCv = new StyleConverter(ofr,config,this,nType);
         textCv = new TextConverter(ofr,config,this);

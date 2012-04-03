@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.4 (2012-03-27)
+ *  Version 1.4 (2012-04-01)
  *
  */
 
@@ -43,7 +43,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import writer2latex.util.SimpleSAXHandler;
+import writer2latex.util.SimpleXMLParser;
 import writer2latex.util.SimpleZipReader;
 
 /**
@@ -225,6 +225,7 @@ public class OfficeDocument {
 	 *  @param  is  Office document <code>InputStream</code>.
 	 *
 	 *  @throws  IOException  If any I/O error occurs.
+	 * @throws SAXException 
 	 */
 	public void read(InputStream is) throws IOException {
 		// We need to read 4 bytes ahead to detect flat or zip format
@@ -295,21 +296,11 @@ public class OfficeDocument {
 
 
 	private void readFlat(InputStream is) throws IOException {
-		SAXParserFactory factory=SAXParserFactory.newInstance();
-		SimpleSAXHandler handler = new SimpleSAXHandler();
 		try {
-			SAXParser saxParser = factory.newSAXParser();
-			saxParser.parse(is,handler);
+			contentDoc = SimpleXMLParser.parse(is);
+		} catch (SAXException e) {
+			throw new IOException(e);
 		}
-		catch (SAXException e){
-			System.err.println("Oops - Error parsing document");
-			e.printStackTrace();
-		}
-		catch (ParserConfigurationException e) {
-			System.err.println("Oops - failed to get XML parser!?");
-			e.printStackTrace();
-		}
-		contentDoc = handler.getDOM();
 		styleDoc = null;
 		settingsDoc = null;
 		metaDoc = null;
@@ -332,7 +323,7 @@ public class OfficeDocument {
 	 */
 	static Document parse(byte bytes[]) throws SAXException, IOException {
 		SAXParserFactory factory=SAXParserFactory.newInstance();
-		SimpleSAXHandler handler = new SimpleSAXHandler();
+		SimpleXMLParser handler = new SimpleXMLParser();
 		try {
 			SAXParser saxParser = factory.newSAXParser();
 			saxParser.parse(new ByteArrayInputStream(bytes),handler);

@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2010 by Henrik Just
+ *  Copyright: 2002-2012 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-03-28)
+ *  Version 1.4 (2012-04-01)
  *
  */
 
@@ -126,6 +126,10 @@ public class BinaryGraphicsDocument implements Document {
      */
     public String getFileName() {
         return new String(docName + getFileExtension());
+    }
+    
+    public byte[] getData() {
+    	return data;
     }
     
     

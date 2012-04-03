@@ -20,28 +20,58 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.4 (2012-03-23) 
+ *  Version 1.4 (2012-04-01) 
  * 
  */
 
 package writer2latex.util;
 
+import java.io.IOException;
+import java.io.InputStream;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
+import org.w3c.dom.Document;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 
-/** A simple SAX handler which transforms the SAX events into a DOM tree
+/** A simple SAX based XML parser which transforms the SAX events into a DOM tree
  *  (supporting element and text nodes only)
  */
-public class SimpleSAXHandler extends DefaultHandler {
+public class SimpleXMLParser extends DefaultHandler {
 	
+	/** Static method to parse an XML input stream into a DOM tree
+	 * 
+	 * @param is the input stream to parse
+	 * @return a DOM tree of the document
+	 * @throws IOException if an error occurs reading the input stream
+	 * @throws SAXException if an error occurs parsing the stream
+	 */
+	public static Document parse(InputStream is) throws IOException, SAXException {
+		SAXParserFactory factory=SAXParserFactory.newInstance();
+		SimpleXMLParser handler = new SimpleXMLParser();
+		try {
+			SAXParser saxParser = factory.newSAXParser();
+			saxParser.parse(is,handler);
+			return handler.getDOM();
+		}
+		catch (ParserConfigurationException e) {
+			System.err.println("Oops - failed to get XML parser!?");
+			e.printStackTrace();
+		}
+		return null;
+	}
+
 	private SimpleDOMBuilder builder = new SimpleDOMBuilder();
 	
 	public org.w3c.dom.Document getDOM() {
 		return builder.getDOM();
 	}
-	
+		
 	@Override public void startElement(String nameSpace, String localName, String qName, Attributes attributes){
 		builder.startElement(qName);
 		int nLen = attributes.getLength();

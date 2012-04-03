@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2009 by Henrik Just
+ *  Copyright: 2002-2012 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2009-03-26)
+ *  Version 1.4 (2012-04-03)
  *
  */
  
@@ -67,7 +67,7 @@ public class GraphicConverterImpl2 implements GraphicConverter {
 
         importFilter = new Hashtable<String,String>();
         importFilter.put(MIMETypes.BMP, "BMP - MS Windows");
-        //importFilter.put(MIMETypes.EMF, "EMF - MS Windows Metafile");
+        importFilter.put(MIMETypes.EMF, "EMF - MS Windows Metafile");
         importFilter.put(MIMETypes.EPS, "EPS - Encapsulated PostScript");
         importFilter.put(MIMETypes.GIF, "GIF - Graphics Interchange Format");
         importFilter.put(MIMETypes.JPEG, "JPG - JPEG");
@@ -78,12 +78,12 @@ public class GraphicConverterImpl2 implements GraphicConverter {
 		
         exportFilter = new Hashtable<String,String>();
         exportFilter.put(MIMETypes.BMP,"draw_bmp_Export");
-        //exportFilter.put(MIMETypes.EMF,"draw_emf_Export");
+        exportFilter.put(MIMETypes.EMF,"draw_emf_Export");
         exportFilter.put(MIMETypes.EPS,"draw_eps_Export");
         exportFilter.put(MIMETypes.GIF,"draw_gif_Export");
         exportFilter.put(MIMETypes.JPEG,"draw_jpg_Export");
         exportFilter.put(MIMETypes.PNG,"draw_png_Export");
-        //exportFilter.put(MIMETypes.SVG,"draw_svg_Export");
+        exportFilter.put(MIMETypes.SVG,"draw_svg_Export");
         exportFilter.put(MIMETypes.SVM,"draw_svm_Export");
         exportFilter.put(MIMETypes.TIFF,"draw_tif_Export");
         exportFilter.put(MIMETypes.WMF,"draw_wmf_Export");
@@ -96,22 +96,23 @@ public class GraphicConverterImpl2 implements GraphicConverter {
         // We don't support cropping and resizing
         if (bCrop || bResize) { return false; }
 
-        // We currently support conversion of bitmaps and svm into pdf and eps
-        // Trying wmf causes an IllegalArgumentException "URL seems to be an unsupported one"
+        // We currently support conversion of bitmaps and SVM into PDF, EPS and SVG
+        // TODO: SVG does not seem to work in all versions of OOo/LO?
+        // Trying WMF/EMF causes an IllegalArgumentException "URL seems to be an unsupported one"
         // Seems to be an OOo bug; workaround: Use temporary files..??
         boolean bSupportsSource = MIMETypes.SVM.equals(sSourceMime) ||
            MIMETypes.PNG.equals(sSourceMime) || MIMETypes.JPEG.equals(sSourceMime) ||
            MIMETypes.GIF.equals(sSourceMime) || MIMETypes.TIFF.equals(sSourceMime) ||
            MIMETypes.BMP.equals(sSourceMime);
-           //  || MIMETypes.WMF.equals(sSourceMime)
-        boolean bSupportsTarget = MIMETypes.PDF.equals(sTargetMime) || MIMETypes.EPS.equals(sTargetMime);
+           //|| MIMETypes.WMF.equals(sSourceMime) || MIMETypes.EMF.equals(sSourceMime);
+        boolean bSupportsTarget = MIMETypes.PDF.equals(sTargetMime) || MIMETypes.EPS.equals(sTargetMime) ||
+        	MIMETypes.SVG.equals(sTargetMime);
         return bSupportsSource && bSupportsTarget;
     }
 	
     public byte[] convert(byte[] source, String sSourceMime, String sTargetMime) {
         // Open a hidden sdraw document
         XMultiComponentFactory xMCF = xComponentContext.getServiceManager();
-
         try {
             // Load the graphic into a new draw document as xDocument
             // using a named filter
@@ -168,7 +169,7 @@ public class GraphicConverterImpl2 implements GraphicConverter {
             refreshDocument(xDocument);
 			
             XOutputStreamToByteArrayAdapter outputStream = new XOutputStreamToByteArrayAdapter();
-			
+            
             PropertyValue[] exportProps = new PropertyValue[3];
             exportProps[0] = new PropertyValue();
             exportProps[0].Name = "FilterName";
@@ -186,6 +187,7 @@ public class GraphicConverterImpl2 implements GraphicConverter {
             outputStream.closeOutput();
 
             byte[] result = outputStream.getBuffer();
+            
             xDocument.dispose(); 
             
             if (MIMETypes.EPS.equals(sTargetMime)) {
@@ -213,9 +215,8 @@ public class GraphicConverterImpl2 implements GraphicConverter {
 
         // Conversion failed, for whatever reason
         return null;
-
-    } 
-	
+    }
+    
     protected void refreshDocument(XComponent document) {
         XRefreshable refreshable = (XRefreshable) UnoRuntime.queryInterface(XRefreshable.class, document);
         if (refreshable != null) {

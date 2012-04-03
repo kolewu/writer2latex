@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2011 by Henrik Just
+ *  Copyright: 2002-2012 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-08-05)
+ *  Version 1.4 (2012-04-01)
  *
  */
 
@@ -61,6 +61,7 @@ public final class MIMETypes extends writer2latex.api.MIMETypes {
     public static final byte[] EPS_SIG = { 0x25, 0x21 }; // %!
     public static final byte[] SVM_SIG = { 0x56, 0x43, 0x4c, 0x4d, 0x54, 0x46 }; // VCLMTF
     public static final byte[] ZIP_SIG = { 0x50, 0x4b, 0x03, 0x04 }; // PK..
+    public static final byte[] SVG_SIG = { 0x3c, 0x73, 0x76, 0x67 }; // Not so magic: <svg
 	
 	
     // Preferred file extensions for some files
@@ -77,6 +78,7 @@ public final class MIMETypes extends writer2latex.api.MIMETypes {
     public static final String EMF_EXT = ".emf";
     public static final String WMF_EXT = ".wmf";
     public static final String EPS_EXT = ".eps";
+    public static final String SVG_EXT = ".svg";
     public static final String SVM_EXT = ".svm";
     public static final String PDF_EXT = ".pdf";
 	
@@ -86,6 +88,24 @@ public final class MIMETypes extends writer2latex.api.MIMETypes {
             if (blob[i]!=sig[i]) { return false; }
         }
         return true;
+    }
+    
+    private static final boolean isSVG(byte[] blob) {
+        // Look for <svg within the first 250 bytes
+    	int m = Math.max(blob.length, 250);
+        int n = SVG_SIG.length;
+        for (int j=0; j<m; j++) {
+            boolean bFound = true;
+        	for (int i=0; i<n; i++) {
+        		if (blob[j+i]!=SVG_SIG[i]) {
+        			bFound = false;
+        			break;
+        		}
+        	}
+        	if (bFound) return true;
+        }
+        return false;
+    	
     }
 	
     public static final String getMagicMIMEType(byte[] blob) {
@@ -102,6 +122,7 @@ public final class MIMETypes extends writer2latex.api.MIMETypes {
         if (isType(blob,EPS_SIG)) { return EPS; }
         if (isType(blob,SVM_SIG)) { return SVM; }
         if (isType(blob,ZIP_SIG)) { return ZIP; }
+        if (isSVG(blob)) { return SVG; }
         return "";
     }
 	
@@ -114,6 +135,7 @@ public final class MIMETypes extends writer2latex.api.MIMETypes {
         if (EMF.equals(sMIME)) { return EMF_EXT; }
         if (WMF.equals(sMIME)) { return WMF_EXT; }
         if (EPS.equals(sMIME)) { return EPS_EXT; }
+        if (SVG.equals(sMIME)) { return SVG_EXT; }
         if (SVM.equals(sMIME)) { return SVM_EXT; }
         if (PDF.equals(sMIME)) { return PDF_EXT; }
         if (LATEX.equals(sMIME)) { return LATEX_EXT; }
@@ -125,7 +147,7 @@ public final class MIMETypes extends writer2latex.api.MIMETypes {
     }		
 	
     public static boolean isVectorFormat(String sMIME) {
-        return EMF.equals(sMIME) || WMF.equals(sMIME) || EPS.equals(sMIME) || SVM.equals(sMIME) || PDF.equals(sMIME);
+        return EMF.equals(sMIME) || WMF.equals(sMIME) || EPS.equals(sMIME) || SVG.equals(sMIME) || SVM.equals(sMIME) || PDF.equals(sMIME);
     }
 
 

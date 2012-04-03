@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.4 (2012-03-27)
+ *  Version 1.4 (2012-04-01)
  *
  */
 
@@ -40,6 +40,7 @@ public class MIMETypes {
     public static final String EMF="image/x-emf";
     public static final String WMF="image/x-wmf";
     public static final String EPS="image/x-eps";
+    public static final String SVG="image/svg+xml";
     // MIME type for SVM has changed
     //public static final String SVM="image/x-svm";
     public static final String SVM="application/x-openoffice-gdimetafile;windows_formatname=\"GDIMetaFile\"";

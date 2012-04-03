@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2011 by Henrik Just
+ *  Copyright: 2002-2012 by Henrik Just
  *
  *  All Rights Reserved.
  *  
- *  Version 1.2 (2011-07-22)
+ *  Version 1.4 (2012-04-03)
  */
 
  
@@ -76,8 +76,9 @@ public class GraphicConverterImpl1 implements GraphicConverter {
         // We don't support cropping and resizing
         if (bCrop || bResize) { return false; }
 
-        // We can convert vector formats to eps:
-        if (MIMETypes.EPS.equals(sTargetMime) &&
+        // We can convert vector formats to EPS.
+        // The IDL reference claims we can convert to SVG too, but for some reason this always returns an empty array?
+        if ((MIMETypes.EPS.equals(sTargetMime)) && // || MIMETypes.SVG.equals(sTargetMime)) &&
         		(MIMETypes.EMF.equals(sSourceMime) || MIMETypes.WMF.equals(sSourceMime) || MIMETypes.SVM.equals(sSourceMime))) {
             return true;
         }
@@ -96,7 +97,6 @@ public class GraphicConverterImpl1 implements GraphicConverter {
     }
 	
     public byte[] convert(byte[] source, String sSourceMime, String sTargetMime) {
-
         // It seems that the GraphicProvider can only create proper eps if
         // the source is a vector format, hence
         if (MIMETypes.EPS.equals(sTargetMime)) {
@@ -125,15 +125,15 @@ public class GraphicConverterImpl1 implements GraphicConverter {
             targetProps[1].Value = xTarget; 
             xGraphicProvider.storeGraphic(result,targetProps);
 
-
             // Close the output and return the result
-            xTarget.closeOutput();
             xTarget.flush();
+            xTarget.closeOutput();
             if (MIMETypes.EPS.equals(sTargetMime)) {
                 return epsCleaner.cleanEps(xTarget.getBuffer());
             }
             else {
-                return xTarget.getBuffer();
+            	byte[] converted = xTarget.getBuffer();
+                return converted;
             }
         }
         catch (com.sun.star.io.IOException e) {
