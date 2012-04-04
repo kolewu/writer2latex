@@ -28,6 +28,7 @@ package writer2latex.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -35,6 +36,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.w3c.dom.Document;
 import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -53,6 +55,8 @@ public class SimpleXMLParser extends DefaultHandler {
 	 */
 	public static Document parse(InputStream is) throws IOException, SAXException {
 		SAXParserFactory factory=SAXParserFactory.newInstance();
+		
+		factory.setValidating(false);
 		SimpleXMLParser handler = new SimpleXMLParser();
 		try {
 			SAXParser saxParser = factory.newSAXParser();
@@ -71,7 +75,13 @@ public class SimpleXMLParser extends DefaultHandler {
 	public org.w3c.dom.Document getDOM() {
 		return builder.getDOM();
 	}
-		
+	
+	// We don't need - and in fact should avoid - any external entities
+	@Override public InputSource resolveEntity(String publicID, String systemID) throws SAXException {
+		System.out.println("resolveEntity "+publicID+" "+systemID);
+		return new InputSource(new StringReader(""));
+	}
+	
 	@Override public void startElement(String nameSpace, String localName, String qName, Attributes attributes){
 		builder.startElement(qName);
 		int nLen = attributes.getLength();

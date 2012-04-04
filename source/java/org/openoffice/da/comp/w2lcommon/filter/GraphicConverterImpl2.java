@@ -185,7 +185,7 @@ public class GraphicConverterImpl2 implements GraphicConverter {
                 XStorable.class, xDocument);
             xStore.storeToURL ("private:stream", exportProps);
             outputStream.closeOutput();
-
+            
             byte[] result = outputStream.getBuffer();
             
             xDocument.dispose(); 

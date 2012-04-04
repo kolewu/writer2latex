@@ -491,12 +491,20 @@ public class DrawConverter extends ConverterHelper {
         	byte[] blob = bgd.getData();
         	try {
 				Document dom = SimpleXMLParser.parse(new ByteArrayInputStream(blob));
-				Element elm = hnodeInline!=null ? hnodeInline : hnodeBlock;
-				imageElement = (Element) elm.getOwnerDocument().importNode(dom.getDocumentElement(), true);
+				if (dom!=null) {
+					Element elm = hnodeInline!=null ? hnodeInline : hnodeBlock;
+					imageElement = (Element) elm.getOwnerDocument().importNode(dom.getDocumentElement(), true);
+				}
+				else {
+					System.out.println("Failed to parse SVG");
+				}
 			} catch (IOException e) {
 				// Will not happen with a byte array
+				System.out.println("IOException parsing SVG");
+				e.printStackTrace();
 			} catch (SAXException e) {
 				e.printStackTrace();
+				System.out.println("SAXException parsing SVG");
 			}
         }
         else {
@@ -517,17 +525,19 @@ public class DrawConverter extends ConverterHelper {
         	imageElement = image;
         }
         
-    	// Now style it
-    	StyleInfo info = new StyleInfo();
-    	String sStyleName = Misc.getAttribute(frame, XMLString.DRAW_STYLE_NAME);
-    	if (nMode!=FULL_SCREEN) { getFrameSc().applyStyle(sStyleName,info); }
-    	applyImageSize(frame,info.props,nMode,false);
+        if (imageElement!=null) {
+        	// Now style it
+        	StyleInfo info = new StyleInfo();
+        	String sStyleName = Misc.getAttribute(frame, XMLString.DRAW_STYLE_NAME);
+        	if (nMode!=FULL_SCREEN) { getFrameSc().applyStyle(sStyleName,info); }
+        	applyImageSize(frame,info.props,nMode,false);
 
-    	// Apply placement
-    	applyPlacement(frame, hnodeBlock, hnodeInline, nMode, imageElement, info);
+        	// Apply placement
+        	applyPlacement(frame, hnodeBlock, hnodeInline, nMode, imageElement, info);
 
-    	applyStyle(info,imageElement);
-    	addLink(onode,imageElement);
+        	applyStyle(info,imageElement);
+        	addLink(onode,imageElement);
+        }
     }
 
     private void handleDrawTextBox(Element onode, Element hnodeBlock, Element hnodeInline, int nMode) {
