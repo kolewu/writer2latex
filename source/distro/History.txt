@@ -1,7 +1,7 @@
 Version history for Writer2LaTeX
 ================================
 
-Version 1.2 beta (March 2012)
+Version 1.2 (March 2012)
   - Filters:
        - Added user interface to edit custom configuration
        - Added help files

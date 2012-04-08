@@ -8,8 +8,8 @@
 <project name="w2l" default="help" basedir=".">
 
     <!-- set this property to the location of your SO/OOo installation -->
-	<property name="OFFICE_CLASSES" location="/usr/share/java/openoffice" />
-	<property name="URE_CLASSES" location="/usr/share/java/openoffice" />
+	<property name="OFFICE_CLASSES" location="/usr/share/libreoffice/program/classes" />
+	<property name="URE_CLASSES" location="/usr/share/java" />
 
     <description>writer2latex - build file</description>
 
@@ -35,7 +35,7 @@
     <!-- configure the directories -->
     <property name="jarfile" value="writer2latex"/>
     <property name="basename" value="writer2latex12"/>
-    <property name="distrofile" value="${basename}beta.zip" />
+    <property name="distrofile" value="${basename}.zip" />
     <!--<property name="sourcedistrofile" value="${basename}source.zip" />-->
     <property name="src" location="source/java"/>
     <property name="source.distro" location="source/distro" />

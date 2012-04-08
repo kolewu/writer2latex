@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2011 by Henrik Just
+ *  Copyright: 2002-2012 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2011-03-30)
+ *  Version 1.2 (2012-04-04)
  *
  */
 
@@ -465,7 +465,13 @@ public class LaTeXConfig extends writer2latex.base.ConfigBase {
             String sInput = elm.getAttribute("input");
             Map<String,String> attributes = new HashMap<String,String>();
             attributes.put("latex-code", elm.getAttribute("latex-code"));
-            attributes.put("fontenc", elm.getAttribute("fontenc"));
+            if (elm.hasAttribute("fontenc") && elm.getAttribute("fontenc").length()>0) {
+            	// The fontenc attribute is optional
+            	attributes.put("fontenc", elm.getAttribute("fontenc"));
+            }
+            else {
+            	attributes.put("fontenc", "any");
+            }
             stringReplace.put(sInput,attributes);
         }
         else if (elm.getTagName().equals("math-symbol-map")) {

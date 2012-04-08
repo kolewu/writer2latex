@@ -18,7 +18,7 @@
  *
  *  Copyright: 2002-2012 by Henrik Just
  *  
- *  Version 1.2 (2012-03-05)
+ *  Version 1.2 (2012-04-04)
  *
  *  All Rights Reserved.
  */
@@ -240,6 +240,7 @@ class Token{
     public static final Token COPROD=new Token();
     public static final Token FORALL=new Token();
     public static final Token EXISTS=new Token();
+    public static final Token NOTEXISTS = new Token();
     public static final Token LIM=new Token();
     public static final Token NABLA=new Token();
     public static final Token TOWARD=new Token();
@@ -458,6 +459,7 @@ class SmTokenTable{
          new SmTokenTableEntry( "emptyset" , Token.EMPTYSET, "\\emptyset ", TGroup.STANDALONE, 5),
          new SmTokenTableEntry( "equiv", Token.EQUIV, "\\equiv ", TGroup.RELATION, 0),
          new SmTokenTableEntry( "exists", Token.EXISTS, "\\exists ", TGroup.STANDALONE, 5),
+         new SmTokenTableEntry( "notexists", Token.NOTEXISTS, "\\nexists ", TGroup.STANDALONE, 5),
          new SmTokenTableEntry( "exp", Token.EXP, "\\exp ", TGroup.FUNCTION, 5),
          new SmTokenTableEntry( "fact", Token.FACT, "!", TGroup.UNOPER, 5),
          new SmTokenTableEntry( "fixed", Token.FIXED, "\\mathtt", TGroup.FONT, 0),

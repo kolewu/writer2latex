@@ -1,5 +1,17 @@
 Changelog for Writer2LaTeX version 1.0 -> 1.2
 
+---------- version 1.2 final ----------
+
+[w2l] Bugfix: The attribute fontenc on string-replace rules is now again optional in configuration files 
+
+[all] Bugfix: Fixed update problem in configuration dialogs when New-button is used to select an existing item
+
+[w2l] Added support for the new notexists keyword in StarMath
+
+[w2x] Removed text from the horizontal bar in the EPUB export dialog
+
+[all] Minor edits to the user's manual
+
 ---------- version 1.2 beta ----------
 
 [w2x] Bugfix: Ignore empty element attribute in style maps
