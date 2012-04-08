@@ -125,7 +125,7 @@ public class GraphicConverterImpl2 implements GraphicConverter {
             PropertyValue[] fileProps = new PropertyValue[3];
             fileProps[0] = new PropertyValue();
             fileProps[0].Name = "FilterName";
-            fileProps[0].Value = (String) importFilter.get(sSourceMime);
+            fileProps[0].Value = importFilter.get(sSourceMime);
             fileProps[1] = new PropertyValue();
             fileProps[1].Name = "InputStream";
             fileProps[1].Value = new ByteArrayToXInputStreamAdapter(source);
@@ -135,11 +135,12 @@ public class GraphicConverterImpl2 implements GraphicConverter {
 
             XComponent xDocument = xComponentLoader.loadComponentFromURL(
                 "private:stream", "_blank", 0, fileProps);
-				
+            
             // Get the first draw page as xDrawPage
             XDrawPagesSupplier xDrawPagesSupplier = (XDrawPagesSupplier)
                 UnoRuntime.queryInterface(XDrawPagesSupplier.class, xDocument);
             XDrawPages xDrawPages = xDrawPagesSupplier.getDrawPages();
+            
             Object drawPage =  xDrawPages.getByIndex(0);
             XDrawPage xDrawPage = (XDrawPage) UnoRuntime.queryInterface(
                 XDrawPage.class, drawPage);
@@ -164,16 +165,16 @@ public class GraphicConverterImpl2 implements GraphicConverter {
             xPageProps.setPropertyValue("BorderBottom", new Integer(0));
             xPageProps.setPropertyValue("BorderLeft", new Integer(0));
             xPageProps.setPropertyValue("BorderRight", new Integer(0));
-			
+            
             // Export the draw document (xDocument)
             refreshDocument(xDocument);
-			
+            
             XOutputStreamToByteArrayAdapter outputStream = new XOutputStreamToByteArrayAdapter();
             
             PropertyValue[] exportProps = new PropertyValue[3];
             exportProps[0] = new PropertyValue();
             exportProps[0].Name = "FilterName";
-            exportProps[0].Value = (String) exportFilter.get(sTargetMime);
+            exportProps[0].Value = exportFilter.get(sTargetMime);
             exportProps[1] = new PropertyValue();
             exportProps[1].Name = "OutputStream";
             exportProps[1].Value = outputStream;
@@ -189,7 +190,7 @@ public class GraphicConverterImpl2 implements GraphicConverter {
             byte[] result = outputStream.getBuffer();
             
             xDocument.dispose(); 
-            
+
             if (MIMETypes.EPS.equals(sTargetMime)) {
             	return epsCleaner.cleanEps(result);
             }

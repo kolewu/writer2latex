@@ -172,7 +172,7 @@ public final class ImageLoader {
                 	// Try vector format first
                     newBlob = gcv.convert(blob, sMIME, sTargetMIME=sDefaultVectorFormat);
                 }
-                else if (gcv.supportsConversion(sMIME,sDefaultFormat,false,false)) {
+                if (newBlob==null && gcv.supportsConversion(sMIME,sDefaultFormat,false,false)) {
                 	// Then try bitmap format
                     newBlob = gcv.convert(blob,sMIME,sTargetMIME=sDefaultFormat);
                 }

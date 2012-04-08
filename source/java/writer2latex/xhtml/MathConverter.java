@@ -16,11 +16,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  *  MA  02111-1307  USA
  *
- *  Copyright: 2002-2010 by Henrik Just
+ *  Copyright: 2002-2012 by Henrik Just
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2010-03-15)
+ *  Version 1.4 (2012-04-07)
  *
  */
 
@@ -70,8 +70,11 @@ public class MathConverter extends ConverterHelper {
      * @param onode the math node
      * @param hnode the xhtml node to which content should be added
      */
-    public void convert(Node image, Node onode, Node hnode) {
+    public void convert(Node image, Element onode, Node hnode) {
         if (bSupportMathML) {
+            if (converter.getTextCv().isDisplayEquation()) {
+            	onode.setAttribute("display", "block");
+            }
             convertAsMathML(onode,hnode);
         }
         else {

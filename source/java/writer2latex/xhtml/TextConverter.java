@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.2 (2012-03-07)
+ *  Version 1.4 (2012-04-07)
  *
  */
 
@@ -140,6 +140,9 @@ public class TextConverter extends ConverterHelper {
     // (labels for footnotes and endnotes)
     // We put it here and insert it in the first paragraph/heading to come:
     private Node asapNode = null;
+    
+    // Are we within a display equation?
+    private boolean bDisplayEquation = false;
 
     // When generating toc, a few things should be done differently
     private boolean bInToc = false;
@@ -356,6 +359,10 @@ public class TextConverter extends ConverterHelper {
         }
         p.appendChild(inline);
         return inline;
+    }
+    
+    public boolean isDisplayEquation() {
+    	return bDisplayEquation;
     }
 	
     ////////////////////////////////////////////////////////////////////////
@@ -813,7 +820,9 @@ public class TextConverter extends ConverterHelper {
             	insertListLabel(currentListStyle, nCurrentListLevel, "ItemNumber", null, sCurrentListLabel, par);
             }
             sCurrentListLabel = null;
+            bDisplayEquation=converter.parseDisplayEquation(onode);
             traverseInlineText(onode,par);
+            bDisplayEquation=false;
         }
         else {
             // An empty paragraph (this includes paragraphs that only contains

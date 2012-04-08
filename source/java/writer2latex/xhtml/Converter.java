@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.4 (2012-04-03)
+ *  Version 1.4 (2012-04-07)
  *
  */
 
@@ -349,6 +349,23 @@ public class Converter extends ConverterBase {
         	}
         }
         
+        // Load MathJax
+        // TODO: Should we support different configurations of MathJax?
+        if (nType==XhtmlDocument.HTML5 && config.useMathJax()) {
+        	for (int i=0; i<=nOutFileIndex; i++) {
+        		if (outFiles.get(i).hasMath()) {
+        			XhtmlDocument doc = outFiles.get(i);
+        			Element head = doc.getHeadNode();
+        			if (head!=null) {
+        				Element script = doc.getContentDOM().createElement("script");
+        				head.appendChild(script);
+        				script.setAttribute("type", "text/javascript");
+        				script.setAttribute("src", "http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=MML_HTMLorMML");
+        			}
+        		}
+        	}
+        }
+        
         // Create headers & footers (if nodes are available)
         if (ofr.isSpreadsheet()) {
             for (int i=0; i<=nOutFileIndex; i++) {
@@ -486,6 +503,7 @@ public class Converter extends ConverterBase {
         		converterResult.addDocument(cssDoc);
         	}
         }
+        
     }
 	
     private void addNavigationLink(Document dom, Node node, String s, int nIndex) {
@@ -600,7 +618,7 @@ public class Converter extends ConverterBase {
     public boolean outFileHasContent() {
         return htmlDoc.getContentNode().hasChildNodes();
     }
-	
+    
     // Use another document. TODO: This is very ugly; clean it up!!!
     public void changeOutFile(int nIndex) {
         nOutFileIndex = nIndex;

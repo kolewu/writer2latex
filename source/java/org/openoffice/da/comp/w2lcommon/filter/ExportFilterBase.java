@@ -93,8 +93,7 @@ XTypeProvider {
 		xComponentContext = xComponentContext1;
 		xMSF = null;
 	}
-
-
+	
 	// Utility method:
 
 	String getFileName(String origName) {
@@ -125,7 +124,6 @@ XTypeProvider {
 
 	public boolean exporter(com.sun.star.beans.PropertyValue[] aSourceData, 
 			java.lang.String[] msUserData) throws com.sun.star.uno.RuntimeException{
-
 		sURL=null;
 		filterData = null;
 

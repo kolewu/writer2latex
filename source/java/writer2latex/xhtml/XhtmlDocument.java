@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.4 (2012-04-01)
+ *  Version 1.4 (2012-04-07)
  *
  */
 
@@ -44,6 +44,7 @@ import javax.xml.parsers.DocumentBuilder;
 //import javax.xml.parsers.ParserConfigurationException;
 
 import writer2latex.api.MIMETypes;
+import writer2latex.office.XMLString;
 import writer2latex.xmerge.DOMDocument;
 
 import java.io.InputStream;
@@ -350,6 +351,31 @@ public class XhtmlDocument extends DOMDocument {
     public void setContentDOM(Document doc) {
         super.setContentDOM(doc);
         collectNodes();
+    }
+    
+    /** Does this document contain any math nodes?
+     * 
+     * @return true if so
+     */
+    public boolean hasMath() {
+    	return hasMath(getContentDOM().getDocumentElement()); 
+    }
+    
+    private boolean hasMath(Element node) {
+    	// Check this element
+    	if (node.getTagName().equals(XMLString.MATH)) {
+    		return true;
+    	}
+    	// Check children
+    	Node child = node.getFirstChild();
+    	while (child!=null) {
+    		if (child.getNodeType()==Node.ELEMENT_NODE && hasMath((Element)child)) {
+    			return true;
+    		}
+    		child = child.getNextSibling();
+    	}
+    	// Found nothing
+    	return false;
     }
 	
     public void read(InputStream is) throws IOException {

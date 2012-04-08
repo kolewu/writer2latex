@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.4 (2012-04-03)
+ *  Version 1.4 (2012-04-07)
  *
  */
  
@@ -399,7 +399,7 @@ public class DrawConverter extends ConverterHelper {
             }
         }
         else { // flat xml format
-            Node formula = Misc.getChildByTagName(onode,XMLString.MATH); // Since OOo 3.2
+            Element formula = Misc.getChildByTagName(onode,XMLString.MATH); // Since OOo 3.2
             if (formula==null) {
             	formula = Misc.getChildByTagName(onode,XMLString.MATH_MATH);
             }

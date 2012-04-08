@@ -26,6 +26,8 @@
 
 package writer2latex.latex;
 
+// TODO: Use parseDisplayEquation of ConverterBase
+
 //import java.util.Hashtable;
 
 import org.w3c.dom.Document;
