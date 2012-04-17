@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.4 (2012-04-07)
+ *  Version 1.4 (2012-04-12)
  *
  */
 
@@ -62,6 +62,12 @@ public class XhtmlConfig extends writer2latex.base.ConfigBase {
         	if (sValue.equals("true")) { sValue = "css1_hack"; }
         	else { sValue = "css1"; }
         }
+        // this option has been renamed and extended
+        if (sName.equals("ignore_table_dimensions")) {
+        	sName = "table_size";
+        	if (sValue.equals("true")) { sValue="none"; }
+        	else { sValue="absolute"; }
+        }
         super.setOption(sName, sValue);
     }
  
@@ -76,11 +82,11 @@ public class XhtmlConfig extends writer2latex.base.ConfigBase {
     public static final int CSS1_HACK = 1;
     public static final int HARD_LABELS = 2;
     
-    // Image dimensions
+    // Image and table dimensions
     public static final int NONE = 0;
     public static final int ABSOLUTE = 1;
     public static final int RELATIVE = 2;
-
+    
     // Formulas (for XHTML 1.0 strict)
     public static final int STARMATH = 0;
     public static final int LATEX = 1;
@@ -112,7 +118,7 @@ public class XhtmlConfig extends writer2latex.base.ConfigBase {
     private static final int FRAME_FORMATTING = 15;
     private static final int SECTION_FORMATTING = 16;
     private static final int TABLE_FORMATTING = 17;
-    private static final int IGNORE_TABLE_DIMENSIONS = 18;
+    private static final int TABLE_SIZE = 18;
     private static final int LIST_FORMATTING = 19;
     private static final int USE_DEFAULT_FONT = 20;
     private static final int DEFAULT_FONT_NAME = 21;
@@ -189,7 +195,14 @@ public class XhtmlConfig extends writer2latex.base.ConfigBase {
         options[FRAME_FORMATTING] = new XhtmlFormatOption("frame_formatting","convert_all");
         options[SECTION_FORMATTING] = new XhtmlFormatOption("section_formatting","convert_all");
         options[TABLE_FORMATTING] = new XhtmlFormatOption("table_formatting","convert_all");
-        options[IGNORE_TABLE_DIMENSIONS] = new BooleanOption("ignore_table_dimensions","false");
+        options[TABLE_SIZE] = new IntegerOption("table_size","auto") {
+        	@Override public void setString(String sValue) {
+        		super.setString(sValue);
+        		if ("relative".equals(sValue)) { nValue = RELATIVE; }
+        		else if ("none".equals(sValue)) { nValue = NONE; }
+        		else { nValue = ABSOLUTE; }
+        	}
+        };
         options[LIST_FORMATTING] = new IntegerOption("list_formatting","css1") {
         	@Override public void setString(String sValue) {
         		super.setString(sValue);
@@ -365,7 +378,7 @@ public class XhtmlConfig extends writer2latex.base.ConfigBase {
     public int xhtmlFrameFormatting() { return ((XhtmlFormatOption) options[FRAME_FORMATTING]).getValue(); }
     public int xhtmlSectionFormatting() { return ((XhtmlFormatOption) options[SECTION_FORMATTING]).getValue(); }
     public int xhtmlTableFormatting() { return ((XhtmlFormatOption) options[TABLE_FORMATTING]).getValue(); }
-    public boolean xhtmlIgnoreTableDimensions() { return ((BooleanOption) options[IGNORE_TABLE_DIMENSIONS]).getValue(); }
+    public int tableSize() { return ((IntegerOption) options[TABLE_SIZE]).getValue(); }
     public int listFormatting() { return ((IntegerOption) options[LIST_FORMATTING]).getValue(); }
     public boolean useDefaultFont() { return ((BooleanOption) options[USE_DEFAULT_FONT]).getValue(); }
     public String defaultFontName() { return options[DEFAULT_FONT_NAME].getString(); }

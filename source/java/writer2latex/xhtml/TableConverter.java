@@ -20,7 +20,7 @@
  *
  *  All Rights Reserved.
  * 
- *  Version 1.4 (2012-03-28)
+ *  Version 1.4 (2012-04-12)
  *
  */
 
@@ -203,15 +203,15 @@ public class TableConverter extends ConverterHelper {
         // interpret column width the same way. IE excludes padding and border,
         // Mozilla (like OOo) includes them.
         // If the first row contains colspan we have to add <col> anyway
-        if (!config.xhtmlIgnoreTableDimensions()) {
-        	if (view.getRelTableWidth()!=null || bFirstRowColSpan) {
+        if (config.tableSize()!=XhtmlConfig.NONE) {
+        	if (view.getRelTableWidth()!=null || config.tableSize()==XhtmlConfig.RELATIVE || bFirstRowColSpan) {
         		Element colgroup = hnode;
         		if (converter.nType==XhtmlDocument.HTML5) {
         			// Polyglot HTML5 documents must use an explicit colgroup
         			colgroup = converter.createElement("colgroup");
         			hnode.appendChild(colgroup);
         		}
-        		if (view.getRelTableWidth()!=null) {
+        		if (view.getRelTableWidth()!=null || config.tableSize()==XhtmlConfig.RELATIVE) {
         			for (int nCol=0; nCol<nColCount; nCol++) {
         				Element col = converter.createElement("col");
         				colgroup.appendChild(col);
@@ -335,7 +335,7 @@ public class TableConverter extends ConverterHelper {
         StyleInfo info = new StyleInfo();
         getTableSc().applyStyle(sStyleName,info);
 
-        if (!config.xhtmlIgnoreTableDimensions()) {
+        if (config.tableSize()!=XhtmlConfig.NONE) {
             StyleWithProperties style = ofr.getTableStyle(sStyleName);
             if (style!=null) {
                 // Set table width
@@ -346,7 +346,14 @@ public class TableConverter extends ConverterHelper {
                 else {
                     sWidth = style.getProperty(XMLString.STYLE_WIDTH);
                     if (sWidth!=null) {
-                        info.props.addValue("width",getTableSc().colScale(sWidth));
+                        if (config.tableSize()==XhtmlConfig.RELATIVE){
+                        	// Force relative width
+                        	sWidth=Misc.divide(sWidth, converter.getContentWidth(), true);
+                        	info.props.addValue("width",sWidth);
+                        }
+                        else {
+                        	info.props.addValue("width",getTableSc().colScale(sWidth));
+                        }
                     }
                 }
             }
@@ -376,7 +383,7 @@ public class TableConverter extends ConverterHelper {
         StyleInfo info = new StyleInfo();
         getRowSc().applyStyle(sStyleName,info);
 
-        if (!config.xhtmlIgnoreTableDimensions()) {
+        if (config.tableSize()!=XhtmlConfig.NONE) {
             StyleWithProperties style = ofr.getRowStyle(sStyleName);
             if (style!=null) {
                 // Translates row style properties
@@ -399,7 +406,7 @@ public class TableConverter extends ConverterHelper {
 
         StyleWithProperties style = ofr.getCellStyle(sStyleName);
         if (style!=null) {
-            if (!config.xhtmlIgnoreTableDimensions() && !bIsRelative) {
+            if (config.tableSize()==XhtmlConfig.ABSOLUTE && !bIsRelative) {
                 String sEdge = "0";
     
                 // Set the cell width. This is calculated as
