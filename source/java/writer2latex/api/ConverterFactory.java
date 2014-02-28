@@ -32,8 +32,8 @@ package writer2latex.api;
 public class ConverterFactory {
 
     // Version information
-    private static final String VERSION = "1.2";
-    private static final String DATE = "2012-04-04";
+    private static final String VERSION = "1.2.1";
+    private static final String DATE = "2014-03-01";
 	
     /** Return the Writer2LaTeX version in the form
      *  (major version).(minor version).(patch level)<br/>
