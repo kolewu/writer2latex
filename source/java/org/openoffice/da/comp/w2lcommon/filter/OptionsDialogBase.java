@@ -33,7 +33,7 @@ import com.sun.star.beans.PropertyValue;
 import com.sun.star.beans.XPropertyAccess;
 import com.sun.star.beans.XPropertySet;
 import com.sun.star.container.XNameAccess;
-import com.sun.star.document.XDocumentInfoSupplier;
+import com.sun.star.document.XDocumentPropertiesSupplier;
 import com.sun.star.frame.XDesktop;
 import com.sun.star.lang.XComponent;
 import com.sun.star.lang.XMultiServiceFactory;
@@ -179,13 +179,9 @@ public abstract class OptionsDialogBase extends DialogBase implements
             XComponent xComponent = xDesktop.getCurrentComponent();
 			
             // Get the document info property set
-            XDocumentInfoSupplier xDocInfoSuppl = (XDocumentInfoSupplier)
-                UnoRuntime.queryInterface(XDocumentInfoSupplier.class, xComponent);
-            Object docInfo = xDocInfoSuppl.getDocumentInfo();
-            XPropertySet xDocInfo = (XPropertySet)
-                UnoRuntime.queryInterface(XPropertySet.class, docInfo);
-
-            return XPropertySetHelper.getPropertyValueAsString(xDocInfo,"Template");
+            XDocumentPropertiesSupplier xDocPropsSuppl =
+                UnoRuntime.queryInterface(XDocumentPropertiesSupplier.class, xComponent);
+            return xDocPropsSuppl.getDocumentProperties().getTemplateName();
         }
         catch (Exception e) {
             return "";

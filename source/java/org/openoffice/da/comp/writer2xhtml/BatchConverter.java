@@ -35,8 +35,8 @@ import com.sun.star.lib.uno.adapter.XInputStreamToInputStreamAdapter;
 import com.sun.star.lib.uno.adapter.XOutputStreamToOutputStreamAdapter;
 import com.sun.star.beans.PropertyValue;
 import com.sun.star.beans.UnknownPropertyException;
-import com.sun.star.beans.XPropertySet;
-import com.sun.star.document.XDocumentInfoSupplier;
+import com.sun.star.document.XDocumentProperties;
+import com.sun.star.document.XDocumentPropertiesSupplier;
 import com.sun.star.frame.XComponentLoader;
 import com.sun.star.frame.XStorable;
 import com.sun.star.io.NotConnectedException;
@@ -367,32 +367,14 @@ public class BatchConverter implements
         }
         
         // Get the title and the description of the document
-        XDocumentInfoSupplier docInfo = (XDocumentInfoSupplier) UnoRuntime.queryInterface(XDocumentInfoSupplier.class, xDocument);
-        XPropertySet infoProps = (XPropertySet) UnoRuntime.queryInterface(XPropertySet.class, docInfo.getDocumentInfo());
-        if (infoProps!=null) {
-            try {
-            	Object loadedTitle = infoProps.getPropertyValue("Title");
-            	if (AnyConverter.isString(loadedTitle)) {
-            		String sLoadedTitle = AnyConverter.toString(loadedTitle);
-            		if (bUseTitle && sLoadedTitle.length()>0) {
-            			entry.setDisplayName(sLoadedTitle);
-            		}
-            	}
-
-            	Object loadedDescription = infoProps.getPropertyValue("Description");
-            	if (AnyConverter.isString(loadedDescription)) {
-            		String sLoadedDescription = AnyConverter.toString(loadedDescription);
-            		if (bUseDescription && sLoadedDescription.length()>0) {
-            			entry.setDescription(sLoadedDescription);
-            		}
-            	}
-            }
-            catch (UnknownPropertyException e) {
-            }
-            catch (WrappedTargetException e) {
-            }
-            catch (com.sun.star.lang.IllegalArgumentException e) {
-            }
+        XDocumentProperties docProps = UnoRuntime.queryInterface(XDocumentPropertiesSupplier.class, xDocument).getDocumentProperties();
+        String loadedTitle = docProps.getTitle();
+        if (bUseTitle && loadedTitle.length()>0) {
+            entry.setDisplayName(loadedTitle);
+        }
+        String loadedDescription = docProps.getDescription();
+        if (bUseDescription && loadedDescription.length()>0) {
+            entry.setDescription(loadedDescription);
         }
 
         // Determine the type of the component
